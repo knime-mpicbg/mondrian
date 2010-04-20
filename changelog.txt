@@ -1,0 +1,5 @@
+
+
+v1.2 (not yet released)
+- restructured code-base
+- git-repository
