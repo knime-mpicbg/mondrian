@@ -1,5 +1,9 @@
 package org.rosuda.mondrian;
 
+import org.rosuda.mondrian.core.InteractionSet;
+import org.rosuda.mondrian.core.Selection;
+import org.rosuda.mondrian.io.db.Query;
+
 import java.lang.Cloneable;
 import java.lang.Exception;
 import java.lang.Object;
@@ -25,13 +29,13 @@ public class Table implements Cloneable {
     public double p;
     public int[] initialVars;
     public int[][] Ids;
-    public dataSet data;
+    public DataSet data;
     public int count;        // == -1 if the tables needs to be "breaked down", the weighting variabe otherwise
     public Query initialQuery;    // The query which was used to set up the table ...
     public String lastQuery;    // The query which last issued to get the selected items ...
 
 
-    public Table(String name, double[] table, int k, int[] levels, String[] names, String[][] lnames, int[] initialVars, int[][] Ids, dataSet data, int count) {
+    public Table(String name, double[] table, int k, int[] levels, String[] names, String[][] lnames, int[] initialVars, int[][] Ids, DataSet data, int count) {
         this.name = name;
         this.table = table;
         this.k = k;
@@ -364,12 +368,12 @@ public class Table implements Cloneable {
                         while (rs.next()) {
                             int index = 0;
                             for (int j = 0; j < initialVars.length; j++) {
-//System.out.println((rs.getString(j+1)+" -> "+((dataSet.Variable)data.data.elementAt(initialVars[j])).isLevel((rs.getString(j+1)).trim())));
+//System.out.println((rs.getString(j+1)+" -> "+((Variable)data.data.elementAt(initialVars[j])).isLevel((rs.getString(j+1)).trim())));
                                 if (initialQuery.getItems().indexOf("category42") == -1) {  // classical Table
                                     String tmp = rs.getString(j + 1);
                                     if (tmp == null)
                                         tmp = "NA";
-                                    index += plevels[j] * ((dataSet.Variable) data.data.elementAt(initialVars[j])).Level((tmp).trim());
+                                    index += plevels[j] * ((Variable) data.data.elementAt(initialVars[j])).Level((tmp).trim());
                                 } else // table for histogram !!!
                                     for (int i = 0; i < table.length; i++) {
 //System.out.println(lnames[0][i]+" <-> "+rs.getString(j+1).trim());

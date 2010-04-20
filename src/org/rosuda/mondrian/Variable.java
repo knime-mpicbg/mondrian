@@ -1,5 +1,8 @@
 package org.rosuda.mondrian;
 
+import org.rosuda.mondrian.util.Qsort;
+import org.rosuda.mondrian.util.Util;
+
 import java.sql.ResultSet;
 import java.sql.Statement;
 

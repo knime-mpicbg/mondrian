@@ -8,10 +8,12 @@ package org.rosuda.mondrian;// Fuck? HŠŠŠh??
 //  Copyright (c) 2003 __MyCompanyName__. All rights reserved.
 //
 
+import org.rosuda.mondrian.core.DragBox;
+import org.rosuda.mondrian.util.Util;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.JColorChooser;
-import javax.swing.JFrame;
 import java.util.prefs.*;		 // for preferences
 
 public class PreferencesFrame extends Frame implements WindowListener, MouseListener, ActionListener, ItemListener {

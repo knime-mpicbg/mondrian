@@ -1,4 +1,4 @@
-package org.rosuda.mondrian;
+package org.rosuda.mondrian.core;
 
 public interface SelectionListener {
 

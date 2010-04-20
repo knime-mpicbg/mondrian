@@ -1,11 +1,11 @@
-package org.rosuda.mondrian;
+package org.rosuda.mondrian.core;
 
-import org.rosuda.mondrian.DragBox;
+import org.rosuda.mondrian.core.DragBox;
 
 import java.awt.*;         // New event model.
 
 
-class DataEvent extends AWTEvent {
+public class DataEvent extends AWTEvent {
 
     public DataEvent(DragBox b) {
         super(b, DATA_EVENT);

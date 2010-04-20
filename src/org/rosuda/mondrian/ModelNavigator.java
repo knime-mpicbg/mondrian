@@ -1,6 +1,9 @@
 package org.rosuda.mondrian;
 
-import com.sun.tools.javac.util.Name;
+import org.rosuda.mondrian.core.ModelListener;
+import org.rosuda.mondrian.core.SelectionEvent;
+import org.rosuda.mondrian.plots.Mosaic;
+import org.rosuda.mondrian.util.Util;
 
 import javax.swing.*;
 import java.awt.*;

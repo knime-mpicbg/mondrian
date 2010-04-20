@@ -1,4 +1,11 @@
-package org.rosuda.mondrian;
+package org.rosuda.mondrian.plots;
+
+import org.rosuda.mondrian.*;
+import org.rosuda.mondrian.core.*;
+import org.rosuda.mondrian.io.db.Query;
+import org.rosuda.mondrian.plots.basic.MyRect;
+import org.rosuda.mondrian.plots.basic.MyText;
+import org.rosuda.mondrian.util.Util;
 
 import javax.swing.*;
 import java.awt.*;
@@ -7,6 +14,11 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 
 
+/**
+ * Document me!
+ *
+ * @author Holger Brandl
+ */
 public class Mosaic extends DragBox implements ActionListener {
 
     private Vector rects = new Vector(256, 256);  // Store the tiles.
@@ -876,7 +888,7 @@ public class Mosaic extends DragBox implements ActionListener {
         // start the recursion ////////////
         createMosaic(0, 0, startTable, x1, y1, Math.max(x2 - subX, 1), Math.max(y2 - subY, 1), info);
 
-        // Create labels for the first 2 dimensions 
+        // Create labels for the first 2 dimensions
         int pF = 1;
         if (printing)
             pF = printFactor;

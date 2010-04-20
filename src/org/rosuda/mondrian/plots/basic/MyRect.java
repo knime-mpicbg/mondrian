@@ -1,5 +1,11 @@
-package org.rosuda.mondrian;
+package org.rosuda.mondrian.plots.basic;
 
+
+import org.rosuda.mondrian.MFrame;
+import org.rosuda.mondrian.Stat;
+import org.rosuda.mondrian.Table;
+import org.rosuda.mondrian.core.DragBox;
+import org.rosuda.mondrian.util.Util;
 
 import javax.swing.*;
 import java.awt.*;

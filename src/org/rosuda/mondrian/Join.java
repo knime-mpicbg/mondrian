@@ -17,6 +17,15 @@ package org.rosuda.mondrian;// Please use this software or at least parts of it 
 import com.apple.mrj.*;
 import org.rosuda.REngine.*;
 import org.rosuda.REngine.Rserve.*;
+import org.rosuda.mondrian.core.DataListener;
+import org.rosuda.mondrian.core.DragBox;
+import org.rosuda.mondrian.core.Selection;
+import org.rosuda.mondrian.core.SelectionListener;
+import org.rosuda.mondrian.io.ProgressIndicator;
+import org.rosuda.mondrian.io.db.Query;
+import org.rosuda.mondrian.plots.*;
+import org.rosuda.mondrian.plots.basic.MyPoly;
+import org.rosuda.mondrian.util.Util;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -41,7 +50,7 @@ import java.util.prefs.Preferences;
 /**
  */
 
-class Join extends JFrame implements ProgressIndicator, SelectionListener, DataListener, MRJQuitHandler, MRJOpenDocumentHandler {
+public class Join extends JFrame implements ProgressIndicator, SelectionListener, DataListener, MRJQuitHandler, MRJOpenDocumentHandler {
 
     /**
      * Remember # of open windows so we can quit when last one is closed
@@ -714,8 +723,8 @@ class Join extends JFrame implements ProgressIndicator, SelectionListener, DataL
 
         if (dataSets.isEmpty())
             graphicsPerf = setGraphicsPerformance();
-        else if (((dataSet) dataSets.firstElement()).graphicsPerf != 0)
-            graphicsPerf = ((dataSet) dataSets.firstElement()).graphicsPerf;
+        else if (((DataSet) dataSets.firstElement()).graphicsPerf != 0)
+            graphicsPerf = ((DataSet) dataSets.firstElement()).graphicsPerf;
         else
             graphicsPerf = 25000;
 
@@ -749,7 +758,7 @@ class Join extends JFrame implements ProgressIndicator, SelectionListener, DataL
      *
      * @param data dataset to open
      */
-    public Join(dataSet data) {
+    public Join(DataSet data) {
         this((Mondrians == null) ? new Vector(5, 5) : Mondrians, (dataSets == null) ? new Vector(5, 5) : dataSets, false, false, null);
         initWithData(data);
     }
@@ -760,18 +769,18 @@ class Join extends JFrame implements ProgressIndicator, SelectionListener, DataL
      *
      * @param data dataset to use
      */
-    public void initWithData(dataSet data) {
+    public void initWithData(DataSet data) {
         dataSets.addElement(data);
         thisDataSet = dataSets.size() - 1;
         selectBuffer = new int[data.k + 15];
         setVarList();
-        this.setTitle("Mondrian(" + ((dataSet) dataSets.elementAt(thisDataSet)).setName + ")");               //
+        this.setTitle("Mondrian(" + ((DataSet) dataSets.elementAt(thisDataSet)).setName + ")");               //
         me.setText(this.getTitle());
         c.setEnabled(true);
         s.setEnabled(true);
 
-        int nom = ((dataSet) dataSets.elementAt(thisDataSet)).countSelection();
-        int denom = ((dataSet) dataSets.elementAt(thisDataSet)).n;
+        int nom = ((DataSet) dataSets.elementAt(thisDataSet)).countSelection();
+        int denom = ((DataSet) dataSets.elementAt(thisDataSet)).n;
         String Display = nom + "/" + denom + " (" + Stat.roundToString(100 * nom / denom, 2) + "%)";
         progText.setText(Display);
         progBar.setValue(nom);
@@ -842,14 +851,14 @@ class Join extends JFrame implements ProgressIndicator, SelectionListener, DataL
             return;
         }
 
-        String message = "Close dataset \"" + ((dataSet) dataSets.elementAt(thisDataSet)).setName + "\" and\n all corresponding plots?";
+        String message = "Close dataset \"" + ((DataSet) dataSets.elementAt(thisDataSet)).setName + "\" and\n all corresponding plots?";
 
         int answer = JOptionPane.showConfirmDialog(this, message);
         if (answer == JOptionPane.YES_OPTION) {
             num_windows--;
             for (int i = Plots.size() - 1; i >= 0; i--)
                 ((MFrame) ((DragBox) Plots.elementAt(i)).frame).close();
-            dataSets.setElementAt(new dataSet("nullinger"), thisDataSet);
+            dataSets.setElementAt(new DataSet("nullinger"), thisDataSet);
             this.dispose();
             if (num_windows == 0) {
                 new Join(Mondrians, dataSets, false, false, null);
@@ -919,7 +928,7 @@ class Join extends JFrame implements ProgressIndicator, SelectionListener, DataL
 
         System.out.println("Transform: " + mode);
         String name = "";
-        dataSet data = ((dataSet) dataSets.elementAt(thisDataSet));
+        DataSet data = ((DataSet) dataSets.elementAt(thisDataSet));
 
         double[] tData = new double[data.n];
         boolean[] tMiss = new boolean[data.n];
@@ -1011,7 +1020,7 @@ class Join extends JFrame implements ProgressIndicator, SelectionListener, DataL
 
 
     public void switchSelection() {
-        if (thisDataSet > -1 && ((dataSet) dataSets.elementAt(thisDataSet)).isDB)
+        if (thisDataSet > -1 && ((DataSet) dataSets.elementAt(thisDataSet)).isDB)
             selseq = true;
         else {
             selseq = se.isSelected();
@@ -1030,7 +1039,7 @@ class Join extends JFrame implements ProgressIndicator, SelectionListener, DataL
 
     public void selectAll() {
         if (thisDataSet > -1) {
-            ((dataSet) dataSets.elementAt(thisDataSet)).selectAll();
+            ((DataSet) dataSets.elementAt(thisDataSet)).selectAll();
             updateSelection();
         }
     }
@@ -1038,7 +1047,7 @@ class Join extends JFrame implements ProgressIndicator, SelectionListener, DataL
 
     public void toggleSelection() {
         if (thisDataSet > -1) {
-            ((dataSet) dataSets.elementAt(thisDataSet)).toggleSelection();
+            ((DataSet) dataSets.elementAt(thisDataSet)).toggleSelection();
             updateSelection();
         }
     }
@@ -1046,7 +1055,7 @@ class Join extends JFrame implements ProgressIndicator, SelectionListener, DataL
 
     public void clearColors() {
         if (thisDataSet > -1) {
-            ((dataSet) dataSets.elementAt(thisDataSet)).colorsOff();
+            ((DataSet) dataSets.elementAt(thisDataSet)).colorsOff();
             dataChanged(-1);
         }
     }
@@ -1062,7 +1071,7 @@ class Join extends JFrame implements ProgressIndicator, SelectionListener, DataL
     public void deriveVariable(boolean color) {
 
         String name;
-        dataSet data = ((dataSet) dataSets.elementAt(thisDataSet));
+        DataSet data = ((DataSet) dataSets.elementAt(thisDataSet));
         if (color)
             name = "Colors " + dCol++;
         else
@@ -1195,7 +1204,7 @@ class Join extends JFrame implements ProgressIndicator, SelectionListener, DataL
                 }
             }
             sqlConditions = new Query();                // Replace ???
-            if (((dataSet) dataSets.elementAt(thisDataSet)).isDB)
+            if (((DataSet) dataSets.elementAt(thisDataSet)).isDB)
                 for (int i = 0; i < selList.size(); i++) {
                     Selection S = ((Selection) selList.elementAt(i));
                     if (S.mode == S.MODE_STANDARD)
@@ -1205,22 +1214,22 @@ class Join extends JFrame implements ProgressIndicator, SelectionListener, DataL
                         sqlConditions.addCondition(S.getSQLModeString(S.mode), "(" + condStr + ")");
                 }
             ;
-            ((dataSet) (dataSets.elementAt(thisDataSet))).sqlConditions = sqlConditions;
+            ((DataSet) (dataSets.elementAt(thisDataSet))).sqlConditions = sqlConditions;
 
             //      System.out.println("Main Update: "+sqlConditions.makeQuery());
 
         } else {
             if (toggleSelection) {
                 System.out.println(" TOGGLE SELECTION ... ");
-                ((dataSet) (dataSets.elementAt(thisDataSet))).toggleSelection();
+                ((DataSet) (dataSets.elementAt(thisDataSet))).toggleSelection();
             } else if (unSelect) {
                 System.out.println(" UNSELECT ... ");
-                ((dataSet) (dataSets.elementAt(thisDataSet))).clearSelection();
+                ((DataSet) (dataSets.elementAt(thisDataSet))).clearSelection();
             } else {
                 System.out.println(" SELECT ALL ... ");
-                ((dataSet) (dataSets.elementAt(thisDataSet))).selectAll();
+                ((DataSet) (dataSets.elementAt(thisDataSet))).selectAll();
             }
-            if (((dataSet) dataSets.elementAt(thisDataSet)).isDB)
+            if (((DataSet) dataSets.elementAt(thisDataSet)).isDB)
                 sqlConditions.clearConditions();
         }
 
@@ -1232,9 +1241,9 @@ class Join extends JFrame implements ProgressIndicator, SelectionListener, DataL
             ((DragBox) Plots.elementAt(i)).updateSelection();
         }
 
-        ((dataSet) dataSets.elementAt(thisDataSet)).selChanged = true;
-        int nom = ((dataSet) dataSets.elementAt(thisDataSet)).countSelection();
-        int denom = ((dataSet) dataSets.elementAt(thisDataSet)).n;
+        ((DataSet) dataSets.elementAt(thisDataSet)).selChanged = true;
+        int nom = ((DataSet) dataSets.elementAt(thisDataSet)).countSelection();
+        int denom = ((DataSet) dataSets.elementAt(thisDataSet)).n;
         String Display = nom + "/" + denom + " (" + Stat.roundToString(100F * nom / denom, 2) + "%)";
         progText.setText(Display);
         progBar.setValue(nom);
@@ -1261,7 +1270,7 @@ class Join extends JFrame implements ProgressIndicator, SelectionListener, DataL
             int col = ((DragBox) Plots.elementAt(i)).colorSet;
             if (col > -1) {
                 ((DragBox) Plots.elementAt(i)).colorSet = -1;
-                dataSet data = ((dataSet) dataSets.elementAt(thisDataSet));
+                DataSet data = ((DataSet) dataSets.elementAt(thisDataSet));
                 id = -1;
                 if (col < 999) {
                     System.out.println("Setting Colors !!!!");
@@ -1302,14 +1311,14 @@ class Join extends JFrame implements ProgressIndicator, SelectionListener, DataL
 
     public boolean saveDataSet(String file, boolean selection) {
         try {
-            int k = ((dataSet) dataSets.elementAt(thisDataSet)).k;
-            int n = ((dataSet) dataSets.elementAt(thisDataSet)).n;
+            int k = ((DataSet) dataSets.elementAt(thisDataSet)).k;
+            int n = ((DataSet) dataSets.elementAt(thisDataSet)).n;
 
             FileWriter fw = new FileWriter(file);
 
             double[][] dataCopy = new double[k][n];
             boolean[][] missing = new boolean[k][n];
-            dataSet data = ((dataSet) dataSets.elementAt(thisDataSet));
+            DataSet data = ((DataSet) dataSets.elementAt(thisDataSet));
             double[] selected = data.getSelection();
             for (int j = 0; j < k; j++) {
                 missing[j] = data.getMissings(j);
@@ -1369,15 +1378,15 @@ class Join extends JFrame implements ProgressIndicator, SelectionListener, DataL
             if (loadAsciiFile(file)) {
                 setVarList();
                 if (title.equals(""))
-                    this.setTitle("Mondrian(" + ((dataSet) dataSets.elementAt(thisDataSet)).setName + ")");               //
+                    this.setTitle("Mondrian(" + ((DataSet) dataSets.elementAt(thisDataSet)).setName + ")");               //
                 else
                     this.setTitle("Mondrian(" + title + ")");
                 me.setText(this.getTitle());
                 c.setEnabled(true);
                 s.setEnabled(true);
 
-                int nom = ((dataSet) dataSets.elementAt(thisDataSet)).countSelection();
-                int denom = ((dataSet) dataSets.elementAt(thisDataSet)).n;
+                int nom = ((DataSet) dataSets.elementAt(thisDataSet)).countSelection();
+                int denom = ((DataSet) dataSets.elementAt(thisDataSet)).n;
                 String Display = nom + "/" + denom + " (" + Stat.roundToString(100 * nom / denom, 2) + "%)";
                 progText.setText(Display);
                 progBar.setValue(nom);
@@ -1389,7 +1398,7 @@ class Join extends JFrame implements ProgressIndicator, SelectionListener, DataL
             new Join(Mondrians, dataSets, true, isDB, file);
         }
         if (thisDataSet != -1)
-            ((dataSet) dataSets.elementAt(thisDataSet)).graphicsPerf = graphicsPerf;
+            ((DataSet) dataSets.elementAt(thisDataSet)).graphicsPerf = graphicsPerf;
     }
 
 
@@ -1564,7 +1573,7 @@ class Join extends JFrame implements ProgressIndicator, SelectionListener, DataL
         }
         if (thisDataSet == -1)
             thisDataSet = dataSets.size() - 1;
-        final dataSet data = (dataSet) dataSets.elementAt(thisDataSet);
+        final DataSet data = (DataSet) dataSets.elementAt(thisDataSet);
         String listNames[] = new String[data.k];
         for (int j = 0; j < data.k; j++) {
             listNames[j] = " " + data.getName(j);
@@ -1890,7 +1899,7 @@ class Join extends JFrame implements ProgressIndicator, SelectionListener, DataL
 
 
                 public void actionPerformed(ActionEvent e) {
-                    dataSet data = new dataSet(d, con, DBList.getSelectedItem(), tableList.getSelectedItem());
+                    DataSet data = new DataSet(d, con, DBList.getSelectedItem(), tableList.getSelectedItem());
                     dataSets.addElement(data);
                     setVarList();
                     DBFrame.dispose();
@@ -1906,7 +1915,7 @@ class Join extends JFrame implements ProgressIndicator, SelectionListener, DataL
     boolean loadAsciiFile(File file) {
 
         boolean[] alpha;
-        dataSet data;
+        DataSet data;
         String filename = "";
         String path = "";
 
@@ -1954,7 +1963,7 @@ class Join extends JFrame implements ProgressIndicator, SelectionListener, DataL
             if (true) {                                          // new reader
                 progBar.setMinimum(0);
                 progBar.setMaximum(100);
-                data = new dataSet(justFile);
+                data = new DataSet(justFile);
                 dataSets.addElement(data);
                 progText.setText("Loading ...");
 
@@ -2038,7 +2047,7 @@ class Join extends JFrame implements ProgressIndicator, SelectionListener, DataL
             } else {                                               // old reader
                 try {
                     BufferedReader br = new BufferedReader(new FileReader(filename));
-                    data = new dataSet(justFile);
+                    data = new DataSet(justFile);
                     dataSets.addElement(data);
                     progText.setText("Peeking ...");
                     alpha = data.sniff(br);
@@ -2140,7 +2149,7 @@ public void handleQuit(ApplicationEvent event) {}
 public void handlePrintFile(ApplicationEvent event) {} */
 
 
-    public int[] getWeightVariable(int[] vars, dataSet data) {
+    public int[] getWeightVariable(int[] vars, DataSet data) {
 
         if (numCategorical == (vars).length - 1) {
             int[] returner = new int[vars.length];
@@ -2236,7 +2245,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
         checkHistoryBuffer();
 
         int p = (varNames.getSelectedIndices()).length;
-        dataSet tempData = ((dataSet) dataSets.elementAt(thisDataSet));
+        DataSet tempData = ((DataSet) dataSets.elementAt(thisDataSet));
         final MFrame scatterMf = new MFrame(this);
         int dims = Math.min(200 * p, (Toolkit.getDefaultToolkit().getScreenSize()).height);
         scatterMf.setSize(dims - 20, dims);
@@ -2256,7 +2265,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
                     tmpVars[0] = selectBuffer[p - j - 1];
                     tmpVars[1] = selectBuffer[p - i - 1];
                     //
-                    Scatter2D scat = new Scatter2D(scatterMf, 200, 200, (dataSet) dataSets.elementAt(thisDataSet), tmpVars, varNames, true);
+                    Scatter2D scat = new Scatter2D(scatterMf, 200, 200, (DataSet) dataSets.elementAt(thisDataSet), tmpVars, varNames, true);
                     scat.addSelectionListener(this);
                     scat.addDataListener(this);
                     Plots.addElement(scat);
@@ -2288,14 +2297,14 @@ public void handlePrintFile(ApplicationEvent event) {} */
         int[] passTmpBuffer = new int[k];
         int count = 0;
         for (int i = 0; i < k; i++) {
-            if (((dataSet) dataSets.elementAt(thisDataSet)).getNumMissings(selectBuffer[k - i - 1]) < ((dataSet) dataSets.elementAt(thisDataSet)).n)  // make sure not all data is missing
+            if (((DataSet) dataSets.elementAt(thisDataSet)).getNumMissings(selectBuffer[k - i - 1]) < ((DataSet) dataSets.elementAt(thisDataSet)).n)  // make sure not all data is missing
                 passTmpBuffer[count++] = selectBuffer[k - i - 1];
         }
         int[] passBuffer = new int[count];
         for (int i = 0; i < count; i++)
             passBuffer[i] = passTmpBuffer[i];
 
-        PC plotw = new PC(pC, (dataSet) dataSets.elementAt(thisDataSet), passBuffer, mode, varNames);
+        PC plotw = new PC(pC, (DataSet) dataSets.elementAt(thisDataSet), passBuffer, mode, varNames);
         plotw.addSelectionListener(this);
         plotw.addDataListener(this);
         Plots.addElement(plotw);
@@ -2310,12 +2319,12 @@ public void handlePrintFile(ApplicationEvent event) {} */
         final MFrame mV = new MFrame(this);
         int k = 0;
         for (int i = 0; i < (varNames.getSelectedIndices()).length; i++)
-            if (((dataSet) dataSets.elementAt(thisDataSet)).n > ((dataSet) dataSets.elementAt(thisDataSet)).getN((varNames.getSelectedIndices())[i]))
+            if (((DataSet) dataSets.elementAt(thisDataSet)).n > ((DataSet) dataSets.elementAt(thisDataSet)).getN((varNames.getSelectedIndices())[i]))
                 k++;
         int[] passVars = new int[k];
         int kk = 0;
         for (int i = 0; i < (varNames.getSelectedIndices()).length; i++)
-            if (((dataSet) dataSets.elementAt(thisDataSet)).n > ((dataSet) dataSets.elementAt(thisDataSet)).getN(selectBuffer[i]))
+            if (((DataSet) dataSets.elementAt(thisDataSet)).n > ((DataSet) dataSets.elementAt(thisDataSet)).getN(selectBuffer[i]))
                 passVars[k - 1 - kk++] = selectBuffer[i]; //(varNames.getSelectedIndices())[i];
 
         if (k > 0) {
@@ -2330,7 +2339,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
             mV.setSize(300, Math.min(tmpHeight, (Toolkit.getDefaultToolkit().getScreenSize()).height - 30));
             mV.setLocation(150, 150);
 
-            final MissPlot plotw = new MissPlot(mV, (dataSet) dataSets.elementAt(thisDataSet), passVars);
+            final MissPlot plotw = new MissPlot(mV, (DataSet) dataSets.elementAt(thisDataSet), passVars);
             plotw.setScrollX();
             plotw.addSelectionListener(this);
             plotw.addDataListener(this);
@@ -2347,7 +2356,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
         final MFrame mondrian = new MFrame(this);
         mondrian.setSize(400, 400);
 
-        dataSet data = (dataSet) dataSets.elementAt(thisDataSet);
+        DataSet data = (DataSet) dataSets.elementAt(thisDataSet);
 
         int k = (varNames.getSelectedIndices()).length;
         int[] passBuffer = new int[k];
@@ -2384,7 +2393,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
         final MFrame mondrian = new MFrame(this);
         mondrian.setSize(400, 400);
 
-        dataSet tempData = ((dataSet) dataSets.elementAt(thisDataSet));
+        DataSet tempData = ((DataSet) dataSets.elementAt(thisDataSet));
 
         int k = (varNames.getSelectedIndices()).length;
         int[] passBuffer = new int[k];
@@ -2420,7 +2429,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
     public void barChart() {
 
-        dataSet tempData = ((dataSet) dataSets.elementAt(thisDataSet));
+        DataSet tempData = ((DataSet) dataSets.elementAt(thisDataSet));
 
         int[] indices = varNames.getSelectedIndices();
         int lastY = 333;
@@ -2462,7 +2471,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
     public void weightedbarChart() {
 
-        dataSet tempData = ((dataSet) dataSets.elementAt(thisDataSet));
+        DataSet tempData = ((DataSet) dataSets.elementAt(thisDataSet));
 
         int[] vars = getWeightVariable(varNames.getSelectedIndices(), tempData);
         int[] passed = new int[vars.length - 1];
@@ -2507,7 +2516,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
     public void weightedHistogram() {
 
-        dataSet tempData = ((dataSet) dataSets.elementAt(thisDataSet));
+        DataSet tempData = ((DataSet) dataSets.elementAt(thisDataSet));
 
         int[] vars = getWeightVariable(varNames.getSelectedIndices(), tempData);
         if (vars.length > 1) {
@@ -2525,14 +2534,14 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
     public void histogram() {
 
-        dataSet tempData = ((dataSet) dataSets.elementAt(thisDataSet));
+        DataSet tempData = ((DataSet) dataSets.elementAt(thisDataSet));
         int[] indices = varNames.getSelectedIndices();
 
         histoCore(tempData, indices, -1);
     }
 
 
-    public void histoCore(dataSet tempData, int[] indices, int weight) {
+    public void histoCore(DataSet tempData, int[] indices, int weight) {
         int lastX = 310, oldX = 0;
         int row = 0;
         int menuOffset = 0, xOff = 0;
@@ -2579,7 +2588,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
         mapf.setSize(400, 400);
         mapf.setTitle("Map");
 
-        Map map = new Map(mapf, 400, 400, (dataSet) dataSets.elementAt(thisDataSet), polys, varNames);
+        Map map = new Map(mapf, 400, 400, (DataSet) dataSets.elementAt(thisDataSet), polys, varNames);
         map.addSelectionListener(this);
         map.addDataListener(this);
         Plots.addElement(map);
@@ -2603,7 +2612,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
         int[] passBuffer = new int[2];
         passBuffer[0] = selectBuffer[1];
         passBuffer[1] = selectBuffer[0];
-        Scatter2D scat = new Scatter2D(scatterf, 400, 400, (dataSet) dataSets.elementAt(thisDataSet), passBuffer, varNames, false);
+        Scatter2D scat = new Scatter2D(scatterf, 400, 400, (DataSet) dataSets.elementAt(thisDataSet), passBuffer, varNames, false);
         scat.addSelectionListener(this);
         scat.addDataListener(this);
         Plots.addElement(scat);
@@ -2615,7 +2624,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
     public void mds() {
 
         int[] varsT = varNames.getSelectedIndices();
-        dataSet dataT = (dataSet) dataSets.elementAt(thisDataSet);
+        DataSet dataT = (DataSet) dataSets.elementAt(thisDataSet);
         try {
             RConnection c = new RConnection();
             c.voidEval("library(MASS, pos=1)");
@@ -2671,7 +2680,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
     public void pca() {
 
         int[] varsT = varNames.getSelectedIndices();
-        dataSet dataT = (dataSet) dataSets.elementAt(thisDataSet);
+        DataSet dataT = (DataSet) dataSets.elementAt(thisDataSet);
         try {
             RConnection c = new RConnection();
             String call = " ~ x1 ";
@@ -2738,7 +2747,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
     public void switchVariableMode() {
         for (int i = 0; i < varNames.getSelectedIndices().length; i++) {
             int index = (varNames.getSelectedIndices())[i];
-            dataSet data = (dataSet) dataSets.elementAt(thisDataSet);
+            DataSet data = (DataSet) dataSets.elementAt(thisDataSet);
             if (!data.alpha(index)) {
                 if (data.categorical(index))
                     data.catToNum(index);
@@ -2754,7 +2763,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
     public void getSelectedTypes() {
         numCategorical = 0;
         for (int i = 0; i < varNames.getSelectedIndices().length; i++) {
-            if (((dataSet) dataSets.elementAt(thisDataSet)).categorical(varNames.getSelectedIndices()[i]))
+            if (((DataSet) dataSets.elementAt(thisDataSet)).categorical(varNames.getSelectedIndices()[i]))
                 numCategorical++;
             else
                 weightIndex = varNames.getSelectedIndices()[i];
@@ -2915,12 +2924,12 @@ public void handlePrintFile(ApplicationEvent event) {} */
                 sc2.setEnabled(false);
                 //        sc.setEnabled(false);
         }
-        if (!((dataSet) dataSets.elementAt(thisDataSet)).hasMissings)
+        if (!((DataSet) dataSets.elementAt(thisDataSet)).hasMissings)
             mv.setEnabled(false);
 
         // Now handle transform Menue
         int alphs = 0;
-        dataSet data = ((dataSet) dataSets.elementAt(thisDataSet));
+        DataSet data = ((DataSet) dataSets.elementAt(thisDataSet));
         for (int i = 0; i < varNames.getSelectedIndices().length; i++)
             if (data.alpha(varNames.getSelectedIndices()[i]))
                 alphs++;
@@ -2973,7 +2982,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
 
     public void maintainOptionMenu() {
-        dataSet data = ((dataSet) dataSets.elementAt(thisDataSet));
+        DataSet data = ((DataSet) dataSets.elementAt(thisDataSet));
 
         // Selection
         if (data.countSelection() == 0)
@@ -3020,7 +3029,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
     class MCellRenderer extends JLabel implements ListCellRenderer {
 
-        final dataSet data = (dataSet) dataSets.elementAt(thisDataSet);
+        final DataSet data = (DataSet) dataSets.elementAt(thisDataSet);
 
         final ImageIcon alphaIcon = new ImageIcon(Util.readGif("alpha.gif"));
         final ImageIcon alphaMissIcon = new ImageIcon(Util.readGif("alpha-miss.gif"));

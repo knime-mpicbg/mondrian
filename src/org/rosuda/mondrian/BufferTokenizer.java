@@ -1,5 +1,10 @@
 package org.rosuda.mondrian;//package org.rosuda.Mondrian;
 
+import org.rosuda.mondrian.io.ProgressIndicator;
+import org.rosuda.mondrian.io.ScanException;
+import org.rosuda.mondrian.io.UnacceptableFormatException;
+import org.rosuda.mondrian.util.Util;
+
 import javax.swing.*;
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -330,7 +335,7 @@ public class BufferTokenizer {
         else if (format == "KOMMA-QUOTE-Format") SEPERATOR = KOMMA;
         else if (format == "UNKNOWN-Format") {
             System.out.println(format);
-            throw new UnacceptableFormatException();
+            throw new RuntimeException();
         }
 
         columns = amountColumns(buffer, format);

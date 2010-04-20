@@ -1,5 +1,7 @@
 package org.rosuda.mondrian;
 
+import org.rosuda.mondrian.core.DragBox;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.print.PageFormat;

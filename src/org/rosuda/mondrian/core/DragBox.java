@@ -1,8 +1,16 @@
-package org.rosuda.mondrian;
+package org.rosuda.mondrian.core;
 //
 // A drag box - for my good friend Marvin.
 //
 
+
+import org.rosuda.mondrian.*;
+import org.rosuda.mondrian.core.SelectionEvent;
+import org.rosuda.mondrian.core.DataEvent;
+import org.rosuda.mondrian.core.DataListener;
+import org.rosuda.mondrian.plots.Barchart;
+import org.rosuda.mondrian.plots.Histogram;
+import org.rosuda.mondrian.util.Util;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,13 +39,13 @@ abstract class DragBox
 
 {
 
-    static Color hiliteColor = new Color(180, 96, 135);
+   public static Color hiliteColor = new Color(180, 96, 135);
 
-    static boolean extSelMode = false;  // AND selction via <SHIFT><ALT>
+    public static boolean extSelMode = false;  // AND selction via <SHIFT><ALT>
 
-    protected Color background = Color.black;
-    protected Color dragboxcolor = Color.red;
-    protected Graphics dragboxgraphics = null;
+    public  Color background = Color.black;
+    public Color dragboxcolor = Color.red;
+    public Graphics dragboxgraphics = null;
 
     public MFrame frame;                               // The frame we are within.
     public JScrollBar sb;                             // We might need a scroll bar
@@ -152,13 +160,13 @@ abstract class DragBox
     protected int diffX;
     protected int diffY;
 
-    int border = 0;
-    int xShift = 0;
-    int yShift = 0;
+    protected int border = 0;
+    protected int xShift = 0;
+    protected int yShift = 0;
 
-    Vector Selections = new Vector(10, 0);
+    public Vector Selections = new Vector(10, 0);
 
-    Selection activeS;
+    protected Selection activeS;
 
     protected int minX = 0;
     protected int minY = 0;

@@ -1,6 +1,12 @@
 package org.rosuda.mondrian;
 
 
+import org.rosuda.mondrian.core.*;
+import org.rosuda.mondrian.plots.basic.MyRect;
+import org.rosuda.mondrian.plots.basic.MyText;
+import org.rosuda.mondrian.util.Qsort;
+import org.rosuda.mondrian.util.Util;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -30,7 +36,7 @@ public class PC extends DragBox implements ActionListener {
     protected int scaleFactor = 3;
     protected double centerAt = 0;
     private JList varList;
-    protected dataSet data;
+    protected DataSet data;
     protected double[] dMins, dIQRs, dMedians, dMeans, dSDevs, dMaxs;
     protected double[] Mins, Maxs;
     protected double[][] dataCopy;
@@ -64,7 +70,7 @@ public class PC extends DragBox implements ActionListener {
     private static EventQueue evtq;
 
 
-    public PC(MFrame frame, dataSet data, int[] vars, String mode, JList varList) {
+    public PC(MFrame frame, DataSet data, int[] vars, String mode, JList varList) {
         super(frame);
         Dimension size = frame.getSize();
         this.width = size.width;
@@ -857,7 +863,7 @@ public class PC extends DragBox implements ActionListener {
             update(this.getGraphics());
         } else if (command.equals("min") || command.equals("quar") || command.equals("sdev") || command.equals("mean") || command.equals("median") || command.equals("max") || command.equals("ini") || command.equals("rev")) {
             sortMode = command;
-            dataSet.Variable v = (dataSet.Variable) data.data.elementAt(yVar);
+            Variable v = (Variable) data.data.elementAt(yVar);
             if (command.equals("ini"))
                 if (paintMode.equals("XbyY"))
                     v.sortLevels();
@@ -1682,7 +1688,7 @@ S.o = new floatRect((double)((S.r.x - border) % slotWidth)/slotWidth,
            bPlots.removeAllElements();
            for( int j=0; j<k; j++ ) {
              int x = border+slotWidth*j;
-             bPlots.addElement(new boxPlot( j, xVar, yVar, ((dataSet.Variable)data.data.elementAt(yVar)).isLevel(lNames[j]) ,
+             bPlots.addElement(new boxPlot( j, xVar, yVar, ((Variable)data.data.elementAt(yVar)).isLevel(lNames[j]) ,
                                             x, slotWidth/2, border, height-border));
            }
          }

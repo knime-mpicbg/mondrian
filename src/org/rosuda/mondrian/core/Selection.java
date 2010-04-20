@@ -1,4 +1,7 @@
-package org.rosuda.mondrian;
+package org.rosuda.mondrian.core;
+
+import org.rosuda.mondrian.core.DragBox;
+import org.rosuda.mondrian.io.db.Query;
 
 import java.awt.*;               //
 
@@ -20,8 +23,8 @@ public class Selection {
     public int total;
     public int mode;
     public int status = VALID;
-    DragBox d;
-    String modeString;
+    public DragBox d;
+    public String modeString;
     public Query condition = new Query();        // Query to store the part of the WHERE clause generated
 
 

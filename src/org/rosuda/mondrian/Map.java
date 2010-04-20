@@ -2,6 +2,10 @@ package org.rosuda.mondrian;
 
 import org.rosuda.REngine.*;
 import org.rosuda.REngine.Rserve.*;
+import org.rosuda.mondrian.core.DragBox;
+import org.rosuda.mondrian.core.Selection;
+import org.rosuda.mondrian.plots.basic.MyPoly;
+import org.rosuda.mondrian.util.Util;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,7 +28,7 @@ public class Map extends DragBox {
     public double ratio;
     private int shiftx, shifty;
     private double scalex, scaley;
-    private dataSet data;
+    private DataSet data;
     private int borderAlpha = 5;
     private int[] alphas = {0, 10, 20, 40, 70, 100};
 
@@ -54,7 +58,7 @@ public class Map extends DragBox {
     /**
      * This constructor requires a Frame and a desired size
      */
-    public Map(MFrame frame, int width, int height, dataSet data, Vector polys, JList varList) {
+    public Map(MFrame frame, int width, int height, DataSet data, Vector polys, JList varList) {
         super(frame);
         this.polys = polys;
         this.data = data;
@@ -725,7 +729,7 @@ public class Map extends DragBox {
 
     public void dump() {
 /*      Table NPAs = this.data.breakDown("Dump",new int[] {2}, -1);
-      dataSet.Variable vNPA = (dataSet.Variable)(data.data.elementAt(2));
+      Variable vNPA = (Variable)(data.data.elementAt(2));
       for( int j=0; j< NPAs.table.length; j++ )
         System.out.println("Level: "+NPAs.lnames[0][j]+" ("+
                            vNPA.Level(NPAs.lnames[0][j])+

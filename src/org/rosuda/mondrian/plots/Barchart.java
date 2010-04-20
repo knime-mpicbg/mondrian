@@ -1,4 +1,12 @@
-package org.rosuda.mondrian;
+package org.rosuda.mondrian.plots;
+
+import org.rosuda.mondrian.*;
+import org.rosuda.mondrian.core.*;
+import org.rosuda.mondrian.io.db.Query;
+import org.rosuda.mondrian.plots.basic.MyRect;
+import org.rosuda.mondrian.plots.basic.MyText;
+import org.rosuda.mondrian.util.Qsort;
+import org.rosuda.mondrian.util.Util;
 
 import javax.swing.*;
 import java.awt.*;
@@ -476,7 +484,7 @@ public class Barchart extends DragBox implements ActionListener {
                 moving = false;
                 movingRect.moveTo(-1, oldY);
                 frame.setCursor(Frame.DEFAULT_CURSOR);
-                dataSet.Variable v = (dataSet.Variable) (tablep.data.data.elementAt(tablep.initialVars[0]));
+                Variable v = (Variable) (tablep.data.data.elementAt(tablep.initialVars[0]));
                 out:
                 {
                     for (int i = 0; i < rects.size(); i++) {
@@ -648,7 +656,7 @@ public class Barchart extends DragBox implements ActionListener {
         } else if (command.equals("abs") || command.equals("rel") || command.equals("lex") || command.equals("frq") || command.equals("rev")) {
             if (command.equals("abs") || command.equals("rel") || command.equals("lex") || command.equals("frq")) {
                 double[] sortA = new double[this.k];
-                dataSet.Variable v = (dataSet.Variable) (tablep.data.data.elementAt(tablep.initialVars[0]));
+                Variable v = (Variable) (tablep.data.data.elementAt(tablep.initialVars[0]));
                 //
                 // first get all highlighting fixed
                 //
@@ -693,7 +701,7 @@ public class Barchart extends DragBox implements ActionListener {
                 if (command.equals("lex"))
                     v.sortLevels();
             } else if (command.equals("rev")) {
-                dataSet.Variable v = (dataSet.Variable) (tablep.data.data.elementAt(tablep.initialVars[0]));
+                Variable v = (Variable) (tablep.data.data.elementAt(tablep.initialVars[0]));
                 for (int i = 0; i < v.permA.length / 2; i++) {
                     int save = v.permA[i];
                     v.permA[i] = v.permA[v.permA.length - i - 1];

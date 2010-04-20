@@ -1,4 +1,4 @@
-package org.rosuda.mondrian;
+package org.rosuda.mondrian.core;
 
 import java.util.BitSet;
 import java.util.Vector;               // for Vector

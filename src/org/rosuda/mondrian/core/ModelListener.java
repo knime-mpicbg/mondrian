@@ -1,5 +1,6 @@
-package org.rosuda.mondrian;
+package org.rosuda.mondrian.core;
 
+import org.rosuda.mondrian.Table;
 
 
 public interface ModelListener {

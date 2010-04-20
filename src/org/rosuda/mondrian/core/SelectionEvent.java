@@ -1,9 +1,11 @@
-package org.rosuda.mondrian;
+package org.rosuda.mondrian.core;
+
+import org.rosuda.mondrian.core.DragBox;
 
 import java.awt.*;         // New event model.
 
 
-class SelectionEvent extends AWTEvent {
+public class SelectionEvent extends AWTEvent {
 
     public SelectionEvent(DragBox s) {
 

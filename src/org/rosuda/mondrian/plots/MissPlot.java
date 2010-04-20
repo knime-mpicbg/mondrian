@@ -1,4 +1,14 @@
-package org.rosuda.mondrian;
+package org.rosuda.mondrian.plots;
+
+import org.rosuda.mondrian.*;
+import org.rosuda.mondrian.core.DataEvent;
+import org.rosuda.mondrian.core.DataListener;
+import org.rosuda.mondrian.core.DragBox;
+import org.rosuda.mondrian.core.Selection;
+import org.rosuda.mondrian.plots.basic.MyRect;
+import org.rosuda.mondrian.plots.basic.MyText;
+import org.rosuda.mondrian.util.Qsort;
+import org.rosuda.mondrian.util.Util;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,7 +30,7 @@ public class MissPlot extends DragBox implements ActionListener {
     private MyText movingText;
     private int movingId;
     private int oldY;
-    protected dataSet data;
+    protected DataSet data;
     protected int[] vars;
     protected int[] miss;
     protected int[] permA;
@@ -32,7 +42,7 @@ public class MissPlot extends DragBox implements ActionListener {
     private int k;
 
 
-    public MissPlot(MFrame frame, dataSet data, int[] vars) {
+    public MissPlot(MFrame frame, DataSet data, int[] vars) {
         super(frame);
 
         this.vars = vars;

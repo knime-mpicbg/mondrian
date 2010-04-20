@@ -1,7 +1,12 @@
-package org.rosuda.mondrian;
+package org.rosuda.mondrian.plots;
 
 import org.rosuda.REngine.*;
 import org.rosuda.REngine.Rserve.*;
+import org.rosuda.mondrian.*;
+import org.rosuda.mondrian.core.DragBox;
+import org.rosuda.mondrian.core.Selection;
+import org.rosuda.mondrian.plots.basic.MyRect;
+import org.rosuda.mondrian.util.Util;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,7 +31,7 @@ public class Scatter2D extends DragBox {
     private double xMin, xMax, yMin, yMax;         // Scalings for plot
     private int shiftx, shifty;
     private double scalex, scaley;
-    private dataSet data;
+    private DataSet data;
     private JComboBox Varlist;
     private int displayVar = -1;
     private Image bi, tbi, ttbi, tttbi, fi;            // four buffer: 1. double, 2. hilite, 3. labels, 4. filtered
@@ -68,7 +73,7 @@ public class Scatter2D extends DragBox {
     /**
      * This constructor requires a Frame and a desired size
      */
-    public Scatter2D(MFrame frame, int width, int height, dataSet data, int[] Vars, JList varList, boolean matrix) {
+    public Scatter2D(MFrame frame, int width, int height, DataSet data, int[] Vars, JList varList, boolean matrix) {
         super(frame);
         this.matrix = matrix;
         this.data = data;

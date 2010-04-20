@@ -1,4 +1,6 @@
-package org.rosuda.mondrian;
+package org.rosuda.mondrian.plots.basic;
+
+import org.rosuda.mondrian.Stat;
 
 //
 

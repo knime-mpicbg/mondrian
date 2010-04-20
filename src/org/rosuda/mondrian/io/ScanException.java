@@ -1,12 +1,12 @@
-package org.rosuda.mondrian;
+package org.rosuda.mondrian.io;
 
-class ScanException extends Exception {
+public class ScanException extends Exception {
 
-    ScanException() {
+    public ScanException() {
     }
 
 
-    ScanException(String msg) {
+    public ScanException(String msg) {
         super(msg);
     }
 }

@@ -1,7 +1,16 @@
-package org.rosuda.mondrian;
+package org.rosuda.mondrian.plots;
 
 import org.rosuda.REngine.*;
 import org.rosuda.REngine.Rserve.*;
+import org.rosuda.mondrian.*;
+import org.rosuda.mondrian.core.DataEvent;
+import org.rosuda.mondrian.core.DataListener;
+import org.rosuda.mondrian.core.DragBox;
+import org.rosuda.mondrian.core.Selection;
+import org.rosuda.mondrian.io.db.Query;
+import org.rosuda.mondrian.plots.basic.Axis;
+import org.rosuda.mondrian.plots.basic.MyRect;
+import org.rosuda.mondrian.util.Util;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,7 +37,7 @@ public class Histogram extends DragBox implements ActionListener {
     public boolean densityMode = false;
     public boolean scaleSelD = true;
     public boolean CDPlot = false;
-    private dataSet data;
+    private DataSet data;
     private double[] add;
     private double totalSum = 0;
     private int weight;

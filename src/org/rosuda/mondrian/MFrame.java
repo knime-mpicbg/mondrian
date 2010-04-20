@@ -3,6 +3,8 @@ package org.rosuda.mondrian;
 // A closeable Frame for Mondrian.
 //
 
+import org.rosuda.mondrian.core.DragBox;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -26,9 +28,9 @@ public class MFrame extends JFrame implements WindowListener {
     private boolean firstTime = true;
 
     //  static Color backgroundColor = new Color(223, 184, 96);
-    static Color backgroundColor = new Color(255, 255, 179);
-    static Color objectColor = Color.lightGray;
-    static Color lineColor = Color.black;
+    public static Color backgroundColor = new Color(255, 255, 179);
+    public static Color objectColor = Color.lightGray;
+    public static Color lineColor = Color.black;
 
 
     public MFrame(Join J) {

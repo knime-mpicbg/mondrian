@@ -1,4 +1,4 @@
-package org.rosuda.mondrian;//
+package org.rosuda.mondrian.util;//
 // Quick sort - from K+R. The optional flag argument is handed back
 // to compare(), so the original qsort() call can easily control the
 // comparison.
