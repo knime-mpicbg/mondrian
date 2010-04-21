@@ -1,4 +1,4 @@
-package org.rosuda.mondrian;
+package org.rosuda.mondrian.util;
 
 import org.rosuda.mondrian.core.DragBox;
 
@@ -88,10 +88,8 @@ public class PrintUtilities implements Printable {
 
 
     /**
-     * The speed and quality of printing suffers dramatically if any of the containers have double buffering turned on. So
-     * this turns if off globally.
-     *
-     * @see enableDoubleBuffering
+     * The speed and quality of printing suffers dramatically if any of the containers have double buffering turned on.
+     * So this turns if off globally.
      */
     public static void disableDoubleBuffering(Component c) {
         RepaintManager currentManager = RepaintManager.currentManager(c);

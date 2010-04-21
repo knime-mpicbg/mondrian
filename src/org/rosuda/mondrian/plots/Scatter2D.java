@@ -1,8 +1,14 @@
 package org.rosuda.mondrian.plots;
 
-import org.rosuda.REngine.*;
-import org.rosuda.REngine.Rserve.*;
-import org.rosuda.mondrian.*;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REngineException;
+import org.rosuda.REngine.RList;
+import org.rosuda.REngine.Rserve.RConnection;
+import org.rosuda.REngine.Rserve.RserveException;
+import org.rosuda.mondrian.MFrame;
+import org.rosuda.mondrian.Stat;
+import org.rosuda.mondrian.Table;
+import org.rosuda.mondrian.core.DataSet;
 import org.rosuda.mondrian.core.DragBox;
 import org.rosuda.mondrian.core.Selection;
 import org.rosuda.mondrian.plots.basic.MyRect;
@@ -14,9 +20,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.lang.Integer;
-import java.lang.InterruptedException;
-import java.lang.String;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Vector;

@@ -1,13 +1,11 @@
 package org.rosuda.mondrian;
 
+import org.rosuda.mondrian.core.DataSet;
 import org.rosuda.mondrian.core.InteractionSet;
 import org.rosuda.mondrian.core.Selection;
+import org.rosuda.mondrian.core.Variable;
 import org.rosuda.mondrian.io.db.Query;
 
-import java.lang.Cloneable;
-import java.lang.Exception;
-import java.lang.Object;
-import java.lang.String;
 import java.sql.ResultSet;
 import java.sql.Statement;
 

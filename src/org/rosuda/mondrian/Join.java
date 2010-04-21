@@ -14,17 +14,19 @@ package org.rosuda.mondrian;// Please use this software or at least parts of it 
 //           - zoom back -> common scale ?!
 
 
-import com.apple.mrj.*;
-import org.rosuda.REngine.*;
-import org.rosuda.REngine.Rserve.*;
-import org.rosuda.mondrian.core.DataListener;
-import org.rosuda.mondrian.core.DragBox;
-import org.rosuda.mondrian.core.Selection;
-import org.rosuda.mondrian.core.SelectionListener;
+import com.apple.mrj.MRJApplicationUtils;
+import com.apple.mrj.MRJOpenDocumentHandler;
+import com.apple.mrj.MRJQuitHandler;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REngineException;
+import org.rosuda.REngine.Rserve.RConnection;
+import org.rosuda.REngine.Rserve.RserveException;
+import org.rosuda.mondrian.core.*;
 import org.rosuda.mondrian.io.ProgressIndicator;
 import org.rosuda.mondrian.io.db.Query;
 import org.rosuda.mondrian.plots.*;
 import org.rosuda.mondrian.plots.basic.MyPoly;
+import org.rosuda.mondrian.ui.PreferencesFrame;
 import org.rosuda.mondrian.util.Util;
 
 import javax.swing.*;
@@ -35,10 +37,6 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.lang.Exception;
-import java.lang.Integer;
-import java.lang.Object;
-import java.lang.String;
 import java.sql.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;

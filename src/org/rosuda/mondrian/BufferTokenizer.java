@@ -58,27 +58,27 @@ public class BufferTokenizer {
     /**
      * #columns and #lines
      */
-    int columns, lines;
+    public int columns, lines;
 
     int discretLimit = 0; // ab discretLimit inkl. bereits Behandlung als nicht-diskret
-    String format;
+    public String format;
 
     /**
      * headline (j,k) = (column, letter)
      */
-    byte[][] head;
+    public byte[][] head;
 
     /**
      * items (j,i) = (column, line) if column is numerical: numerical value saved else: saved reference to item in
      * word[][][]
      */
-    double[][] item;
+    public double[][] item;
 
     /**
-     * words (j,i,k) = (column, line, letter) if column is not numerical: words saved else: null equal words are NOT saved
-     * twice NOTE: first word, which is null in a column, indicates the end of a column -> see wordStackSize[]
+     * words (j,i,k) = (column, line, letter) if column is not numerical: words saved else: null equal words are NOT
+     * saved twice NOTE: first word, which is null in a column, indicates the end of a column -> see wordStackSize[]
      */
-    byte[][][] word;
+    public byte[][][] word;
 
 /** sorted words: like words, but sorted
  sorted list is not a class attribute for speed reasons */
@@ -87,43 +87,43 @@ public class BufferTokenizer {
     /**
      * numericalColumn (j) = (column) if true: column is numerical else: column is not numerical
      */
-    boolean[] numericalColumn;
+    public boolean[] numericalColumn;
 
-    boolean[] isPhoneNum;  //MTh
+    public boolean[] isPhoneNum;  //MTh
 
     /**
      * isDiscret (j) = (column) if true: column is discret else: column is continuous NOTE: not numerical columns are
      * always discret
      */
-    boolean[] isDiscret;
+    public boolean[] isDiscret;
 
     /**
      * NA (j,i) = (column, line) saves missings (missings = NA or NaN) if true: element (i,j) is a missing one else: not a
      * missing
      */
-    boolean[][] NA;
+    public boolean[][] NA;
 
     /**
      * NACount counts amount of NA's in a numerical column
      */
-    int[] NACount;
+    public int[] NACount;
 
     /**
      * wordCount (j,i) = (column, line) referenced to word[][][] or item[][] counts #appearence of a word or numerical
-     * discret values in a column NOTE: first element, which is 0 in a column, indicates the end of a column in wordCount
-     * -> see wordStackSize[]
+     * discret values in a column NOTE: first element, which is 0 in a column, indicates the end of a column in wordCount ->
+     * see wordStackSize[] public
      */
-    int[][] wordCount;
+    public int[][] wordCount;
 
     /**
      * wordStackSize (j) = (column) limit position for existing words in word[][][] for a column
      */
-    int[] wordStackSize;
+    public int[] wordStackSize;
 
     /**
      * used for handling discret values in a numerical column
      */
-    double[][] discretValue;
+    public double[][] discretValue;
 
 // 	i think i do not need it any more
     double[] doubleCover = new double[1];
@@ -152,8 +152,8 @@ public class BufferTokenizer {
     ByteBuffer buffer;
 
     /**
-     * error: String of softerrors, if harderror occurs System exits, harderror is saved in Sring[] error hardReadError: if
-     * true: hard reading error occured errorposition: position of hard reading error
+     * error: String of softerrors, if harderror occurs System exits, harderror is saved in Sring[] error hardReadError:
+     * if true: hard reading error occured errorposition: position of hard reading error
      */
     String[] error = null;
     boolean hardReadError = false;
@@ -174,9 +174,9 @@ public class BufferTokenizer {
     /**
      * isPolygonAvailable: indicates availability of a polygon polygonName: name of polygon in DataMatrix
      */
-    boolean isPolygonAvailable = false;
-    String polygonName = null;
-    int polygonID = -1;
+    public boolean isPolygonAvailable = false;
+    public String polygonName = null;
+    public int polygonID = -1;
 
 
     /**
@@ -733,8 +733,8 @@ public class BufferTokenizer {
 
     /**
      * analyzes text-format in ByteBuffer "SPACE-Format" = ... ..., where ... == number | "word" "KOMMA-QUOTE-Format" =
-     * ...,... where ... == number | "word" "TAB-Format" = ...	..., where ... == number | word "KOMMA-Format" = ...,... ,
-     * where ... == number | word
+     * ...,... where ... == number | "word" "TAB-Format" = ...	..., where ... == number | word "KOMMA-Format" = ...,...
+     * , where ... == number | word
      *
      * @param buffer the associated ByteBuffer to read
      * @return "UNKNOWN-Format" if format not found out, "SPACE-Format", "KOMMA-QUOTE-Format" if, "TAB-Format",

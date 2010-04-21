@@ -1,12 +1,14 @@
 package org.rosuda.mondrian.plots;
 
-import org.rosuda.REngine.*;
-import org.rosuda.REngine.Rserve.*;
-import org.rosuda.mondrian.*;
-import org.rosuda.mondrian.core.DataEvent;
-import org.rosuda.mondrian.core.DataListener;
-import org.rosuda.mondrian.core.DragBox;
-import org.rosuda.mondrian.core.Selection;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REngineException;
+import org.rosuda.REngine.RList;
+import org.rosuda.REngine.Rserve.RConnection;
+import org.rosuda.REngine.Rserve.RserveException;
+import org.rosuda.mondrian.MFrame;
+import org.rosuda.mondrian.Stat;
+import org.rosuda.mondrian.Table;
+import org.rosuda.mondrian.core.*;
 import org.rosuda.mondrian.io.db.Query;
 import org.rosuda.mondrian.plots.basic.Axis;
 import org.rosuda.mondrian.plots.basic.MyRect;

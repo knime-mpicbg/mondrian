@@ -1,10 +1,8 @@
 package org.rosuda.mondrian.plots;
 
-import org.rosuda.mondrian.*;
-import org.rosuda.mondrian.core.DataEvent;
-import org.rosuda.mondrian.core.DataListener;
-import org.rosuda.mondrian.core.DragBox;
-import org.rosuda.mondrian.core.Selection;
+import org.rosuda.mondrian.MFrame;
+import org.rosuda.mondrian.Table;
+import org.rosuda.mondrian.core.*;
 import org.rosuda.mondrian.plots.basic.MyRect;
 import org.rosuda.mondrian.plots.basic.MyText;
 import org.rosuda.mondrian.util.Qsort;

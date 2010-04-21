@@ -1,6 +1,6 @@
-package org.rosuda.mondrian;
+package org.rosuda.mondrian.core;
 
-import org.rosuda.mondrian.core.Selection;
+import org.rosuda.mondrian.*;
 import org.rosuda.mondrian.io.ScanException;
 import org.rosuda.mondrian.io.UnacceptableFormatException;
 import org.rosuda.mondrian.io.db.Query;
@@ -10,10 +10,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.lang.Exception;
-import java.lang.Float;
-import java.lang.NumberFormatException;
-import java.lang.String;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.ResultSet;
@@ -36,8 +32,8 @@ public class DataSet {
     protected Color[] brushColors;
     public boolean colorBrush = false;
     protected double[] filterA;
-    protected int[] filterGrpSize;
-    protected int[] filterSelGrpSize;
+    public int[] filterGrpSize;
+    public int[] filterSelGrpSize;
     protected boolean groupsSet = false;
     protected boolean filterON = false;
     public int filterVar = -1;
@@ -57,7 +53,7 @@ public class DataSet {
     public Query sqlConditions = new Query();
     public int graphicsPerf = 0;
     int counter;
-    boolean selChanged;
+    public boolean selChanged;
     private int[][] RGBs;
 
 

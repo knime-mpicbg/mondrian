@@ -1,5 +1,6 @@
-package org.rosuda.mondrian;
+package org.rosuda.mondrian.core;
 
+import org.rosuda.mondrian.BufferTokenizer;
 import org.rosuda.mondrian.util.Qsort;
 import org.rosuda.mondrian.util.Util;
 
@@ -8,10 +9,10 @@ import java.sql.Statement;
 
 
 /**
-* Document me!
-*
-* @author Holger Brandl
-*/
+ * Document me!
+ *
+ * @author Holger Brandl
+ */
 public class Variable {
 
     private int catThres;
@@ -43,7 +44,7 @@ public class Variable {
         if (name.substring(0, 2).equals("/P"))
             isCategorical = false;
 
-        
+
         catThres = (dataSet.n > 800) ? (15 * Math.max(1, (int) (Math.log(dataSet.n) / Math.log(10)) - 1)) : ((int) (1.5 * Math.sqrt(dataSet.n)));
     }
 

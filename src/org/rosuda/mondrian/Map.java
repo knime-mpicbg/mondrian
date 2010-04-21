@@ -1,7 +1,9 @@
 package org.rosuda.mondrian;
 
-import org.rosuda.REngine.*;
-import org.rosuda.REngine.Rserve.*;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.Rserve.RConnection;
+import org.rosuda.REngine.Rserve.RserveException;
+import org.rosuda.mondrian.core.DataSet;
 import org.rosuda.mondrian.core.DragBox;
 import org.rosuda.mondrian.core.Selection;
 import org.rosuda.mondrian.plots.basic.MyPoly;
@@ -13,7 +15,6 @@ import java.awt.event.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.String;
 import java.util.Date;
 import java.util.Vector;
 
