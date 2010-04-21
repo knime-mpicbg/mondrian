@@ -1,0 +1,113 @@
+<project name="mondrian" default="deploy.mac" basedir=".">
+
+    <taskdef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler"/>
+
+    <path id="maven-ant-tasks.classpath" path="${basedir}/resources/maven-ant-tasks-2.1.0.jar"/>
+
+    <property name="src.dir" location="${basedir}/src"/>
+    <property name="resources.dir" location="${basedir}/resources"/>
+    <property name="classes.dir" location="${basedir}/classes"/>
+    <property name="lib.dir" location="${basedir}/lib"/>
+    <property name="lib.mrj" location="${basedir}/mrj"/>
+    <property name="dist.dir" location="${basedir}/dist"/>
+    <property name="bin.dir" location="${basedir}/bin"/>
+
+    <property name="project.name" value="mondrian"/>
+
+
+    <path id="classpath">
+
+        <fileset dir="${lib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+
+        <fileset dir="${lib.mrj}">
+            <include name="*.jar"/>
+        </fileset>
+
+    </path>
+
+    <target name="compile" description="compile all sources">
+        <mkdir dir="${classes.dir}"/>
+
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" source="1.5" target="1.5">
+            <classpath refid="classpath"/>
+            <!--<compilerarg value="-g:lines,source,vars"/>-->
+        </javac>
+    </target>
+
+
+    <target name="create-jar" depends="compile" description="Recreates the mondrian.jar">
+
+        <property name="jarfile" value="${project.name}.jar"/>
+        <delete failonerror="true" file="${jarfile}"/>
+
+        <jar basedir="${classes.dir}" destfile="${jarfile}"/>
+        <jar update="true" basedir="${resources.dir}" destfile="${jarfile}"/>
+        <jar update="true" basedir="${lib.mrj}" destfile="${jarfile}"/>
+
+        <!--<jar basedir="${bin.dir}" includes="config/config.sxl" update="true" destfile="${project.name}.jar"/>-->
+        <!--<jar basedir="${user.home}" includes=".winlayout" update="true" destfile="${project.name}.jar"/>-->
+
+        <jar destfile="${jarfile}" update="true">
+            <manifest>
+                <attribute name="Built-By"
+                           value="Holger Brandl (Max Planck Institute of Molecular Cell Biology and Genetics (MPI-CBG)). All rights reserverd, 2010"/>
+                <attribute name="Main-Class" value="org.rosuda.mondrian.MondrianStarter"/>
+                <attribute name="Class-Path" value="lib/REngine-0.6.jar lib/Rserve-0.6.jar"/>
+            </manifest>
+        </jar>
+
+        <!-- embedd some config files directly into the jar-->
+        <!--<jar basedir="${bin.dir}" includes="config/miguelmic.sxl" update="true" destfile="${project.name}.jar"/>-->
+
+        <!--<move file="${jarfile}" todir="${lib.dir}"/>-->
+    </target>
+
+
+    <target name="deploy.mac" depends="create-jar" description="creates a macos app for the mondrian">
+        <property name="target.dir" value="${basedir}/../mondrian4mac"/>
+        <delete file="${target.dir}" failonerror="true"/>
+
+        <mkdir dir="${target.dir}"/>
+
+
+        <!--readd this if you want an icon icon="rmicon.icns"-->
+        <jarbundler dir="${target.dir}"
+                    name="Mondrian"
+                    shortname="Mondrian"
+                    mainclass="org.rosuda.mondrian.MondrianStarter"
+                    jvmversion="1.6+"
+                    version="5.0"
+                    vmoptions="-Xmx1024m -Xms512m -Dcom.apple.macos.useScreenMenuBar=true -Dapple.laf.useScreenMenuBar=true">
+
+
+            <!--<javaproperty name="WorkingDirectory" value="$APP_PACKAGE/Contents/Resources/Java/"/>-->
+
+            <!--<jarfileset refid="maven.dependencies">-->
+            <!--<include name="*.jar"/>-->
+            <!--<include name="target/tdscore.jar"/>-->
+            <!--</jarfileset>-->
+
+            <jarfileset dir="${basedir}">
+                <include name="lib/*.jar"/>
+                <include name="mondrian.jar"/>
+            </jarfileset>
+
+            <!--<resourcefilelist dir="lib/" files="plugins/*" />-->
+
+            <javaproperty name="apple.laf.useScreenMenuBar" value="true"/>
+            <javaproperty name="apple.awt.brushMetal" value="true"/>
+            <javaproperty name="apple.awt.showGrowBox" value="false"/>
+
+        </jarbundler>
+    </target>
+
+
+    <target name="cleanAll" description="remove all generated files">
+        <!--<delete failonerror="false" dir="${dist.dir}"/>-->
+        <!--<delete file="${basedir}/${project.name}.jar"/>-->
+        <!--<delete dir="${classes.dir}" failonerror="false"/>-->
+    </target>
+
+</project>

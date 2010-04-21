@@ -1,0 +1,4 @@
+
+Compilation
+
+add misc/jarbundler-2.1.0.jar ant's extension class-path. Just type ant

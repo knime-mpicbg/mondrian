@@ -2,4 +2,5 @@
 
 v1.2 (not yet released)
 - restructured code-base
-- git-repository
+- started git-repository
+- created ant-buiild.xml for deployment
