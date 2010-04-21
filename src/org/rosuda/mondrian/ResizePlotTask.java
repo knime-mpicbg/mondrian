@@ -5,7 +5,7 @@ import org.rosuda.mondrian.core.DragBox;
 import java.util.TimerTask;
 
 
-public final class ResizePlotTask extends TimerTask {
+final class ResizePlotTask extends TimerTask {
 
     private DragBox DB;
 

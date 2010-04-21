@@ -36,7 +36,7 @@ public class MondrianStarter implements MRJOpenDocumentHandler {
         try {
             // put it to sleep "forever" ...
             Thread.sleep(Integer.MAX_VALUE);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ignored) {
         }
     }
 

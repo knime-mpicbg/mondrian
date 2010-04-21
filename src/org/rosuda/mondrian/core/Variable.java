@@ -17,12 +17,12 @@ public class Variable {
 
     private int catThres;
     private int dimThres = 1000;
-    protected String[] levelA = new String[dimThres];
-    protected int[] grpSize = new int[dimThres];
+    private String[] levelA = new String[dimThres];
+    int[] grpSize = new int[dimThres];
     public int[] permA;
     public int[] IpermA;
     public int levelP = 0;
-    protected boolean alpha;
+    boolean alpha;
     public boolean isCategorical = true;
     public boolean forceCategorical = false;
     public boolean phoneNumber = false;
@@ -32,8 +32,11 @@ public class Variable {
     public int numMiss = 0;
     public int[] sortI;
     public boolean missing[];
-    public double min = 1e+100, max = -1e+100;
-    protected boolean minSet = false, maxSet = false, levelsSet = false;
+    private double min = 1e+100;
+    private double max = -1e+100;
+    private boolean minSet = false;
+    private boolean maxSet = false;
+    private boolean levelsSet = false;
     private DataSet dataSet;
 
 
@@ -199,7 +202,7 @@ public class Variable {
     }
 
 
-    public void expand() {
+    void expand() {
         dimThres = (int) (1.5 * dimThres);
         System.out.println("-- Expand to: " + dimThres);
         levelA = (String[]) Util.resizeArray(levelA, dimThres);

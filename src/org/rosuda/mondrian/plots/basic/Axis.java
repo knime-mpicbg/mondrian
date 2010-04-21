@@ -7,13 +7,18 @@ import org.rosuda.mondrian.Stat;
 
 public class Axis {
 
-    double min, max;
-    double d;
-    public double range;
+    private double min;
+    private double max;
     public double tickM, tickMM, tickMMM, tickMMMM;
-    public double firstM, firstMM, firstMMM, firstMMMM;
-    public double lastM, lastMM, lastMMM, lastMMMM;
-    public int numM, numMM, numMMM, numMMMM;
+    private double firstM;
+    private double firstMM;
+    private double firstMMM;
+    private double lastM;
+    private double lastMM;
+    private double lastMMM;
+    private int numM;
+    private int numMM;
+    private int numMMM;
 
 
     public Axis(double min, double max) {
@@ -21,9 +26,9 @@ public class Axis {
         this.min = min;
         this.max = max;
 
-        range = max - min;
+        double range = max - min;
 
-        d = Math.floor(Math.log(range) / Math.log(10));
+        double d = Math.floor(Math.log(range) / Math.log(10));
 
         double r10 = range / Math.pow(10, d);
 
@@ -73,18 +78,19 @@ public class Axis {
         numMMM = (int) ((lastMMM - firstMMM) / tickMMM) + 1;
 
         tickMMMM = Stat.round(tickMMMM * Math.pow(10, d - 1), (int) (3 - d));
+        double firstMMMM;
         if (min % tickMMMM != 0)
             firstMMMM = (Math.floor(min / tickMMMM)) * tickMMMM;
         else
             firstMMMM = min;
-        lastMMMM = Math.floor(max / tickMMMM) * tickMMMM;
-        numMMMM = (int) ((lastMMMM - firstMMMM) / tickMMMM) + 1;
+        double lastMMMM = Math.floor(max / tickMMMM) * tickMMMM;
+        int numMMMM = (int) ((lastMMMM - firstMMMM) / tickMMMM) + 1;
 
         this.print();
     }
 
 
-    public void print() {
+    void print() {
         System.out.println("Min: " + min + ", 1st: " + firstM + ", Tick: " + tickM + " last:" + lastM + ", Max: " + max + " Num: " + numM);
         System.out.println("Min: " + min + ", 1st: " + firstMM + ", Tick: " + tickMM + " last:" + lastMM + ", Max: " + max + " Num: " + numMM);
         System.out.println("Min: " + min + ", 1st: " + firstMMM + ", Tick: " + tickMMM + " last:" + lastMMM + ", Max: " + max + " Num: " + numMMM);

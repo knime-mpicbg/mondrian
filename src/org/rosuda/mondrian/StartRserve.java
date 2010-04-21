@@ -115,9 +115,8 @@ public class StartRserve {
             /* a safety sleep just in case the start up is delayed or asynchronous */
             try {
                 Thread.sleep(500);
-            } catch (InterruptedException ix) {
+            } catch (InterruptedException ignored) {
             }
-            ;
             attempts--;
         }
         return false;
@@ -189,6 +188,6 @@ public class StartRserve {
         try {
             RConnection c = new RConnection();
 			c.shutdown();
-		} catch (Exception x) {};
-	}
+		} catch (Exception ignored) {}
+    }
 }

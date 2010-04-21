@@ -40,7 +40,7 @@ public class InteractionSet implements Cloneable {
             test.set(k[i]);
 
         for (int i = 0; i < l; i++) {
-            if (test.equals((BitSet) (Set.elementAt(i))))
+            if (test.equals(Set.elementAt(i)))
                 return true;
         }
         return false;
@@ -50,7 +50,7 @@ public class InteractionSet implements Cloneable {
     boolean isMember(BitSet test) {
 
         for (int i = 0; i < Set.size(); i++) {
-            if (test.equals((BitSet) (Set.elementAt(i))))
+            if (test.equals(Set.elementAt(i)))
                 return true;
         }
         return false;
@@ -114,7 +114,7 @@ public class InteractionSet implements Cloneable {
             test.set(inter[i]);
 
         for (int i = 0; i < Set.size(); i++)
-            if (test.equals((BitSet) (Set.elementAt(i)))) {
+            if (test.equals(Set.elementAt(i))) {
                 Set.removeElementAt(i);
                 for (int j = 0; j < k; j++)
                     if (insertAt[j] > i)
@@ -129,7 +129,7 @@ public class InteractionSet implements Cloneable {
     public void deleteMember(BitSet rem) {
 
         for (int i = 0; i < Set.size(); i++)
-            if (rem.equals((BitSet) (Set.elementAt(i)))) {
+            if (rem.equals(Set.elementAt(i))) {
                 Set.removeElementAt(i);
                 for (int j = 0; j < k; j++)
                     if (insertAt[j] > i)
@@ -175,7 +175,7 @@ public class InteractionSet implements Cloneable {
     public void permute(int[] perm) {
 
         for (int i = 0; i < this.size(); i++) {
-            int[] interPerm = (int[]) this.memberAt(i);
+            int[] interPerm = this.memberAt(i);
             for (int j = 0; j < interPerm.length; j++) {
                 int k = 0;
                 while (perm[k] != interPerm[j])

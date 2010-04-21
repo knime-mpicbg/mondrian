@@ -1,6 +1,7 @@
 package org.rosuda.mondrian.plots;
 
-import org.rosuda.mondrian.*;
+import org.rosuda.mondrian.MFrame;
+import org.rosuda.mondrian.Table;
 import org.rosuda.mondrian.core.*;
 import org.rosuda.mondrian.io.db.Query;
 import org.rosuda.mondrian.plots.basic.MyRect;
@@ -33,7 +34,6 @@ public class Mosaic extends DragBox implements ActionListener {
     private int border = 20;
     private boolean showLabels = false;
     private Image bi;
-    private Graphics2D bg;
     private int eventID;
 
 
@@ -137,7 +137,7 @@ public class Mosaic extends DragBox implements ActionListener {
                 } else {
                     double sum = 0, sumh = 0;
                     for (int j = 0; j < r.tileIds.size(); j++) {
-                        int id = ((Integer) (r.tileIds.elementAt(j))).intValue();
+                        int id = (Integer) (r.tileIds.elementAt(j));
                         tablep.setSelection(id, 1, mode);
                         sumh += tablep.getSelected(id) * tablep.table[id];
                         sum += tablep.table[id];
@@ -146,7 +146,7 @@ public class Mosaic extends DragBox implements ActionListener {
                 }
             } else if (!tablep.data.isDB)
                 for (int j = 0; j < r.tileIds.size(); j++) {
-                    int id = ((Integer) (r.tileIds.elementAt(j))).intValue();
+                    int id = (Integer) (r.tileIds.elementAt(j));
                     tablep.setSelection(id, 0, mode);
                 }
         }
@@ -180,6 +180,7 @@ public class Mosaic extends DragBox implements ActionListener {
         Dimension size;
         size = this.getSize();
 
+        Graphics2D bg;
         if (!printing) {
             bi = createImage(size.width, size.height);    // double buffering from CORE JAVA p212
             bg = (Graphics2D) bi.getGraphics();
@@ -222,7 +223,7 @@ public class Mosaic extends DragBox implements ActionListener {
             r.setMax(residMax);
             double sum = 0, sumh = 0;
             for (int j = 0; j < r.tileIds.size(); j++) {
-                int id = ((Integer) (r.tileIds.elementAt(j))).intValue();
+                int id = (Integer) (r.tileIds.elementAt(j));
                 sumh += tablep.getSelected(id) * tablep.table[id];
                 sum += tablep.table[id];
             }
@@ -349,7 +350,6 @@ public class Mosaic extends DragBox implements ActionListener {
                             }
 
 
-                            ;
                         });
                     } else {
                         brush = new JMenuItem("Clear all Colors");
@@ -360,7 +360,6 @@ public class Mosaic extends DragBox implements ActionListener {
                             }
 
 
-                            ;
                         });
                     }
                     mm.add(brush);
@@ -384,7 +383,6 @@ public class Mosaic extends DragBox implements ActionListener {
                         }
 
 
-                        ;
                     });
                     mm.add(rotall);
 
@@ -396,7 +394,6 @@ public class Mosaic extends DragBox implements ActionListener {
                         }
 
 
-                        ;
                     });
                     mm.add(rotlast);
 
@@ -410,7 +407,6 @@ public class Mosaic extends DragBox implements ActionListener {
                         }
 
 
-                        ;
                     });
                     mm.add(exclude);
 
@@ -424,7 +420,6 @@ public class Mosaic extends DragBox implements ActionListener {
                         }
 
 
-                        ;
                     });
                     mm.add(include);
 
@@ -438,7 +433,6 @@ public class Mosaic extends DragBox implements ActionListener {
                         }
 
 
-                        ;
                     });
                     mm.add(changeRight);
 
@@ -452,7 +446,6 @@ public class Mosaic extends DragBox implements ActionListener {
                         }
 
 
-                        ;
                     });
                     mm.add(changeLeft);
 
@@ -466,7 +459,6 @@ public class Mosaic extends DragBox implements ActionListener {
                         }
 
 
-                        ;
                     });
                     mm.add(zoomIn);
 
@@ -480,7 +472,6 @@ public class Mosaic extends DragBox implements ActionListener {
                         }
 
 
-                        ;
                     });
                     mm.add(zoomOut);
 
@@ -597,7 +588,7 @@ public class Mosaic extends DragBox implements ActionListener {
                 for (int i = 0; i < rects.size(); i++) {
                     MyRect r = (MyRect) rects.elementAt(i);
                     for (int j = 0; j < r.tileIds.size(); j++) {
-                        int id = ((Integer) (r.tileIds.elementAt(j))).intValue();
+                        int id = (Integer) (r.tileIds.elementAt(j));
                         for (int l = 0; l < (tablep.Ids[id]).length; l++)
                             tablep.data.setColor(tablep.Ids[id][l], 1 + i);
                     }
@@ -609,7 +600,7 @@ public class Mosaic extends DragBox implements ActionListener {
                 evtq.postEvent(de);
             }
             if ((e.getModifiers() == Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() && (e.getKeyCode() == KeyEvent.VK_ADD) || (e.getKeyCode() == KeyEvent.VK_SUBTRACT))) {
-                frame.setCursor(Frame.WAIT_CURSOR);
+                frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 int[] interact = new int[maxLevel];
                 for (int i = 0; i < maxLevel; i++)
                     interact[i] = i;
@@ -659,7 +650,7 @@ public class Mosaic extends DragBox implements ActionListener {
                     exps[j] += tablep.exp[index];
                     obs[j] += tablep.table[index];
                     if (levelid == maxLevel - 1)
-                        tileIds[j].addElement(new Integer(index));
+                        tileIds[j].addElement(index);
                 }
                 counts[j + 1] += counts[j];
                 oCounts[j + 1] += oCounts[j];
@@ -673,7 +664,7 @@ public class Mosaic extends DragBox implements ActionListener {
                 oCounts[j + 1] += oCounts[j];
                 exps[j] += tablep.exp[start + j];
                 obs[j] += tablep.table[start + j];
-                tileIds[j].addElement(new Integer(start + j));
+                tileIds[j].addElement(start + j);
             }
         }
 
@@ -699,7 +690,7 @@ public class Mosaic extends DragBox implements ActionListener {
         if (total > 0)
             for (int j = 0; j < levels[levelid]; j++) {                                     // for each level in this variable
 
-                info = infop.toString() + names[levelid] + ": " + lnames[levelid][j] + '\n';// Add the popup information
+                info = infop + names[levelid] + ": " + lnames[levelid][j] + '\n';// Add the popup information
 
                 boolean empty = false;
                 boolean stop = false;
@@ -783,7 +774,7 @@ public class Mosaic extends DragBox implements ActionListener {
 
     public void create(int x1, int y1, int x2, int y2, String info) {
 
-        this.name = tablep.name;
+        String name = tablep.name;
         this.levels = tablep.levels;
         this.lnames = tablep.lnames;
         this.k = tablep.k;
@@ -942,7 +933,6 @@ public class Mosaic extends DragBox implements ActionListener {
     }
 
 
-    private String name;          // the name of the table;
     private double table[];    // data in classical generalized binary order
     private int k;        // number of variables
     private int[] levels;        // number of levels for each variable

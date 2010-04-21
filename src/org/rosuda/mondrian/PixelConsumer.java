@@ -27,8 +27,8 @@ public class PixelConsumer implements ImageConsumer {
         t = 1000;
         while (t > 0 && !complete) {
             try {
-                Thread.currentThread().sleep(100);
-            } catch (Throwable ex) {
+                Thread.sleep(100);
+            } catch (Throwable ignored) {
             }
             t -= 100;
         }

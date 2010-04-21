@@ -89,7 +89,7 @@ public class MissPlot extends DragBox implements ActionListener {
 
         frame.setTitle(titletext);
 
-        evtq = Toolkit.getDefaultToolkit().getSystemEventQueue();
+        EventQueue evtq = Toolkit.getDefaultToolkit().getSystemEventQueue();
     }
 
 
@@ -412,7 +412,7 @@ public class MissPlot extends DragBox implements ActionListener {
                         oldY = rO.getRect().y;
 //                movingText = (MyText)labels.elementAt(i);
                         moving = true;
-                        frame.setCursor(Frame.HAND_CURSOR);
+                        frame.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     }
                 }
             } else if ((e.getID() == MouseEvent.MOUSE_RELEASED) && moving &&
@@ -566,7 +566,7 @@ public class MissPlot extends DragBox implements ActionListener {
         for (int i = 0; i < k; i++) {
             miss[i] = data.n - data.getN(vars[permA[i]]);
             tileIds[i] = new Vector(1, 0);
-            tileIds[i].addElement(new Integer(i));
+            tileIds[i].addElement(i);
         }
 
         int pF = 1;
@@ -642,7 +642,6 @@ public class MissPlot extends DragBox implements ActionListener {
     private String[] names;    // variable names
     private String[][] lnames;    // names of levels
     private DataListener listener;
-    private static EventQueue evtq;
 
 
     class floatRect {

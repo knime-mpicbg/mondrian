@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 
 public class DataSet {
 
-    public Vector data = new Vector(256, 256);
+    public Vector<Variable> data = new Vector<Variable>(256, 256);
     //  protected Vector name = new Vector(256,256);
     protected boolean[] alpha = {true};
     protected int[] NAcount = {0};
@@ -40,15 +40,12 @@ public class DataSet {
     public int target;
     public double filterVal;
     public int filterGrp;
-    private String[] columnType = {""};
     public int n = 0;
     public int k = 0;
     public boolean hasMissings = false;
     public boolean isDB;
     public String setName;
-    private Driver d;
     public Connection con;
-    private String DB;
     public String Table;
     public Query sqlConditions = new Query();
     public int graphicsPerf = 0;
@@ -64,13 +61,11 @@ public class DataSet {
     }
 
 
-    public DataSet(Driver d, Connection con, String DB, String Table) {
+    public DataSet(Connection con, String DB, String Table) {
         defineColors();
         this.isDB = true;
         this.setName = Table;
-        this.d = d;
         this.con = con;
-        this.DB = DB;
         this.Table = Table;
 
         try {
@@ -89,16 +84,14 @@ public class DataSet {
             rs = stmt.executeQuery(query);
 
             alpha = new boolean[k];
-            columnType = new String[k];
+            String[] columnType = new String[k];
             for (int j = 0; j < k; j++) {
                 if (rs.next()) {
                     String varName = rs.getString(1);
 //          name.addElement(varName);
                     columnType[j] = rs.getString(2);
-                    if (columnType[j].startsWith("varchar") || columnType[j].startsWith("enum") || columnType[j].startsWith("char")) {
-                        alpha[j] = true;
-                    } else
-                        alpha[j] = false;
+                    alpha[j] = columnType[j].startsWith("varchar") || columnType[j].startsWith("enum") || columnType[j].startsWith("char");
+
                     Variable Var = new Variable(this, alpha[j], varName);
                     if (!alpha[j])
                         Var.isCategorical = false;
@@ -197,7 +190,7 @@ public class DataSet {
 
     public boolean[] sniff(BufferedReader br) {
 
-        String line, dummy = "";
+        String line, dummy;
 
         try {
             line = br.readLine();
@@ -230,7 +223,7 @@ public class DataSet {
                     }
                 }
             }
-            catch (NoSuchElementException e) {
+            catch (NoSuchElementException ignored) {
             }
         }
         catch (IOException e) {
@@ -252,7 +245,6 @@ public class DataSet {
 
         Variable Var;
         String line, varName;
-        String[] last = new String[k];
 
         try {
             line = br.readLine();
@@ -292,12 +284,10 @@ public class DataSet {
             }
 
             try {
-                double x;
-                String token;
-//progBar.setIndeterminate(true);  //
+                //progBar.setIndeterminate(true);  //
                 progBar.setValue(0);
                 for (int i = 0; i < this.n; i++) {
-                    if ((i % (int) (Math.max(n / 20, 1)) == 0) && (n > 1000)) {
+                    if ((i % Math.max(n / 20, 1) == 0) && (n > 1000)) {
                         progBar.setValue(i);
                         progBar.repaint();
 //System.out.println("Reading Line: "+i);
@@ -305,7 +295,7 @@ public class DataSet {
                     line = br.readLine();
                     StringTokenizer dataLine = new StringTokenizer(line, "\t");
                     for (int j = 0; j < this.k; j++) {
-                        Var = (Variable) data.elementAt(j);
+                        Var = data.elementAt(j);
                         if (alpha[j])
                             Var.data[i] = Var.isLevel(dataLine.nextToken().trim());
                         else {
@@ -314,7 +304,7 @@ public class DataSet {
                             //      Var.data[i] = Var.data[i-1];
                             //    else {
                             //    Var.data[i] = Double.valueOf(token).doubleValue();
-                            Var.data[i] = Double.valueOf(dataLine.nextToken()).doubleValue();
+                            Var.data[i] = Double.valueOf(dataLine.nextToken());
                             Var.isLevel(Double.toString(Var.data[i]));
                             //    }
                             //    last[j] = token;
@@ -322,7 +312,7 @@ public class DataSet {
                     }
                 }
             }
-            catch (NoSuchElementException e) {
+            catch (NoSuchElementException ignored) {
             }
         }
         catch (IOException e) {
@@ -330,7 +320,7 @@ public class DataSet {
             System.exit(1);
         }
         for (int i = 0; i < k; i++) {
-            Var = (Variable) data.elementAt(i);
+            Var = data.elementAt(i);
             if (Var.isCategorical)
                 Var.sortLevels();
             else if (!Var.alpha)
@@ -383,17 +373,16 @@ public class DataSet {
         catch (ScanException e) {
             return "ERROR" + e.getMessage();
         }
-        catch (UnacceptableFormatException e) {
+        catch (UnacceptableFormatException ignored) {
         }
         return "";
     }
 
 
     public void numToCat(int i) {
-        Variable Var = ((Variable) data.elementAt(i));
-        if (alpha[i] && Var.isCategorical)
-            return;
-        else {
+        Variable Var = data.elementAt(i);
+
+        if (!alpha[i] || !Var.isCategorical) {
             for (int l = 0; l < Var.grpSize.length; l++)
                 Var.grpSize[l] = 0;
             Var.forceCategorical = true;
@@ -406,10 +395,8 @@ public class DataSet {
 
 
     public void catToNum(int i) {
-        Variable Var = ((Variable) data.elementAt(i));
-        if (alpha[i] && !Var.isCategorical)
-            return;
-        else {
+        Variable Var = data.elementAt(i);
+        if (!alpha[i] || Var.isCategorical) {
             Var.forceCategorical = false;
             Var.isCategorical = false;
             Var.sortData();
@@ -498,13 +485,13 @@ public class DataSet {
         for (int i = 0; i < tablelength; i++) {
             if (!isDB) {
                 lnames[0][i] = "[" + Stat.roundToString(start + i * width, round) + ", " + Stat.roundToString(start + (i + 1) * width, round) + ")";
-                Ids[i] = new int[(int) tableDim[i]];
+                Ids[i] = new int[tableDim[i]];
             } else
                 Ids[i] = new int[1];
             pointers[i] = 0;
         }
 
-        int index = 0;
+        int index;
 
         if (!isDB) {
             for (int i = 0; i < getN(dvar); i++) {
@@ -523,24 +510,22 @@ public class DataSet {
 
     public Table discretize2D(String name, int xVar, double xStart, double xEnd, int nX, int yVar, double yStart, double yEnd, int nY) {
 
-        int x_num = nX;
-        int y_num = nY;
         double xWidth = (xEnd - xStart) / nX;
         double yWidth = (yEnd - yStart) / nY;
 //System.out.println("x: "+x_num+"y: "+y_num);
-        int tablelength = x_num * y_num;
+        int tablelength = nX * nY;
         int[] vars = new int[2];
         vars[0] = xVar;
         vars[1] = yVar;
         double[] bdtable = new double[tablelength];    // !
         String[][] lnames = new String[2][];    // !
-        lnames[0] = new String[x_num];
-        lnames[1] = new String[y_num];
+        lnames[0] = new String[nX];
+        lnames[1] = new String[nY];
         double[] datacopyX = this.getRawNumbers(xVar);
         double[] datacopyY = this.getRawNumbers(yVar);
         int[] varlevels = new int[2];            // !
-        varlevels[0] = x_num;
-        varlevels[1] = y_num;
+        varlevels[0] = nX;
+        varlevels[1] = nY;
         String[] varnames = new String[2];        // !
         varnames[0] = this.getName(xVar);
         varnames[1] = this.getName(yVar);
@@ -555,15 +540,15 @@ public class DataSet {
         } else {
             for (int i = 0; i < this.n; i++)
                 if (datacopyX[i] < xEnd && datacopyX[i] >= xStart && datacopyY[i] < yEnd && datacopyY[i] >= yStart)
-                    bdtable[(int) ((datacopyX[i] - xStart) / xWidth) * y_num + (int) ((datacopyY[i] - yStart) / yWidth)]++;
+                    bdtable[(int) ((datacopyX[i] - xStart) / xWidth) * nY + (int) ((datacopyY[i] - yStart) / yWidth)]++;
         }
 
-        for (int i = 0; i < x_num; i++) {
+        for (int i = 0; i < nX; i++) {
             if (!isDB) {
                 lnames[0][i] = "[" + Stat.roundToString(xStart + i * xWidth, roundX) + ", " + Stat.roundToString(xStart + (i + 1) * xWidth, roundX) + ")";
             }
         }
-        for (int i = 0; i < y_num; i++) {
+        for (int i = 0; i < nY; i++) {
             if (!isDB) {
                 lnames[1][i] = "[" + Stat.roundToString(yStart + i * yWidth, roundY) + ", " + Stat.roundToString(yStart + (i + 1) * yWidth, roundY) + ")";
             }
@@ -576,11 +561,11 @@ public class DataSet {
             pointers[i] = 0;
         }
 
-        int index = 0;
+        int index;
         if (!isDB)
             for (int i = 0; i < this.n; i++) {
                 if (datacopyX[i] < xEnd && datacopyX[i] >= xStart && datacopyY[i] < yEnd && datacopyY[i] >= yStart) {
-                    index = (int) ((datacopyX[i] - xStart) / xWidth) * y_num + (int) ((datacopyY[i] - yStart) / yWidth);
+                    index = (int) ((datacopyX[i] - xStart) / xWidth) * nY + (int) ((datacopyY[i] - yStart) / yWidth);
                     Ids[index][pointers[index]++] = i;
                 }
             }
@@ -604,7 +589,6 @@ public class DataSet {
         int[] varlevels = new int[vars.length];
         String[] varnames = new String[vars.length];
         int[] plevels = new int[vars.length];
-        String query = "";
         int[][] Ids;
         int[] dimA;
         Query newQ = new Query();
@@ -625,9 +609,9 @@ public class DataSet {
         for (int j = vars.length - 2; j >= 0; j--) {
             plevels[j] = varlevels[j + 1] * plevels[j + 1];
         }
-        for (int j = 0; j < vars.length; j++) {
-//     System.out.println("Tablelength: "+tablelength+"  Name: "+ varnames[j]+"  Levels: "+lnames[j][0]+"..."+"   Plevels: "+plevels[j]);
-        }
+//        for (int j = 0; j < vars.length; j++) {
+//          System.out.println("Tablelength: "+tablelength+"  Name: "+ varnames[j]+"  Levels: "+lnames[j][0]+"..."+"   Plevels: "+plevels[j]);
+//        }
         Ids = new int[tablelength][];
         dimA = new int[tablelength];
 
@@ -646,7 +630,7 @@ public class DataSet {
                         String LString = rs.getString(j + 1);
                         if (LString == null)
                             LString = "NA";
-                        index += plevels[j] * ((Variable) data.elementAt(vars[j])).Level((LString).trim());
+                        index += plevels[j] * data.elementAt(vars[j]).Level((LString).trim());
                     }
                     bdtable[index] = rs.getInt(vars.length + 1);
                 }
@@ -781,37 +765,37 @@ public class DataSet {
 
 
     public boolean categorical(int i) {
-        return ((Variable) data.elementAt(i)).isCategorical;
+        return data.elementAt(i).isCategorical;
     }
 
 
     public boolean phoneNumber(int i) {
-        return ((Variable) data.elementAt(i)).phoneNumber;
+        return data.elementAt(i).phoneNumber;
     }
 
 
     public boolean isPolyID(int i) {
-        return ((Variable) data.elementAt(i)).isPolyID();
+        return data.elementAt(i).isPolyID();
     }
 
 
     public String getName(int i) {
-        return ((Variable) data.elementAt(i)).getName();
+        return data.elementAt(i).getName();
     }
 
 
     public int getNumLevels(int i) {
-        return ((Variable) data.elementAt(i)).getNumLevels();
+        return data.elementAt(i).getNumLevels();
     }
 
 
     public String[] getLevels(int i) {
-        return ((Variable) data.elementAt(i)).getLevels();
+        return data.elementAt(i).getLevels();
     }
 
 
     public String getLevelName(int i, double val) {
-        Variable v = (Variable) data.elementAt(i);
+        Variable v = data.elementAt(i);
         String[] LevelString = v.getLevels();
         if (alpha[i])
             return LevelString[(int) val];
@@ -821,7 +805,7 @@ public class DataSet {
 
 
     public double[] getNumbers(int i) {
-        Variable v = (Variable) data.elementAt(i);
+        Variable v = data.elementAt(i);
         if (!v.isCategorical)
             return v.data;
         else {
@@ -842,13 +826,13 @@ public class DataSet {
 
 
     public double[] getRawNumbers(int i) {
-        Variable v = (Variable) data.elementAt(i);
+        Variable v = data.elementAt(i);
         return v.data;
     }
 
 
     public boolean[] getMissings(int i) {
-        Variable v = (Variable) data.elementAt(i);
+        Variable v = data.elementAt(i);
         return v.missing;
     }
 
@@ -859,13 +843,13 @@ public class DataSet {
 
 
     public int[] getSort(int i) {
-        Variable v = (Variable) data.elementAt(i);
+        Variable v = data.elementAt(i);
         return v.sortI;
     }
 
 
     public int[] getRank(int i) {
-        Variable v = (Variable) data.elementAt(i);
+        Variable v = data.elementAt(i);
         int[] ranks = new int[this.n];
         if (!categorical(i))
             for (int j = 0; j < this.n; j++)
@@ -883,42 +867,42 @@ public class DataSet {
 
 
     public double getMin(int i) {
-        return ((Variable) data.elementAt(i)).Min();
+        return data.elementAt(i).Min();
     }
 
 
     public double getSelMin(int i) {
-        return ((Variable) data.elementAt(i)).SelMin();
+        return data.elementAt(i).SelMin();
     }
 
 
     public double getMax(int i) {
-        return ((Variable) data.elementAt(i)).Max();
+        return data.elementAt(i).Max();
     }
 
 
     public double getSelMax(int i) {
-        return ((Variable) data.elementAt(i)).SelMax();
+        return data.elementAt(i).SelMax();
     }
 
 
     public double getMean(int i) {
-        return ((Variable) data.elementAt(i)).Mean();
+        return data.elementAt(i).Mean();
     }
 
 
     public double getSelMean(int i) {
-        return ((Variable) data.elementAt(i)).selMean();
+        return data.elementAt(i).selMean();
     }
 
 
     public double getSDev(int i) {
-        return ((Variable) data.elementAt(i)).SDev();
+        return data.elementAt(i).SDev();
     }
 
 
     public double getSelSDev(int i) {
-        return ((Variable) data.elementAt(i)).selSDev();
+        return data.elementAt(i).selSDev();
     }
 
 
@@ -1069,7 +1053,7 @@ public class DataSet {
             filterGrp = (int) (((Variable) data.elementAt(filterVar)).Level(Double.toString(Double.valueOf(grp).doubleValue())));
         else
             filterGrp = (int) (((Variable) data.elementAt(filterVar)).Level(grp));
-        if ((((Variable) data.elementAt(filterVar)).alpha))
+        if ((data.elementAt(filterVar).alpha))
             filterVal = filterGrp;
         else if (!grp.equals("NA"))
             filterVal = Util.atod(grp);
@@ -1087,7 +1071,7 @@ public class DataSet {
             filterGrpSize[i] = 0;
             filterSelGrpSize[i] = 0;
         }
-        if ((((Variable) data.elementAt(filterVar)).alpha)) {
+        if ((data.elementAt(filterVar).alpha)) {
             for (int i = 0; i < n; i++)
                 if (!getMissings(target)[i]) {
                     int index = (int) (((Variable) data.elementAt(filterVar)).data[i]);
@@ -1114,10 +1098,10 @@ public class DataSet {
         this.target = target;
         filterON = true;
         for (int i = 0; i < this.n; i++) {
-            filterA[i] = (((Variable) data.elementAt(filterVar)).data)[i];
+            filterA[i] = (data.elementAt(filterVar).data)[i];
         }
-        filterGrpSize = new int[((Variable) data.elementAt(var)).getNumLevels()];
-        filterSelGrpSize = new int[((Variable) data.elementAt(var)).getNumLevels()];
+        filterGrpSize = new int[data.elementAt(var).getNumLevels()];
+        filterSelGrpSize = new int[data.elementAt(var).getNumLevels()];
 //    for( int i=0; i<filterGrpSize.length; i++ ) 
 //      filterGrpSize[i] = (((Variable)data.elementAt(var)).grpSize)[i];
         updateFilter();
@@ -1186,7 +1170,7 @@ public class DataSet {
 
 
     public int countSelection(int j) {
-        Variable v = (Variable) data.elementAt(j);
+        Variable v = data.elementAt(j);
         counter = 0;
         for (int i = 0; i < getN(j); i++)
             if (selectionArray[v.sortI[i]] > 0)
@@ -1201,52 +1185,52 @@ public class DataSet {
 
 
     public double getQuantile(int i, double q) {
-        return ((Variable) data.elementAt(i)).getQuantile(q);
+        return data.elementAt(i).getQuantile(q);
     }
 
 
     public double getSelQuantile(int i, double q) {
-        return ((Variable) data.elementAt(i)).getSelQuantile(i, q);
+        return data.elementAt(i).getSelQuantile(i, q);
     }
 
 
     public double getFirstGreater(int i, double q) {
-        return ((Variable) data.elementAt(i)).getFirstGreater(q);
+        return data.elementAt(i).getFirstGreater(q);
     }
 
 
     public double getFirstSelGreater(int i, double q) {
-        return ((Variable) data.elementAt(i)).getFirstSelGreater(q);
+        return data.elementAt(i).getFirstSelGreater(q);
     }
 
 
     public double getFirstSmaller(int i, double q) {
-        return ((Variable) data.elementAt(i)).getFirstSmaller(q);
+        return data.elementAt(i).getFirstSmaller(q);
     }
 
 
     public double getFirstSelSmaller(int i, double q) {
-        return ((Variable) data.elementAt(i)).getFirstSelSmaller(q);
+        return data.elementAt(i).getFirstSelSmaller(q);
     }
 
 
     public double[] getAllSmaller(int i, double q) {
-        return ((Variable) data.elementAt(i)).getAllSmaller(q);
+        return data.elementAt(i).getAllSmaller(q);
     }
 
 
     public double[] getAllSelSmaller(int i, double q) {
-        return ((Variable) data.elementAt(i)).getAllSelSmaller(q);
+        return data.elementAt(i).getAllSelSmaller(q);
     }
 
 
     public double[] getAllGreater(int i, double q) {
-        return ((Variable) data.elementAt(i)).getAllGreater(q);
+        return data.elementAt(i).getAllGreater(q);
     }
 
 
     public double[] getAllSelGreater(int i, double q) {
-        return ((Variable) data.elementAt(i)).getAllSelGreater(q);
+        return data.elementAt(i).getAllSelGreater(q);
     }
 
 

@@ -33,7 +33,7 @@ public class Qsort
         index = new int[high + 1];
         for (int i = 0; i < high + 1; i++)
             index[i] = i;
-        String[] b = (String[]) a.clone();
+        String[] b = a.clone();
         QuickSort(b, low, high);
         return index;
     }
@@ -98,7 +98,7 @@ public class Qsort
         index = new int[high + 1];
         for (int i = 0; i < high + 1; i++)
             index[i] = i;
-        double[] b = (double[]) a.clone();
+        double[] b = a.clone();
         QuickSort(b, low, high);
         return index;
     }

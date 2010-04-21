@@ -21,11 +21,10 @@ import java.util.prefs.Preferences;         // for preferences
 
 public class PreferencesFrame extends Frame implements WindowListener, MouseListener, ActionListener, ItemListener {
 
-    PrefCanvas pc;
-    Join frame;
-    Choice cs;
-    Preferences prefs;
-    static String[] schemes = {
+    private PrefCanvas pc;
+    private Join frame;
+    private Choice cs;
+    private static String[] schemes = {
             "RoSuDa classic", "#ffff99", "#c0c0c0", "#000000", "#00ff00",
             "Terra di Siena", "#dfb860", "#c0c0c0", "#000000", "#b46087",
             "Xtra red", "#ffff99", "#c0c0c0", "#000000", "#ff0000",
@@ -34,7 +33,7 @@ public class PreferencesFrame extends Frame implements WindowListener, MouseList
             null
     };
 
-    static PreferencesFrame last = null;
+    private static PreferencesFrame last = null;
 
 
     public static PreferencesFrame showPrefsDialog(Join frame) {
@@ -46,7 +45,7 @@ public class PreferencesFrame extends Frame implements WindowListener, MouseList
     }
 
 
-    public PreferencesFrame() {
+    private PreferencesFrame() {
         super("Preferences");
         setLayout(new BorderLayout());
         add(pc = new PrefCanvas());
@@ -159,7 +158,7 @@ public class PreferencesFrame extends Frame implements WindowListener, MouseList
         String s = cs.getSelectedItem();
         int i = 0;
         while (schemes[i] != null) {
-            if (schemes[i] == s) {
+            if (schemes[i].equals(s)) {
                 Color cl = Util.hrgb2color(schemes[++i]);
                 if (cl != null) pc.c[0] = cl;
                 cl = Util.hrgb2color(schemes[++i]);
@@ -234,18 +233,18 @@ public class PreferencesFrame extends Frame implements WindowListener, MouseList
 
     public void actionPerformed(ActionEvent e) {
         String cmd = e.getActionCommand();
-        if (cmd == "Close") {
+        if (cmd.equals("Close")) {
             setVisible(false);
         }
-        if (cmd == "Apply" || cmd == "Save") {
+        if (cmd.equals("Apply") || cmd.equals("Save")) {
             MFrame.backgroundColor = pc.c[0];
             MFrame.objectColor = pc.c[1];
             MFrame.lineColor = pc.c[2];
             DragBox.hiliteColor = pc.c[3];
             frame.updateSelection();
         }
-        if (cmd == "Save") {
-            prefs = Preferences.userNodeForPackage(this.getClass());
+        if (cmd.equals("Save")) {
+            Preferences prefs = Preferences.userNodeForPackage(this.getClass());
             prefs.put("color.background", Util.color2hrgb(MFrame.backgroundColor));
             prefs.put("color.objects", Util.color2hrgb(MFrame.objectColor));
             prefs.put("color.line", Util.color2hrgb(MFrame.lineColor));

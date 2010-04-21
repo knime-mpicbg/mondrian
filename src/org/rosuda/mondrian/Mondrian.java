@@ -20,31 +20,31 @@ public class Mondrian extends Frame
         MRJAboutHandler,
         MRJQuitHandler {
 
-    static final String message = "Hello World!";
+    private static final String message = "Hello World!";
     private Font font = new Font("serif", Font.ITALIC + Font.BOLD, 36);
 
-    protected AboutBox aboutBox;
+    private AboutBox aboutBox;
 
     // Declarations for menus
-    static final MenuBar mainMenuBar = new MenuBar();
+    private static final MenuBar mainMenuBar = new MenuBar();
 
-    static final Menu fileMenu = new Menu("File");
-    protected MenuItem miNew;
-    protected MenuItem miOpen;
-    protected MenuItem miClose;
-    protected MenuItem miSave;
-    protected MenuItem miSaveAs;
+    private static final Menu fileMenu = new Menu("File");
+    private MenuItem miNew;
+    private MenuItem miOpen;
+    private MenuItem miClose;
+    private MenuItem miSave;
+    private MenuItem miSaveAs;
 
-    static final Menu editMenu = new Menu("Edit");
-    protected MenuItem miUndo;
-    protected MenuItem miCut;
-    protected MenuItem miCopy;
-    protected MenuItem miPaste;
-    protected MenuItem miClear;
-    protected MenuItem miSelectAll;
+    private static final Menu editMenu = new Menu("Edit");
+    private MenuItem miUndo;
+    private MenuItem miCut;
+    private MenuItem miCopy;
+    private MenuItem miPaste;
+    private MenuItem miClear;
+    private MenuItem miSelectAll;
 
 
-    public void addFileMenuItems() {
+    void addFileMenuItems() {
         miNew = new MenuItem("New");
         miNew.setShortcut(new MenuShortcut(KeyEvent.VK_N, false));
         fileMenu.add(miNew).setEnabled(true);
@@ -74,7 +74,7 @@ public class Mondrian extends Frame
     }
 
 
-    public void addEditMenuItems() {
+    void addEditMenuItems() {
         miUndo = new MenuItem("Undo");
         miUndo.setShortcut(new MenuShortcut(KeyEvent.VK_Z, false));
         editMenu.add(miUndo).setEnabled(true);
@@ -110,14 +110,14 @@ public class Mondrian extends Frame
     }
 
 
-    public void addMenus() {
+    void addMenus() {
         addFileMenuItems();
         addEditMenuItems();
         setMenuBar(mainMenuBar);
     }
 
 
-    public Mondrian() {
+    private Mondrian() {
         super("Mondrian");
         setLayout(null);
         addMenus();
@@ -167,47 +167,47 @@ public class Mondrian extends Frame
     }
 
 
-    public void doNew() {
+    void doNew() {
     }
 
 
-    public void doOpen() {
+    void doOpen() {
     }
 
 
-    public void doClose() {
+    void doClose() {
     }
 
 
-    public void doSave() {
+    void doSave() {
     }
 
 
-    public void doSaveAs() {
+    void doSaveAs() {
     }
 
 
-    public void doUndo() {
+    void doUndo() {
     }
 
 
-    public void doCut() {
+    void doCut() {
     }
 
 
-    public void doCopy() {
+    void doCopy() {
     }
 
 
-    public void doPaste() {
+    void doPaste() {
     }
 
 
-    public void doClear() {
+    void doClear() {
     }
 
 
-    public void doSelectAll() {
+    void doSelectAll() {
     }
 
 

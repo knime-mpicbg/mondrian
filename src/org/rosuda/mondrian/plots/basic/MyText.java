@@ -6,12 +6,12 @@ import java.awt.*;               //
 
 public class MyText {
 
-    String s;
-    public int x;
+    private String s;
+    private int x;
     public int y;
-    int align = 0;
-    double angle = 0;
-    int extend = 10000;
+    private int align = 0;
+    private double angle = 0;
+    private int extend = 10000;
 
 
     public MyText(String s, int x, int y) {

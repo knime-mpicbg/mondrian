@@ -135,7 +135,6 @@ public class Util {
         while (s.length() < 6) {
             s = "0" + s;
         }
-        ;
         return "#" + s;
     }
 
@@ -153,9 +152,8 @@ public class Util {
         int i = 0;
         try {
             i = Integer.parseInt(s, 16);
-        } catch (Exception dce) {
+        } catch (Exception ignored) {
         }
-        ;
         return i;
     }
 

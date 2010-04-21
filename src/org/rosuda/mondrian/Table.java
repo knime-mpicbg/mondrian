@@ -161,7 +161,7 @@ public class Table implements Cloneable {
 
         int[][] interact = new int[Interactions.Ssize()][];
         for (int i = 0; i < Interactions.Ssize(); i++) {
-            interact[i] = (int[]) Interactions.SmemberAt(i);
+            interact[i] = Interactions.SmemberAt(i);
         }
         int n = this.table.length;
         int[][] permArray = new int[interact.length][this.k];
@@ -371,7 +371,7 @@ public class Table implements Cloneable {
                                     String tmp = rs.getString(j + 1);
                                     if (tmp == null)
                                         tmp = "NA";
-                                    index += plevels[j] * ((Variable) data.data.elementAt(initialVars[j])).Level((tmp).trim());
+                                    index += plevels[j] * data.data.elementAt(initialVars[j]).Level((tmp).trim());
                                 } else // table for histogram !!!
                                     for (int i = 0; i < table.length; i++) {
 //System.out.println(lnames[0][i]+" <-> "+rs.getString(j+1).trim());

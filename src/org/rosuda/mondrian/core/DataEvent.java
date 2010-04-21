@@ -12,5 +12,5 @@ public class DataEvent extends AWTEvent {
     }
 
 
-    public static final int DATA_EVENT = AWTEvent.RESERVED_ID_MAX + 3;
+    private static final int DATA_EVENT = AWTEvent.RESERVED_ID_MAX + 3;
 }

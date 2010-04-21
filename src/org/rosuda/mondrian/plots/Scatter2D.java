@@ -31,7 +31,8 @@ public class Scatter2D extends DragBox {
     private int width, height;                   // The preferred size.
     protected int oldWidth, oldHeight;           // The last size for constructing the polygons.
     private int hiliteId = 0;
-    private double xMin, xMax, yMin, yMax;         // Scalings for plot
+    private double xMin;
+    private double xMax;
     private int shiftx, shifty;
     private double scalex, scaley;
     private DataSet data;
@@ -39,12 +40,13 @@ public class Scatter2D extends DragBox {
     private int displayVar = -1;
     private Image bi, tbi, ttbi, tttbi, fi;            // four buffer: 1. double, 2. hilite, 3. labels, 4. filtered
     private MediaTracker media = new MediaTracker(this);
-    private Graphics2D fg, bg, ttbg, tttbg;
+    private Graphics2D bg;
+    private Graphics2D ttbg;
+    private Graphics2D tttbg;
     private int[] Vars;
     private JList varList;
     private double[] xVal;
     private double[] yVal;
-    private double[] byVal;
     private double[] coeffs;
     private double[] selCoeffs = {-10000, -10000, 0};
     private int radius = 3;            // radius of points
@@ -66,7 +68,6 @@ public class Scatter2D extends DragBox {
     private int roundX;
     private int roundY;
     private Table binning;
-    private boolean matrix = false;
     private boolean force = false;
     private boolean invert = false;
     private boolean alphaChanged = false;
@@ -78,7 +79,7 @@ public class Scatter2D extends DragBox {
      */
     public Scatter2D(MFrame frame, int width, int height, DataSet data, int[] Vars, JList varList, boolean matrix) {
         super(frame);
-        this.matrix = matrix;
+        boolean matrix1 = matrix;
         this.data = data;
         this.width = width;
         this.height = height;
@@ -119,8 +120,8 @@ public class Scatter2D extends DragBox {
 
         xMin = data.getMin(Vars[0]);
         xMax = data.getMax(Vars[0]);
-        yMin = data.getMin(Vars[1]);
-        yMax = data.getMax(Vars[1]);
+        double yMin = data.getMin(Vars[1]);
+        double yMax = data.getMax(Vars[1]);
 
         setCoordinates(xMin, yMin, xMax, yMax, -1);
 
@@ -488,7 +489,7 @@ public class Scatter2D extends DragBox {
                             rougher.setEnabled(false);
                         }
 
-                        if (!((MFrame) frame).hasR()) {
+                        if (!frame.hasR()) {
                             loess.setEnabled(false);
                             splines.setEnabled(false);
                             locfit.setEnabled(false);
@@ -860,6 +861,7 @@ public class Scatter2D extends DragBox {
 
         if (bg == null || alphaChanged || printing) {
 
+            Graphics2D fg;
             if (printing) {
 //        System.out.println("Setting Graphics for Printing");
                 bg = g;
@@ -925,10 +927,10 @@ public class Scatter2D extends DragBox {
                     media.addImage(bi, 0);
                     try {
                         media.waitForID(0);
-                        ti = Util.makeColorTransparent(fi, new Color(0).gray);
+                        ti = Util.makeColorTransparent(fi, Color.gray);
                         bg.drawImage(ti, 0, 0, Color.black, null);
                     }
-                    catch (InterruptedException e) {
+                    catch (InterruptedException ignored) {
                     }
                     pg.dispose();
                 }
@@ -984,16 +986,16 @@ public class Scatter2D extends DragBox {
             bg.rotate(-Math.PI / 2);
             bg.drawString(Stat.roundToString(getLly(), roundY),
                     -(int) userToWorldY(getLly()),
-                    (int) userToWorldY(getUry()) - fm.getMaxAscent() - tick * pF + 1 * pF + (xShift - yShift) * pF);
+                    (int) userToWorldY(getUry()) - fm.getMaxAscent() - tick * pF + pF + (xShift - yShift) * pF);
             bg.drawString(Stat.roundToString(getUry(), roundY),
                     -(int) userToWorldY(getUry()) - fm.stringWidth(Stat.roundToString(getUry(), roundY)),
-                    (int) userToWorldY(getUry()) - fm.getMaxAscent() - tick * pF + 1 * pF + (xShift - yShift) * pF);
+                    (int) userToWorldY(getUry()) - fm.getMaxAscent() - tick * pF + pF + (xShift - yShift) * pF);
             bg.rotate(Math.PI / 2);
         } // end, new background graphics
 
         Graphics tbg;
         if (!printing) {
-            tbg = (Graphics2D) tbi.getGraphics();
+            tbg = tbi.getGraphics();
             tbg.drawImage(bi, 0, 0, Color.black, null);
         } else
             tbg = g;
@@ -1009,7 +1011,7 @@ public class Scatter2D extends DragBox {
             if (connectLines) {
 
                 tbg.setColor(DragBox.hiliteColor);
-                byVal = data.getRawNumbers(byVar);
+                double[] byVal = data.getRawNumbers(byVar);
                 for (int i = 1; i < data.n; i++) {
                     if (selection[i] > 0) {
                         int j = i - 1;
@@ -1032,7 +1034,7 @@ public class Scatter2D extends DragBox {
     }
 }*/
             tbg.setColor(DragBox.hiliteColor);
-            if (((MFrame) frame).getAlphaHi())
+            if (frame.getAlphaHi())
                 ((Graphics2D) tbg).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, ((float) Math.pow((float) alpha / 100, 0.75))));
 
             for (int i = 0; i < data.n; i++) {
@@ -1326,8 +1328,8 @@ public class Scatter2D extends DragBox {
             binning = data.discretize2D("Dummy", Vars[0], getLlx(), getUrx() + 0.01 * (getUrx() - getLlx()), width / radius,
                     Vars[1], getLly(), getUry() + 0.01 * (getUry() - getLly()), width / radius);
         } else {
-            binning.update2DBins(getLlx(), getUrx() + 0.01 * (getUrx() - getLlx()), (int) (width / radius),
-                    getLly(), getUry() + 0.01 * (getUry() - getLly()), (int) (width / radius));
+            binning.update2DBins(getLlx(), getUrx() + 0.01 * (getUrx() - getLlx()), width / radius,
+                    getLly(), getUry() + 0.01 * (getUry() - getLly()), width / radius);
         }
 
         //System.out.println(getLlx()+ " - " +getUrx()+ " - " + getLly()+ " - " +getUry());
@@ -1342,7 +1344,7 @@ public class Scatter2D extends DragBox {
             for (int j = 0; j < binning.levels[1]; j++) {
                 int index = i * (binning.levels[1]) + j;
                 Vector tileIds = new Vector(1, 0);
-                tileIds.addElement(new Integer(index));
+                tileIds.addElement(index);
                 Y = (int) userToWorldY(getLly() + (j + 1) * (getUry() - getLly()) / (width / radius));
                 if (binning.table[index] > 0)
                     rects.addElement(new MyRect(true, 'f', "Observed", X, Y, nextX - X, lastY - Y, binning.table[index],

@@ -33,7 +33,6 @@ public class Barchart extends DragBox implements ActionListener {
     private double max = 0;
     private double iniMax = 0;
     private String searchText = "";
-    private boolean scaleFixed = false;
     private int scaler = 0;
     private Image bi;
     private Graphics bg;
@@ -212,7 +211,7 @@ public class Barchart extends DragBox implements ActionListener {
             oldWidth = size.width;
             oldHeight = size.height;
             if (scaleChanged) {
-                scaleFixed = true;
+                boolean scaleFixed = true;
                 scaleChanged = false;
             }
         }
@@ -439,7 +438,6 @@ public class Barchart extends DragBox implements ActionListener {
                             }
 
 
-                            ;
                         });
                     } else {
                         brush = new JMenuItem("Clear all Colors");
@@ -450,7 +448,6 @@ public class Barchart extends DragBox implements ActionListener {
                             }
 
 
-                            ;
                         });
                     }
                     mode.add(brush);
@@ -471,7 +468,7 @@ public class Barchart extends DragBox implements ActionListener {
                         oldY = r.getRect().y;
                         movingText = (MyText) labels.elementAt(i);
                         moving = true;
-                        frame.setCursor(Frame.HAND_CURSOR);
+                        frame.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     }
                 }
             } else if ((e.getID() == MouseEvent.MOUSE_RELEASED) && moving &&
@@ -483,8 +480,8 @@ public class Barchart extends DragBox implements ActionListener {
                 (this.getGraphics()).drawImage(bi, 0, 0, null);
                 moving = false;
                 movingRect.moveTo(-1, oldY);
-                frame.setCursor(Frame.DEFAULT_CURSOR);
-                Variable v = (Variable) (tablep.data.data.elementAt(tablep.initialVars[0]));
+                frame.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                Variable v = tablep.data.data.elementAt(tablep.initialVars[0]);
                 out:
                 {
                     for (int i = 0; i < rects.size(); i++) {
@@ -656,7 +653,7 @@ public class Barchart extends DragBox implements ActionListener {
         } else if (command.equals("abs") || command.equals("rel") || command.equals("lex") || command.equals("frq") || command.equals("rev")) {
             if (command.equals("abs") || command.equals("rel") || command.equals("lex") || command.equals("frq")) {
                 double[] sortA = new double[this.k];
-                Variable v = (Variable) (tablep.data.data.elementAt(tablep.initialVars[0]));
+                Variable v = tablep.data.data.elementAt(tablep.initialVars[0]);
                 //
                 // first get all highlighting fixed
                 //
@@ -701,7 +698,7 @@ public class Barchart extends DragBox implements ActionListener {
                 if (command.equals("lex"))
                     v.sortLevels();
             } else if (command.equals("rev")) {
-                Variable v = (Variable) (tablep.data.data.elementAt(tablep.initialVars[0]));
+                Variable v = tablep.data.data.elementAt(tablep.initialVars[0]);
                 for (int i = 0; i < v.permA.length / 2; i++) {
                     int save = v.permA[i];
                     v.permA[i] = v.permA[v.permA.length - i - 1];
@@ -746,7 +743,7 @@ public class Barchart extends DragBox implements ActionListener {
             sum += tablep.table[i];
             tMax = Math.max(tMax, tablep.table[i]);
             tileIds[i] = new Vector(1, 0);
-            tileIds[i].addElement(new Integer(i));
+            tileIds[i].addElement(i);
         }
 
         max = getUrx();

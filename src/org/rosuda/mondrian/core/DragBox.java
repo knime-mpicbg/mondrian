@@ -870,39 +870,39 @@ abstract class DragBox
                     changeSelection.add(Step);
 
                     //	  PopupMenu mode = new PopupMenu(S.getModeString(S.mode));
-                    JMenu mode = new JMenu(S.getModeString(S.mode));
-                    JMenuItem modeM = new JMenuItem(S.getModeString(S.mode));
+                    JMenu mode = new JMenu(Selection.getModeString(S.mode));
+                    JMenuItem modeM = new JMenuItem(Selection.getModeString(S.mode));
 
                     if (selStep > 1 || S.total == 1) {
                         if (S.mode != Selection.MODE_STANDARD) {
-                            JMenuItem Replace = new JMenuItem(S.getModeString(Selection.MODE_STANDARD));
+                            JMenuItem Replace = new JMenuItem(Selection.getModeString(Selection.MODE_STANDARD));
                             mode.add(Replace);
                             Replace.addActionListener(this);
-                            Replace.setActionCommand(S.getModeString(Selection.MODE_STANDARD));
+                            Replace.setActionCommand(Selection.getModeString(Selection.MODE_STANDARD));
                         }
                         if (S.mode != Selection.MODE_AND && selStep > 1) {
                             JMenuItem And = new JMenuItem("And");
                             mode.add(And);
                             And.addActionListener(this);
-                            And.setActionCommand(S.getModeString(Selection.MODE_AND));
+                            And.setActionCommand(Selection.getModeString(Selection.MODE_AND));
                         }
                         if (S.mode != Selection.MODE_OR) {
                             JMenuItem Or = new JMenuItem("Or");
                             mode.add(Or);
                             Or.addActionListener(this);
-                            Or.setActionCommand(S.getModeString(Selection.MODE_OR));
+                            Or.setActionCommand(Selection.getModeString(Selection.MODE_OR));
                         }
                         if (S.mode != Selection.MODE_XOR && selStep > 1) {
                             JMenuItem XOr = new JMenuItem("Xor");
                             mode.add(XOr);
                             XOr.addActionListener(this);
-                            XOr.setActionCommand(S.getModeString(Selection.MODE_XOR));
+                            XOr.setActionCommand(Selection.getModeString(Selection.MODE_XOR));
                         }
                         if (S.mode != Selection.MODE_NOT) {
                             JMenuItem Not = new JMenuItem("Not");
                             mode.add(Not);
                             Not.addActionListener(this);
-                            Not.setActionCommand(S.getModeString(Selection.MODE_NOT));
+                            Not.setActionCommand(Selection.getModeString(Selection.MODE_NOT));
                         }
                         changeSelection.add(mode);
                     } else
@@ -1059,9 +1059,9 @@ abstract class DragBox
             PageFormat pageFormat = pj.defaultPage();
             Dimension size = this.getSize();
             if (size.width > size.height)
-                pageFormat.setOrientation(pageFormat.LANDSCAPE);
+                pageFormat.setOrientation(PageFormat.LANDSCAPE);
             else
-                pageFormat.setOrientation(pageFormat.PORTRAIT);
+                pageFormat.setOrientation(PageFormat.PORTRAIT);
 
             pageFormat = pj.pageDialog(pageFormat);
             if (pageFormat != null) {
@@ -1182,7 +1182,7 @@ abstract class DragBox
                 (e.getModifiers() == Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())) {
 
             LD = new LimitDialog(this);
-            LD.show();
+            LD.setVisible(true);
         }
         if ((e.getID() == KeyEvent.KEY_PRESSED) &&
                 (e.getKeyCode() == Event.BACK_SPACE)) {
@@ -1226,7 +1226,7 @@ abstract class DragBox
             evtq.postEvent(se);
         }
         if (e.getModifiers() == Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() && e.getKeyCode() == KeyEvent.VK_W) {
-            ((MFrame) frame).close();
+            frame.close();
         }
         if (e.getModifiers() == Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() && e.getKeyCode() == KeyEvent.VK_C) {
             // todo renable me
@@ -1344,15 +1344,15 @@ abstract class DragBox
             if (command.equals("DeleteAll")) {
                 deleteAll = true;
             }
-            if (command.equals(S.getModeString(Selection.MODE_STANDARD)))
+            if (command.equals(Selection.getModeString(Selection.MODE_STANDARD)))
                 S.mode = Selection.MODE_STANDARD;
-            if (command.equals(S.getModeString(Selection.MODE_AND)))
+            if (command.equals(Selection.getModeString(Selection.MODE_AND)))
                 S.mode = Selection.MODE_AND;
-            if (command.equals(S.getModeString(Selection.MODE_OR)))
+            if (command.equals(Selection.getModeString(Selection.MODE_OR)))
                 S.mode = Selection.MODE_OR;
-            if (command.equals(S.getModeString(Selection.MODE_XOR)))
+            if (command.equals(Selection.getModeString(Selection.MODE_XOR)))
                 S.mode = Selection.MODE_XOR;
-            if (command.equals(S.getModeString(Selection.MODE_NOT)))
+            if (command.equals(Selection.getModeString(Selection.MODE_NOT)))
                 S.mode = Selection.MODE_NOT;
 
             SelectionEvent se = new SelectionEvent(this);

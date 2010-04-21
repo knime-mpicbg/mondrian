@@ -16,8 +16,6 @@ import java.text.DecimalFormat;
 
 public class ModelNavigator extends JFrame implements ActionListener, ModelListener {
 
-    private GridBagLayout gbl;
-    private GridBagConstraints gbc;
     DecimalFormat dfP = new DecimalFormat("0.000");
     private Label modelP;
     private Label currentP;
@@ -53,11 +51,11 @@ public class ModelNavigator extends JFrame implements ActionListener, ModelListe
 
     public ModelNavigator() {
         this.setTitle("ModelNavigator");
-        this.hide();
+        this.setVisible(false);
 
-        gbl = new GridBagLayout();
+        GridBagLayout gbl = new GridBagLayout();
         this.getContentPane().setLayout(gbl);
-        gbc = new GridBagConstraints();
+        GridBagConstraints gbc = new GridBagConstraints();
         gbc.weightx = 10;
         gbc.weighty = 10;
 
@@ -114,7 +112,7 @@ public class ModelNavigator extends JFrame implements ActionListener, ModelListe
         }
 
         interList = new List(5);
-        interList.addItem("Dummy              ");
+        interList.add("Dummy              ");
 
         interList.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
@@ -166,16 +164,16 @@ public class ModelNavigator extends JFrame implements ActionListener, ModelListe
             modelX2.setText(dfX2.format(Stat.round(t.X2, 1)));
             modelDf.setText(dfDf.format(t.df));
 
-            interList.delItems(0, interList.countItems() - 1);
+            interList.delItems(0, interList.getItemCount() - 1);
             for (int i = (t.Interactions).size() - 1; i >= 0; i--) {
                 String inter = "";
-                int k = ((int[]) (t.Interactions.memberAt(i))).length;
+                int k = t.Interactions.memberAt(i).length;
                 if (k > 1)
                     for (int j = 0; j < k - 1; j++) {
-                        String name = t.names[((int[]) (t.Interactions.memberAt(i)))[j]];
+                        String name = t.names[t.Interactions.memberAt(i)[j]];
                         inter += name.substring(0, Math.min(5, name.length())) + "*";
                     }
-                String name = t.names[((int[]) (t.Interactions.memberAt(i)))[k - 1]];
+                String name = t.names[t.Interactions.memberAt(i)[k - 1]];
                 inter += name.substring(0, Math.min(5, name.length()));
                 interList.addItem(inter);
             }
@@ -183,9 +181,9 @@ public class ModelNavigator extends JFrame implements ActionListener, ModelListe
             int[] interact = new int[maxLevel];
             for (int i = 0; i < maxLevel; i++)
                 interact[i] = i;
-            super.setCursor(Frame.WAIT_CURSOR);
+            super.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             myT.addInteraction(interact, true);
-            super.setCursor(Frame.DEFAULT_CURSOR);
+            super.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
             currentP.setText(dfP.format(Stat.round(myT.p, 3)));
             currentG2.setText(dfG2.format(Stat.round(myT.G2, 1)));
@@ -222,9 +220,9 @@ public class ModelNavigator extends JFrame implements ActionListener, ModelListe
         int toDelete = k - id - 1;
         int[] save = myT.Interactions.memberAt(toDelete);
         if (save.length > 1) {
-            super.setCursor(Frame.WAIT_CURSOR);
+            super.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             myT.deleteInteraction(save);
-            super.setCursor(Frame.DEFAULT_CURSOR);
+            super.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
             interP.setText("" + Stat.round(myT.p, 3));
             interG2.setText("" + Stat.round(myT.G2, 1));
@@ -246,9 +244,9 @@ public class ModelNavigator extends JFrame implements ActionListener, ModelListe
             int[] interact = new int[oldMax];
             for (int i = 0; i < oldMax; i++)
                 interact[i] = i;
-            super.setCursor(Frame.WAIT_CURSOR);
+            super.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             t.addInteraction(interact, true);
-            super.setCursor(Frame.DEFAULT_CURSOR);
+            super.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
             modelP.setText(dfP.format(Stat.round(t.p, 3)));
             modelG2.setText(dfG2.format(Stat.round(t.G2, 1)));
@@ -258,13 +256,13 @@ public class ModelNavigator extends JFrame implements ActionListener, ModelListe
             interList.delItems(0, interList.countItems() - 1);
             for (int i = (t.Interactions).size() - 1; i >= 0; i--) {
                 String inter = "";
-                int k = ((int[]) (t.Interactions.memberAt(i))).length;
+                int k = t.Interactions.memberAt(i).length;
                 if (k > 1)
                     for (int j = 0; j < k - 1; j++) {
-                        String name = t.names[((int[]) (t.Interactions.memberAt(i)))[j]];
+                        String name = t.names[t.Interactions.memberAt(i)[j]];
                         inter += name.substring(0, Math.min(5, name.length())) + "*";
                     }
-                String name = t.names[((int[]) (t.Interactions.memberAt(i)))[k - 1]];
+                String name = t.names[t.Interactions.memberAt(i)[k - 1]];
                 inter += name.substring(0, Math.min(5, name.length()));
                 interList.addItem(inter);
             }
@@ -275,9 +273,9 @@ public class ModelNavigator extends JFrame implements ActionListener, ModelListe
                 int kk = (t.Interactions).size();
                 int toDelete = kk - id - 1;
                 int[] save = t.Interactions.memberAt(toDelete);
-                super.setCursor(Frame.WAIT_CURSOR);
+                super.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 t.deleteInteraction(save);
-                super.setCursor(Frame.DEFAULT_CURSOR);
+                super.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
                 modelP.setText(dfP.format(Stat.round(t.p, 3)));
                 modelG2.setText(dfG2.format(Stat.round(t.G2, 1)));
@@ -289,16 +287,16 @@ public class ModelNavigator extends JFrame implements ActionListener, ModelListe
                 interX2.setText("----.-");
                 interDf.setText("----");
 
-                interList.delItems(0, interList.countItems() - 1);
+                interList.delItems(0, interList.getItemCount() - 1);
                 for (int i = (t.Interactions).size() - 1; i >= 0; i--) {
                     String inter = "";
-                    int k = ((int[]) (t.Interactions.memberAt(i))).length;
+                    int k = t.Interactions.memberAt(i).length;
                     if (k > 1)
                         for (int j = 0; j < k - 1; j++) {
-                            String name = t.names[((int[]) (t.Interactions.memberAt(i)))[j]];
+                            String name = t.names[t.Interactions.memberAt(i)[j]];
                             inter += name.substring(0, Math.min(5, name.length())) + "*";
                         }
-                    String name = t.names[((int[]) (t.Interactions.memberAt(i)))[k - 1]];
+                    String name = t.names[t.Interactions.memberAt(i)[k - 1]];
                     inter += name.substring(0, Math.min(5, name.length()));
                     interList.addItem(inter);
                 }

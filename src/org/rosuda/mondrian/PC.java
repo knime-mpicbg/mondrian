@@ -31,7 +31,6 @@ public class PC extends DragBox implements ActionListener {
     protected int addBorder = 0;
     private int outside = 5;
     private int tick = 5;
-    private int roundY;
     protected int selID = -1;
     protected int scaleFactor = 3;
     protected double centerAt = 0;
@@ -566,7 +565,7 @@ public class PC extends DragBox implements ActionListener {
                 //  System.out.println("Moving Start");
                 //
                 moving = true;
-                frame.setCursor(Frame.HAND_CURSOR);
+                frame.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
                 int minXDist = 5000;
                 int popXId = 0;
@@ -588,7 +587,7 @@ public class PC extends DragBox implements ActionListener {
                 //   System.out.println("Moving Stop");
                 //
                 moving = false;
-                frame.setCursor(Frame.DEFAULT_CURSOR);
+                frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
                 int minXDist = 5000;
                 int popXId = 0;
@@ -863,7 +862,7 @@ public class PC extends DragBox implements ActionListener {
             update(this.getGraphics());
         } else if (command.equals("min") || command.equals("quar") || command.equals("sdev") || command.equals("mean") || command.equals("median") || command.equals("max") || command.equals("ini") || command.equals("rev")) {
             sortMode = command;
-            Variable v = (Variable) data.data.elementAt(yVar);
+            Variable v = data.data.elementAt(yVar);
             if (command.equals("ini"))
                 if (paintMode.equals("XbyY"))
                     v.sortLevels();
@@ -1006,7 +1005,6 @@ public class PC extends DragBox implements ActionListener {
 
     public void paint(Graphics2D g2d) {
 
-        Graphics2D g = (Graphics2D) g2d;
         Dimension size = this.getSize();
         data.updateFilter();
 
@@ -1044,7 +1042,7 @@ public class PC extends DragBox implements ActionListener {
                 tbi = createImage(size.width, size.height);
                 bg = (Graphics2D) bi.getGraphics();
             } else
-                bg = g;
+                bg = g2d;
 
             if (alignMode.equals("cvalue")) {          // draw reference x-axis if values are aligned at a certain value
                 bg.setColor(Color.gray);
@@ -1070,7 +1068,7 @@ public class PC extends DragBox implements ActionListener {
                 Font SF = new Font("SansSerif", Font.PLAIN, 11);
                 bg.setFont(SF);
                 FontMetrics fm = bg.getFontMetrics();
-                roundY = (int) Math.max(0, 2 - Math.round((Math.log(Maxs[1] - Mins[1]) / Math.log(10))));
+                int roundY = (int) Math.max(0, 2 - Math.round((Math.log(Maxs[1] - Mins[1]) / Math.log(10))));
                 // y-axis
                 bg.drawLine(3 + border - outside * pF, height - border,
                         3 + border - outside * pF, border);
@@ -1084,19 +1082,19 @@ public class PC extends DragBox implements ActionListener {
                 bg.rotate(-Math.PI / 2);
                 bg.drawString(Stat.roundToString(Mins[1], roundY),
                         -height + border,
-                        border + 4 - fm.getMaxAscent() - tick * pF + 1 * pF);
+                        border + 4 - fm.getMaxAscent() - tick * pF + pF);
                 if (alignMode.equals("cvalue"))
                     bg.drawString(Stat.roundToString(centerAt, roundY),
                             -border - fm.stringWidth(Stat.roundToString(centerAt, roundY)) / 2 - (height - 2 * border) / 2,
-                            border + 4 - fm.getMaxAscent() - tick * pF + 1 * pF);
+                            border + 4 - fm.getMaxAscent() - tick * pF + pF);
 
                 bg.drawString(Stat.roundToString(Maxs[1], roundY),
                         -border - fm.stringWidth(Stat.roundToString(Maxs[1], roundY)),
-                        border + 4 - fm.getMaxAscent() - tick * pF + 1 * pF);
+                        border + 4 - fm.getMaxAscent() - tick * pF + pF);
                 bg.rotate(Math.PI / 2);
             }
 
-            bg.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, ((float) alpha)));
+            bg.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
 
             Color[] cols = new Color[1];
             if (data.colorBrush) {
@@ -1175,9 +1173,9 @@ public class PC extends DragBox implements ActionListener {
         long start = new Date().getTime();
         Graphics tbg, ttbg;
         if (!printing)
-            tbg = (Graphics2D) tbi.getGraphics();
+            tbg = tbi.getGraphics();
         else
-            tbg = g;
+            tbg = g2d;
 
         if (!printing)
             tbg.drawImage(bi, 0, 0, null);
@@ -1186,8 +1184,8 @@ public class PC extends DragBox implements ActionListener {
         if (data.countSelection() > 0) {
             selection = data.getSelection();
             if (paintMode.equals("Poly") || paintMode.equals("Both")) {
-                if (((MFrame) frame).getAlphaHi())
-                    ((Graphics2D) tbg).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
+                if (frame.getAlphaHi())
+                    ((Graphics2D) tbg).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
                 else
                     ((Graphics2D) tbg).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0F));
                 for (int i = 0; i < data.n; i++) {
@@ -1235,7 +1233,7 @@ public class PC extends DragBox implements ActionListener {
             ttbg = ttbi.getGraphics();
             ttbg.drawImage(tbi, 0, 0, null);
         } else
-            ttbg = g;
+            ttbg = g2d;
 
         for (int j = 0; j < k; j++) {
             int x = border + addBorder + (int) (0.5 + (j * slotWidth));
@@ -1287,7 +1285,7 @@ public class PC extends DragBox implements ActionListener {
             ttbg.setColor(Color.black);
             drawSelections(ttbg);
 //        g.drawImage(ttbi, 0, 0, Color.black, null);
-            g.drawImage(ttbi, 0, 0, null);
+            g2d.drawImage(ttbi, 0, 0, null);
 //        g.drawImage(loadGif.getImage(), width/2-16,height/2-16,null);
             tbg.dispose();
             ttbg.dispose();
@@ -1360,13 +1358,13 @@ public class PC extends DragBox implements ActionListener {
             denom = p.xpoints[1] - p.xpoints[0];
 
         if (inverted[selectCol] && paintMode.equals("Poly"))
-            S.o = new floatRect((double) ((S.r.x - border - addBorder) % slotWidth) / slotWidth,
+            S.o = new floatRect((S.r.x - border - addBorder) % slotWidth / slotWidth,
                     ((double) (-border + S.r.y + S.r.height)) / (height - 2 * border) * (Maxs[selectCol] - Mins[selectCol]) + Mins[selectCol],
                     (double) (S.r.width) / denom,
                     (double) (S.r.height) / (height - 2 * border) * (Maxs[selectCol] - Mins[selectCol]),
                     passID);
         else
-            S.o = new floatRect((double) ((S.r.x - border - addBorder) % slotWidth) / slotWidth,
+            S.o = new floatRect((S.r.x - border - addBorder) % slotWidth / slotWidth,
                     ((double) (height - border - S.r.y)) / (height - 2 * border) * (Maxs[selectCol] - Mins[selectCol]) + Mins[selectCol],
                     (double) (S.r.width) / denom,
                     (double) (S.r.height) / (height - 2 * border) * (Maxs[selectCol] - Mins[selectCol]),
@@ -1662,9 +1660,9 @@ S.o = new floatRect((double)((S.r.x - border) % slotWidth)/slotWidth,
                     for (int i = 0; i < lev; i++) {
                         sum += breakdown.table[i];
                         tileIds[i] = new Vector(1, 0);
-                        tileIds[i].addElement(new Integer(i));
+                        tileIds[i].addElement(i);
                     }
-                    int y = (int) (-border + height);
+                    int y = -border + height;
                     for (int i = 0; i < lev; i++) {
                         int w = (int) (0.5 + slotWidth / 2);
                         int h = (int) Math.round((height - 2 * border) * breakdown.table[i] / data.n);

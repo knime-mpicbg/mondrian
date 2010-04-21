@@ -27,7 +27,10 @@ public class Histogram extends DragBox implements ActionListener {
     private Vector labels = new Vector(256, 0);               // Store the labels.
     private int width, height, realHeight, startX;           // The preferred size.
     protected int oldWidth, oldHeight;                       // The last size for constructing the bars.
-    private double xMin, xMax, yMin, yMax, range;           // Scaling
+    private double xMin;
+    private double xMax;
+    private double yMin;
+    private double yMax;
     private int outside = 5;
     private int tick = 5;
     private double bStart, bWidth;            // Anker and Width of the Bins
@@ -48,7 +51,6 @@ public class Histogram extends DragBox implements ActionListener {
     private boolean coordsSet = false;
     private boolean info = false;
     private int eventID;
-    private Polygon pD;
 
 
     public Histogram(MFrame frame, int width, int height, Table tablep, double bStart, double bWidth, int weight) {
@@ -89,7 +91,7 @@ public class Histogram extends DragBox implements ActionListener {
 
         xMin = tablep.data.getMin(tablep.initialVars[0]);
         xMax = tablep.data.getMax(tablep.initialVars[0]);
-        range = xMax - xMin;
+        double range = xMax - xMin;
         yMin = 0;
         yMax = 1 / range * 4.25;
 
@@ -331,6 +333,7 @@ public class Histogram extends DragBox implements ActionListener {
                 double[] dx = l.at("x").asDoubles();
                 double[] dy = l.at("y").asDoubles();
 
+                Polygon pD;
                 if (displayMode.equals("Histogram") && !CDPlot) {
                     pD = new Polygon();
                     for (int f = 0; f < dx.length; f++)
@@ -519,7 +522,7 @@ public class Histogram extends DragBox implements ActionListener {
                 Selection S = (Selection) Selections.elementAt(i);
                 maintainSelection(S);
             }
-            if (!((MFrame) frame).hasR()) {
+            if (!frame.hasR()) {
                 densityMode = false;
                 CDPlot = false;
             }
@@ -542,7 +545,7 @@ public class Histogram extends DragBox implements ActionListener {
 
             if ((e.getModifiers() == ALT_DOWN)) {
 
-                frame.setCursor(Frame.CROSSHAIR_CURSOR);
+                frame.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 
                 info = true;
                 tbg.setColor(MFrame.backgroundColor);
@@ -590,7 +593,7 @@ public class Histogram extends DragBox implements ActionListener {
                 tbg.dispose();
             } else {
                 if (info) {
-                    frame.setCursor(Frame.DEFAULT_CURSOR);
+                    frame.setCursor(Cursor.getDefaultCursor());
                     paint(this.getGraphics());
                     info = false;
                 }
@@ -672,7 +675,7 @@ public class Histogram extends DragBox implements ActionListener {
                         Density.setSelected(false);
                     mode.add(Density);
 
-                    if (!((MFrame) frame).hasR()) {
+                    if (!frame.hasR()) {
                         CDPlotM.setEnabled(false);
                         Density.setEnabled(false);
                     }
@@ -753,16 +756,16 @@ public class Histogram extends DragBox implements ActionListener {
                                 starter = Stat.round((Math.floor(xMin / ticker)) * ticker, 8);
 
                                 while (k < menuStart.getItemCount()) {
-                                    if (starter > Util.atod(((JCheckBoxMenuItem) menuStart.getItem(k)).getText()))
+                                    if (starter > Util.atod(menuStart.getItem(k).getText()))
                                         insert = k + 1;
                                     k++;
                                 }
 
                                 if (insert == menuStart.getItemCount() && insert > 0 &&
-                                        starter == Util.atod(((JCheckBoxMenuItem) menuStart.getItem(insert - 1)).getText()))
+                                        starter == Util.atod(menuStart.getItem(insert - 1).getText()))
                                     insert = -1;
                                 else if (insert < menuStart.getItemCount() &&
-                                        starter == Util.atod(((JCheckBoxMenuItem) menuStart.getItem(insert)).getText()))
+                                        starter == Util.atod(menuStart.getItem(insert).getText()))
                                     insert = -1;
 
                                 if (insert != -1) {
@@ -821,7 +824,6 @@ public class Histogram extends DragBox implements ActionListener {
                             }
 
 
-                            ;
                         });
                     } else {
                         brush = new JMenuItem("Clear all Colors");
@@ -832,7 +834,6 @@ public class Histogram extends DragBox implements ActionListener {
                             }
 
 
-                            ;
                         });
                     }
                     mode.add(brush);
@@ -863,7 +864,7 @@ public class Histogram extends DragBox implements ActionListener {
             home();
             Update();
         } else if (command.equals("Density")) {
-            if (((MFrame) frame).hasR()) {
+            if (frame.hasR()) {
                 densityMode = !densityMode;
                 if (densityMode)
                     scaleSelD = true;
@@ -871,7 +872,7 @@ public class Histogram extends DragBox implements ActionListener {
             } else
                 return;
         } else if (command.equals("CDPlot")) {
-            if (((MFrame) frame).hasR()) {
+            if (frame.hasR()) {
                 CDPlot = !CDPlot;
                 densityMode = true;
                 Update();
@@ -914,7 +915,7 @@ public class Histogram extends DragBox implements ActionListener {
             totalSum += add[i];
             max = Math.max(max, add[i]);
             tileIds[i] = new Vector(1, 0);
-            tileIds[i].addElement(new Integer(i));
+            tileIds[i].addElement(i);
         }
 
         Graphics g = this.getGraphics();
@@ -925,7 +926,7 @@ public class Histogram extends DragBox implements ActionListener {
         if (!coordsSet)
             home();
 
-        if (displayMode == "Histogram") {
+        if (displayMode.equals("Histogram")) {
             for (int i = 0; i < k; i++) {
                 rects.addElement(new MyRect(true, 'y', "Observed",
                         (int) userToWorldX(bStart + i * bWidth),

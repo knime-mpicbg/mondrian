@@ -67,13 +67,13 @@ public class Stat {
     }
 
 
-    public static double qchisq(double p, int df) {
+    private static double qchisq(double p, int df) {
 
         return df * Math.pow(1 - 2 / (9 * (double) df) + qnorm(p) * Math.pow(2 / (9 * (double) df), 0.5), 3);
     }
 
 
-    public static double Gamma(double p) {
+    private static double Gamma(double p) {
 
         if (p == 1.0)
             return 1;

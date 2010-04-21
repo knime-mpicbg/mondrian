@@ -15,12 +15,12 @@ import java.io.PrintStream;
  * @version 1.0
  */
 
-public class PSGr_2 extends java.awt.Graphics {
+class PSGr_2 extends java.awt.Graphics {
 
-    public final static int CLONE = 49;
+    private final static int CLONE = 49;
 
-    protected final static int PAGEHEIGHT = 792;
-    protected final static int PAGEWIDTH = 612;
+    private final static int PAGEHEIGHT = 792;
+    private final static int PAGEWIDTH = 612;
     protected final static int XOFFSET = 30;
     protected final static int YOFFSET = 30;
 
@@ -28,44 +28,44 @@ public class PSGr_2 extends java.awt.Graphics {
      * hexadecimal digits
      */
 
-    protected final static char hd[] = {'0', '1', '2', '3', '4', '5', '6', '7',
+    private final static char[] hd = {'0', '1', '2', '3', '4', '5', '6', '7',
             '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     /**
      * number of chars in a full row of pixel data
      */
 
-    protected final static int charsPerRow = 12 * 6;
+    private final static int charsPerRow = 12 * 6;
 
 
     /**
      * Output stream where postscript goes
      */
 
-    protected PrintStream os = System.out;
+    private PrintStream os = System.out;
 
     /**
      * The current color
      */
 
-    protected Color clr = Color.black;
+    private Color clr = Color.black;
 
 
     /**
      * The background color of the current widget. It's up to the client software to set this correctly!
      */
 
-    protected Color backClr = Color.white;
+    private Color backClr = Color.white;
 
     /**
      * The current font
      */
 
-    protected Font font = new Font("Helvetica", Font.PLAIN, 12);
+    private Font font = new Font("Helvetica", Font.PLAIN, 12);
 
-    protected Rectangle clippingRect = new Rectangle(0, 0, PAGEWIDTH, PAGEHEIGHT);
+    private Rectangle clippingRect = new Rectangle(0, 0, PAGEWIDTH, PAGEHEIGHT);
 
-    protected Graphics g;
+    private Graphics g;
 
 
     /**
@@ -129,7 +129,7 @@ public class PSGr_2 extends java.awt.Graphics {
         psgr.font = font;
         psgr.clippingRect = clippingRect;
         psgr.clr = clr;
-        return (Graphics) psgr;
+        return psgr;
     }
 
 
@@ -203,7 +203,6 @@ public class PSGr_2 extends java.awt.Graphics {
      */
     public void setBackground(Color c) {
         backClr = c;
-        ;
     }
 
 
@@ -413,7 +412,7 @@ public class PSGr_2 extends java.awt.Graphics {
     }
 
 
-    protected void doRect(int x, int y, int width, int height, boolean fill) {
+    void doRect(int x, int y, int width, int height, boolean fill) {
         System.out.println("DoRect: x:" + x + "  y:" + y + "  width:" + width + "  height:" + height);
         os.println("%doRect");
         y = transformY(y);
@@ -928,7 +927,7 @@ public class PSGr_2 extends java.awt.Graphics {
     }
 
 
-    public boolean doImage(Image img, int x, int y, int width, int height,
+    boolean doImage(Image img, int x, int y, int width, int height,
                            ImageObserver observer, Color bgcolor) {
         os.println("%doImage");
         y = transformY(y);
@@ -979,7 +978,6 @@ public class PSGr_2 extends java.awt.Graphics {
 
 
         int offset, sleepyet = 0;
-        ;
         // array to hold a line of pixel data
         char[] sb = new char[charsPerRow + 1];
 
@@ -1170,6 +1168,7 @@ public class PSGr_2 extends java.awt.Graphics {
      * @see #dispose
      */
     public void finalize() {
+        super.finalize();
         dispose();
     }
 
@@ -1186,7 +1185,7 @@ public class PSGr_2 extends java.awt.Graphics {
      * Flip Y coords so Postscript looks like Java
      */
 
-    protected int transformY(int y) {
+    int transformY(int y) {
         return PAGEHEIGHT - y;
     }
 
@@ -1195,7 +1194,7 @@ public class PSGr_2 extends java.awt.Graphics {
      * Top of every PS file
      */
 
-    protected void emitProlog() {
+    void emitProlog() {
         os.println("%!PS-Adobe-2.0 Created by PSGr Java PostScript Context");
         os.println("% PSGr is (C) 1996 Ernest Friedman-Hill and Sandia National Labs");
         os.println("% Right to unrestricted personal and commerical use is granted");
@@ -1206,7 +1205,7 @@ public class PSGr_2 extends java.awt.Graphics {
     }
 
 
-    protected void emitColorImageProlog(int xdim) {
+    void emitColorImageProlog(int xdim) {
         os.println("% Color picture stuff, lifted from XV's PS files");
 
         os.println("% define string to hold a scanline's worth of data");
@@ -1296,8 +1295,7 @@ public class PSGr_2 extends java.awt.Graphics {
 
 
     public Rectangle getClipBounds() {
-        Rectangle r = new Rectangle();
-        return r;
+        return new Rectangle();
     }
 
 
@@ -1306,8 +1304,7 @@ public class PSGr_2 extends java.awt.Graphics {
 
 
     public Shape getClip() {
-        Rectangle r = new Rectangle();
-        return (Shape) r;
+        return new Rectangle();
     }
 
 

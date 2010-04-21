@@ -39,12 +39,12 @@ import java.io.PrintWriter;
  * @version 1.0
  */
 
-public class PSGr extends java.awt.Graphics {
+class PSGr extends java.awt.Graphics {
 
-    public final static int CLONE = 49;
+    private final static int CLONE = 49;
 
-    protected final static int PAGEHEIGHT = 792;
-    protected final static int PAGEWIDTH = 612;
+    private final static int PAGEHEIGHT = 792;
+    private final static int PAGEWIDTH = 612;
     protected final static int XOFFSET = 30;
     protected final static int YOFFSET = 30;
 
@@ -52,37 +52,37 @@ public class PSGr extends java.awt.Graphics {
      * hexadecimal digits
      */
 
-    protected final static char hd[] = {'0', '1', '2', '3', '4', '5', '6', '7',
+    private final static char[] hd = {'0', '1', '2', '3', '4', '5', '6', '7',
             '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     /**
      * number of chars in a full row of pixel data
      */
 
-    protected final static int charsPerRow = 12 * 6;
+    private final static int charsPerRow = 12 * 6;
 
 
     /**
      * Output stream where postscript goes
      */
 
-    protected PrintWriter os = new PrintWriter(System.out);
+    private PrintWriter os = new PrintWriter(System.out);
 
     /**
      * The current color
      */
 
-    protected Color clr = Color.black;
+    Color clr = Color.black;
 
     /**
      * The current font
      */
 
-    protected Font font = new Font("Helvetica", Font.PLAIN, 12);
+    Font font = new Font("Helvetica", Font.PLAIN, 12);
 
-    protected Rectangle clippingRect = new Rectangle(0, 0, PAGEWIDTH, PAGEHEIGHT);
+    Rectangle clippingRect = new Rectangle(0, 0, PAGEWIDTH, PAGEHEIGHT);
 
-    protected Graphics g;
+    private Graphics g;
 
 
     /**
@@ -128,7 +128,7 @@ public class PSGr extends java.awt.Graphics {
     }
 
 
-    public PSGr(PrintWriter o, Graphics g, int what) {
+    private PSGr(PrintWriter o, Graphics g, int what) {
         os = o;
         this.g = g;
         if (what != CLONE)
@@ -136,13 +136,13 @@ public class PSGr extends java.awt.Graphics {
     }
 
 
-    public final void pr(String s) {
+    final void pr(String s) {
         os.write(s);
         os.flush();
     }
 
 
-    public final void prt(String s) {
+    final void prt(String s) {
         pr(s);
         os.println();
         os.flush();
@@ -169,17 +169,17 @@ public class PSGr extends java.awt.Graphics {
     }
 
 
-    public final void prt(double d) {
+    final void prt(double d) {
         prt(String.valueOf(d));
     }
 
 
-    public final void prt(double d1, double d2, String s) {
+    final void prt(double d1, double d2, String s) {
         prt(d1 + " " + d2 + " " + s);
     }
 
 
-    public final void prt(double d1, double d2, double d3, String s) {
+    final void prt(double d1, double d2, double d3, String s) {
         prt(d1 + " " + d2 + " " + d3 + " " + s);
     }
 
@@ -189,7 +189,7 @@ public class PSGr extends java.awt.Graphics {
     }
 
 
-    public final void prt(double d1, double d2, double d3, double d4,
+    final void prt(double d1, double d2, double d3, double d4,
                           double d5, String s) {
         prt(d1 + " " + d2 + " " + d3 + " " + d4 + " " + d5 + " " + s);
     }
@@ -203,7 +203,7 @@ public class PSGr extends java.awt.Graphics {
         psgr.font = font;
         psgr.clippingRect = clippingRect;
         psgr.clr = clr;
-        return (Graphics) psgr;
+        return psgr;
     }
 
 
@@ -477,7 +477,7 @@ public class PSGr extends java.awt.Graphics {
     }
 
 
-    protected void doRect(int x, int y, int width, int height, boolean fill) {
+    void doRect(int x, int y, int width, int height, boolean fill) {
         y = transformY(y);
         prt(x, y, "moveto");
         prt(x + width, y, "lineto");
@@ -883,7 +883,7 @@ public class PSGr extends java.awt.Graphics {
     //  public void drawBytes(byte data[], int offset, int length, int x, int y) {
     //    drawString(new String(data, 0, offset, length), x, y);
     //  }
-    public boolean doImage(Image img, int x, int y, int width, int height,
+    boolean doImage(Image img, int x, int y, int width, int height,
                            ImageObserver observer, Color bgcolor) {
         y = transformY(y);
 
@@ -920,7 +920,6 @@ public class PSGr extends java.awt.Graphics {
 
 
         int offset, sleepyet = 0;
-        ;
         // array to hold a line of pixel data
         char[] sb = new char[charsPerRow + 1];
 
@@ -1127,6 +1126,7 @@ public class PSGr extends java.awt.Graphics {
      * @see #dispose
      */
     public void finalize() {
+        super.finalize();
         dispose();
     }
 
@@ -1143,7 +1143,7 @@ public class PSGr extends java.awt.Graphics {
      * Flip Y coords so Postscript looks like Java
      */
 
-    protected int transformY(int y) {
+    int transformY(int y) {
         return PAGEHEIGHT - y;
     }
 
@@ -1152,14 +1152,14 @@ public class PSGr extends java.awt.Graphics {
      * Top of every PS file
      */
 
-    protected void emitProlog() {
+    void emitProlog() {
         prt("%!PS-Adobe-2.0 Created by PSGr Java PostScript Context");
         prt("30 -30 translate");
         setFont(font);
     }
 
 
-    protected void emitColorImageProlog(int xdim) {
+    void emitColorImageProlog(int xdim) {
         prt("% Color picture stuff, lifted from XV's PS files");
 
         prt("% define string to hold a scanline's worth of data");

@@ -90,8 +90,7 @@ public class Srs {
         try {
             RConnection c = new RConnection();
             c.shutdown();
-        } catch (Exception x) {
+        } catch (Exception ignored) {
         }
-        ;
     }
 }

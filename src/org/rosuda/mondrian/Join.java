@@ -56,7 +56,7 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
     protected static int num_windows = 0;
     protected static Vector dataSets;
     protected static Vector Mondrians;
-    public Vector Plots = new Vector(10, 0);
+    private Vector Plots = new Vector(10, 0);
     public Vector selList = new Vector(10, 0);
     public Query sqlConditions;
     public boolean selseq = false;
@@ -68,13 +68,35 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
     private int weightIndex = 0;
     private JScrollPane scrollPane;
     private JProgressBar progBar;
-    private JPanel progPanel;
     private JLabel progText;
     public JMenuBar menubar;
     public JMenu windows, help, dv, sam, trans, lastOM;
-    private JMenuItem n, nw, c, q, t, m, o, odf, s, ss, sa, ts, p, od, mv, mn, pr, b, bw, pc, pb, byx, sc, sc2, hi, hiw, cc, cs, vm, rc, oh, mds, pca;
+    private JMenuItem n;
+    private JMenuItem nw;
+    private JMenuItem c;
+    private JMenuItem t;
+    private JMenuItem m;
+    private JMenuItem s;
+    private JMenuItem ss;
+    private JMenuItem p;
+    private JMenuItem mv;
+    private JMenuItem mn;
+    private JMenuItem b;
+    private JMenuItem bw;
+    private JMenuItem pc;
+    private JMenuItem pb;
+    private JMenuItem byx;
+    private JMenuItem sc;
+    private JMenuItem sc2;
+    private JMenuItem hi;
+    private JMenuItem hiw;
+    private JMenuItem mds;
+    private JMenuItem pca;
     public JMenuItem ca, fc, fs, me, transPlus, transMinus, transTimes, transDiv, transNeg, transInv, transLog, transExp;
-    private JCheckBoxMenuItem se, ah, ih, os, as;
+    private JCheckBoxMenuItem se;
+    private JCheckBoxMenuItem ah;
+    private JCheckBoxMenuItem os;
+    private JCheckBoxMenuItem as;
     private ModelNavigator Mn;
     private PreferencesFrame Pr;
     private int thisDataSet = -1;
@@ -84,7 +106,6 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
     public boolean mondrianRunning = false;
     private String justFile = "";
     private boolean load = false;
-    private boolean killed = false;
     private int[] selectBuffer;
     private Preferences prefs;
     private int lastOpenedNum = 6;
@@ -140,16 +161,17 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
 
         Font SF = new Font("SansSerif", Font.BOLD, 12);
         this.setFont(SF);
-        this.dataSets = dataSets;
-        this.Mondrians = Mondrians;
+        Join.dataSets = dataSets;
+        Join.Mondrians = Mondrians;
         this.setTitle("Mondrian");               // Create the window.
         num_windows++;                           // Count it.
 
         menubar = new JMenuBar();         // Create a menubar.
 
         // Create menu items, with menu shortcuts, and add to the menu.
-        JMenu file = (JMenu) menubar.add(new JMenu("File"));
+        JMenu file = menubar.add(new JMenu("File"));
         //   JMenu file = new JMenu("File");            // Create a File menu.
+        JMenuItem o;
         file.add(o = new JMenuItem("Open"));
         o.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         file.add(lastOM = new JMenu("Open Recent"));
@@ -178,8 +200,10 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
             }
         }
 
+        JMenuItem odf;
         file.add(odf = new JMenuItem("Open R dataframe"));
         odf.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        JMenuItem od;
         file.add(od = new JMenuItem("Open Database"));
         od.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         if (user.indexOf("theus") > -1 || true)
@@ -196,7 +220,7 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
         c.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         c.setEnabled(false);
         //    file.add(p = new JMenuItem("Print Window",new JMenuShortcut(KeyEvent.VK_P)));
-        q = new JMenuItem("Quit");
+        JMenuItem q = new JMenuItem("Quit");
         if (((System.getProperty("os.name")).toLowerCase()).indexOf("mac") == -1) {
             file.addSeparator();                     // Put a separator in the menu
             file.add(q);
@@ -209,9 +233,8 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
                     try {                                                                                // Shut down RServe if running ...
                         RConnection c = new RConnection();
                         c.shutdown();
-                    } catch (RserveException x) {
+                    } catch (RserveException ignored) {
                     }
-                    ;
                     System.exit(0);
                 }
             });
@@ -278,9 +301,11 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
         menubar.add(calc);                         // Add to menubar.
 
         JMenu options = new JMenu("Options");      // Create an Option menu.
+        JMenuItem sa;
         options.add(sa = new JMenuItem("Select All"));
         sa.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
+        JMenuItem ts;
         options.add(ts = new JMenuItem("Toggle Selection"));
         ts.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
@@ -290,6 +315,7 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
         as.setSelected(true);
 
         options.addSeparator();                     // Put a separator in the menu
+        JMenuItem cc;
         options.add(cc = new JMenuItem("Clear all Colors"));
         cc.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, Event.ALT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
@@ -297,6 +323,7 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
         options.add(se = new JCheckBoxMenuItem("Selection Sequences", selseq));
         se.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
+        JMenuItem cs;
         options.add(cs = new JMenuItem("Clear Sequences"));
         cs.setAccelerator(KeyStroke.getKeyStroke(Event.BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
@@ -305,6 +332,7 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
         ah.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
         options.addSeparator();                     // Put a separator in the menu
+        JMenuItem vm;
         options.add(vm = new JMenuItem("Switch Variable Mode"));
         vm.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
@@ -319,12 +347,13 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
         mn.setEnabled(false);
 
         options.addSeparator();                     // Put a separator in the menu
+        JMenuItem pr;
         options.add(pr = new JMenuItem("Preferences ...", KeyEvent.VK_K));
         pr.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_COMMA, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
         menubar.add(options);                      // Add to menubar.
 
-        windows = (JMenu) menubar.add(new JMenu("Window"));
+        windows = menubar.add(new JMenu("Window"));
 
         windows.add(ca = new JMenuItem("Close All"));
         ca.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -334,16 +363,19 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
 
         windows.add(me = new JMenuItem(this.getTitle()));
 
-        help = (JMenu) menubar.add(new JMenu("Help"));
+        help = menubar.add(new JMenu("Help"));
 
+        JMenuItem rc;
         help.add(rc = new JMenuItem("Reference Card"));
         rc.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_HELP, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         rc.setEnabled(true);
 
+        JCheckBoxMenuItem ih;
         help.add(ih = new JCheckBoxMenuItem("Interactive Help"));
         ih.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_HELP, Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         ih.setEnabled(false);
 
+        JMenuItem oh;
         help.add(oh = new JMenuItem("Online Help"));
         oh.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_HELP, Event.SHIFT_MASK | Event.ALT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         oh.setEnabled(true);
@@ -357,7 +389,7 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
         getContentPane().add("Center", scrollPane);
 
         // Add the status/progress bar
-        progPanel = new JPanel();
+        JPanel progPanel = new JPanel();
         progText = new JLabel("   Welcome !    ");
         progPanel.add("North", progText);
         progBar = new JProgressBar();
@@ -385,6 +417,7 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
 
 
             public void actionPerformed(ActionEvent e) {
+
                 mosaicPlot();
             }
         });
@@ -855,14 +888,14 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
         if (answer == JOptionPane.YES_OPTION) {
             num_windows--;
             for (int i = Plots.size() - 1; i >= 0; i--)
-                ((MFrame) ((DragBox) Plots.elementAt(i)).frame).close();
+                ((DragBox) Plots.elementAt(i)).frame.close();
             dataSets.setElementAt(new DataSet("nullinger"), thisDataSet);
             this.dispose();
             if (num_windows == 0) {
                 new Join(Mondrians, dataSets, false, false, null);
                 //        System.out.println(" -----------------------> disposing Join !!!!!!!!!!!!!!!!");
                 this.dispose();
-                this.killed = true;
+                boolean killed = true;
             }
         }
     }
@@ -870,7 +903,7 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
 
     public void closeAll() {
         for (int i = Plots.size() - 1; i >= 0; i--) {
-            ((MFrame) ((DragBox) Plots.elementAt(i)).frame).close();
+            ((DragBox) Plots.elementAt(i)).frame.close();
             Plots.removeElementAt(i);
         }
     }
@@ -1198,20 +1231,19 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
                     S.step = i + 1;
                     S.total = selList.size();
                     (S.d).maintainSelection(S);
-                    ((MFrame) ((S.d).frame)).maintainMenu(S.step);
+                    (S.d).frame.maintainMenu(S.step);
                 }
             }
             sqlConditions = new Query();                // Replace ???
             if (((DataSet) dataSets.elementAt(thisDataSet)).isDB)
                 for (int i = 0; i < selList.size(); i++) {
                     Selection S = ((Selection) selList.elementAt(i));
-                    if (S.mode == S.MODE_STANDARD)
+                    if (S.mode == Selection.MODE_STANDARD)
                         sqlConditions.clearConditions();
                     String condStr = S.condition.getConditions();
                     if (!condStr.equals(""))
-                        sqlConditions.addCondition(S.getSQLModeString(S.mode), "(" + condStr + ")");
+                        sqlConditions.addCondition(Selection.getSQLModeString(S.mode), "(" + condStr + ")");
                 }
-            ;
             ((DataSet) (dataSets.elementAt(thisDataSet))).sqlConditions = sqlConditions;
 
             //      System.out.println("Main Update: "+sqlConditions.makeQuery());
@@ -1656,7 +1688,7 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
                         for (int i = 0; i < data.k; i++) {
                             String tmp = data.getName(i);
                             if ((tmp.toUpperCase()).startsWith((searchText.toUpperCase())))
-                                setIndices.addElement(new Integer(i));
+                                setIndices.addElement(i);
                         }
                     if (setIndices.size() > 0) {
                         int[] setArray = new int[setIndices.size()];
@@ -1897,7 +1929,7 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
 
 
                 public void actionPerformed(ActionEvent e) {
-                    DataSet data = new DataSet(d, con, DBList.getSelectedItem(), tableList.getSelectedItem());
+                    DataSet data = new DataSet(con, DBList.getSelectedItem(), tableList.getSelectedItem());
                     dataSets.addElement(data);
                     setVarList();
                     DBFrame.dispose();
@@ -2029,7 +2061,7 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
                                 while (line != null) {
                                     MyPoly p = new MyPoly();
                                     p.read(br, xMin, 100000 / Math.min(xMax - xMin, yMax - yMin), yMin, 100000 / Math.min(xMax - xMin, yMax - yMin));
-                                    if (count++ % (int) (Math.max(data.n / 20, 1)) == 0)
+                                    if (count++ % Math.max(data.n / 20, 1) == 0)
                                         progBar.setValue(Math.min(count, data.n));
                                     polys.addElement(p);
                                     line = br.readLine();                          // Read seperator (single blank line)
@@ -2113,7 +2145,7 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
                         while (line != null) {
                             MyPoly p = new MyPoly();
                             p.read(br, xMin, 100000 / Math.min(xMax - xMin, yMax - yMin), yMin, 100000 / Math.min(xMax - xMin, yMax - yMin));
-                            if (count++ % (int) (Math.max(data.n / 20, 1)) == 0)
+                            if (count++ % Math.max(data.n / 20, 1) == 0)
                                 progBar.setValue(Math.min(count, data.n));
                             //MyPoly newP = p.thinHard();
                             polys.addElement(p);
@@ -2210,16 +2242,15 @@ public void handlePrintFile(ApplicationEvent event) {} */
             String[] selecteds = new String[(varNames.getSelectedValues()).length];
             for (int i = 0; i < (varNames.getSelectedValues()).length; i++)
                 selecteds[i] = (String) (varNames.getSelectedValues())[i];
-            int[] selected = vars;
-            int[] returner = new int[selected.length];
-            for (int i = 0; i < selected.length; i++) {
+            int[] returner = new int[vars.length];
+            for (int i = 0; i < vars.length; i++) {
                 if ((selecteds[i].trim()).equals(getCount.getSelectedItem())) {
-                    returner[selected.length - 1] = selected[i];
-                    for (int j = i; j < selected.length - 1; j++)
-                        returner[j] = selected[j + 1];
-                    i = selected.length;
+                    returner[vars.length - 1] = vars[i];
+                    for (int j = i; j < vars.length - 1; j++)
+                        returner[j] = vars[j + 1];
+                    i = vars.length;
                 } else
-                    returner[i] = selected[i];
+                    returner[i] = vars[i];
             }
             return returner;
         }
@@ -2253,7 +2284,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
             for (int j = 1; j < p; j++) {
                 if (i >= j) {
                     JPanel Filler = new JPanel();
-                    Filler.setBackground(scatterMf.backgroundColor);
+                    Filler.setBackground(MFrame.backgroundColor);
                     scatterMf.getContentPane().add(Filler);
                     //          (Filler.getGraphics()).drawString("text",10,10);
                 } else {
@@ -3001,7 +3032,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
     public void maintainWindowMenu(boolean preserve) {
         for (int i = 0; i < Plots.size(); i++)
-            ((MFrame) (((DragBox) Plots.elementAt(i)).frame)).maintainMenu(preserve);
+            ((DragBox) Plots.elementAt(i)).frame.maintainMenu(preserve);
     }
 
 
@@ -3029,12 +3060,12 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
         final DataSet data = (DataSet) dataSets.elementAt(thisDataSet);
 
-        final ImageIcon alphaIcon = new ImageIcon(Util.readGif("alpha.gif"));
-        final ImageIcon alphaMissIcon = new ImageIcon(Util.readGif("alpha-miss.gif"));
-        final ImageIcon catIcon = new ImageIcon(Util.readGif("cat.gif"));
-        final ImageIcon catMissIcon = new ImageIcon(Util.readGif("cat-miss.gif"));
-        final ImageIcon numIcon = new ImageIcon(Util.readGif("num.gif"));
-        final ImageIcon numMissIcon = new ImageIcon(Util.readGif("num-miss.gif"));
+        final ImageIcon alphaIcon = new ImageIcon(Util.readGif("/alpha.gif"));
+        final ImageIcon alphaMissIcon = new ImageIcon(Util.readGif("/alpha-miss.gif"));
+        final ImageIcon catIcon = new ImageIcon(Util.readGif("/cat.gif"));
+        final ImageIcon catMissIcon = new ImageIcon(Util.readGif("/cat-miss.gif"));
+        final ImageIcon numIcon = new ImageIcon(Util.readGif("/num.gif"));
+        final ImageIcon numMissIcon = new ImageIcon(Util.readGif("/num-miss.gif"));
         // This is the only method defined by ListCellRenderer.
         // We just reconfigure the JLabel each time we're called.
 

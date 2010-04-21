@@ -14,7 +14,7 @@ public class Selection {
     public static final int MODE_XOR = 3;
     public static final int MODE_NOT = 4;
 
-    public static final int VALID = 0;
+    private static final int VALID = 0;
     public static final int KILLED = 1;
 
     public Rectangle r;

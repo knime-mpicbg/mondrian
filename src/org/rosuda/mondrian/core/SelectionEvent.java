@@ -14,7 +14,7 @@ public class SelectionEvent extends AWTEvent {
     }
 
 
-    public static final int SELECTION_EVENT = AWTEvent.RESERVED_ID_MAX + 1;
+    private static final int SELECTION_EVENT = AWTEvent.RESERVED_ID_MAX + 1;
 
 }
 

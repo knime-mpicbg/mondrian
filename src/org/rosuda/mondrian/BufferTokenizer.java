@@ -253,7 +253,7 @@ public class BufferTokenizer {
     /**
      * sets limit for discret handling of numerical columns
      *
-     * @param i
+     * @param n
      */
     public void setDiscretLimit(int n) {
         this.discretLimit = (n > 800) ? (15 * Math.max(1, (int) (Math.log(n) / Math.log(10)) - 1)) : ((int) (1.5 * Math.sqrt(n)));
@@ -329,11 +329,11 @@ public class BufferTokenizer {
         newLineBreaker = getNewLineBreaker(buffer);
 
         format = analyzeFormat(buffer);
-        if (format == "TAB-Format") SEPERATOR = TAB;
-        else if (format == "SPACE-Format") SEPERATOR = SPACE;
-        else if (format == "KOMMA-Format") SEPERATOR = KOMMA;
-        else if (format == "KOMMA-QUOTE-Format") SEPERATOR = KOMMA;
-        else if (format == "UNKNOWN-Format") {
+        if (format.equals("TAB-Format")) SEPERATOR = TAB;
+        else if (format.equals("SPACE-Format")) SEPERATOR = SPACE;
+        else if (format.equals("KOMMA-Format")) SEPERATOR = KOMMA;
+        else if (format.equals("KOMMA-QUOTE-Format")) SEPERATOR = KOMMA;
+        else if (format.equals("UNKNOWN-Format")) {
             System.out.println(format);
             throw new RuntimeException();
         }
@@ -355,7 +355,7 @@ public class BufferTokenizer {
 
         System.out.println("Format: " + format);
 
-        if (format == "TAB-Format") {
+        if (format.equals("TAB-Format")) {
             // Format testen
             start = System.currentTimeMillis();
             error = testUNQUOTEDFormat(buffer, SEPERATOR, acceptedErrors);
@@ -427,7 +427,7 @@ public class BufferTokenizer {
             System.out.println("tokenize TABBuffer: " + (stop - start));
 
 
-        } else if (format == "SPACE-Format") {
+        } else if (format.equals("SPACE-Format")) {
             // Format testen und Anzahl der Zeilen lesen
             start = System.currentTimeMillis();
             positionSecondLine = getPositionSecondLine(buffer);
@@ -485,7 +485,7 @@ public class BufferTokenizer {
             stop = System.currentTimeMillis();
             System.out.println("tokenize SPACEBuffer: " + (stop - start));
 
-        } else if (format == "KOMMA-Format") {
+        } else if (format.equals("KOMMA-Format")) {
             // Format testen
             start = System.currentTimeMillis();
             error = testUNQUOTEDFormat(buffer, SEPERATOR, acceptedErrors);
@@ -548,7 +548,7 @@ public class BufferTokenizer {
             stop = System.currentTimeMillis();
             System.out.println("tokenize KOMMABuffer: " + (stop - start));
 
-        } else if (format == "KOMMA-QUOTE-Format") {
+        } else if (format.equals("KOMMA-QUOTE-Format")) {
             // Format testen und Anzahl der Zeilen lesen
             start = System.currentTimeMillis();
             positionSecondLine = getPositionSecondLine(buffer);
@@ -810,7 +810,7 @@ public class BufferTokenizer {
                         }
                     }
                 } else if (b == KOMMA) {
-                    if (format == "KOMMA-QUOTE-Format") {
+                    if (format.equals("KOMMA-QUOTE-Format")) {
                         if (buffer.hasRemaining()) {
                             if (buffer.get(buffer.position() - 2) == QUOTE && buffer.get(buffer.position()) == QUOTE) {
                                 amountKOMMA++;
@@ -835,19 +835,19 @@ public class BufferTokenizer {
             }
         }
 
-        if (format == "TAB-Format") {
+        if (format.equals("TAB-Format")) {
             if (amountTAB >= 2 * amountSPACE && amountTAB >= 2 * amountKOMMA) {
 
             } else {
                 format = "UNKNOWN-Format";
             }
-        } else if (format == "SPACE-Format") {
+        } else if (format.equals("SPACE-Format")) {
             if (amountSPACE >= 2 * amountTAB && amountSPACE >= 2 * amountKOMMA) {
 
             } else {
                 format = "UNKNOWN-Format";
             }
-        } else if (format == "KOMMA-Format" || format == "KOMMA-QUOTE-Format") {
+        } else if (format.equals("KOMMA-Format") || format.equals("KOMMA-QUOTE-Format")) {
             if (amountKOMMA >= 2 * amountTAB && amountKOMMA >= 2 * amountSPACE) {
 
             } else {
@@ -878,7 +878,7 @@ public class BufferTokenizer {
         int j = 0;
         byte[][] head = new byte[columns][];
 
-        if (format == "TAB-Format" || format == "KOMMA-Format") {
+        if (format.equals("TAB-Format") || format.equals("KOMMA-Format")) {
             while (buffer.hasRemaining()) {
 
                 k = 0;
@@ -916,7 +916,7 @@ public class BufferTokenizer {
                     }
                 }
             }
-        } else if (format == "SPACE-Format" || format == "KOMMA-QUOTE-Format") {
+        } else if (format.equals("SPACE-Format") || format.equals("KOMMA-QUOTE-Format")) {
 
 
             while (buffer.hasRemaining()) {
@@ -1070,7 +1070,7 @@ public class BufferTokenizer {
         int k = 0;
         byte b;
 
-        if (format == "TAB-Format" || format == "KOMMA-Format") {
+        if (format.equals("TAB-Format") || format.equals("KOMMA-Format")) {
             while (buffer.hasRemaining() == true) {
                 b = buffer.get();
                 if (b == SEPERATOR)
@@ -1090,7 +1090,7 @@ public class BufferTokenizer {
             }
             if (k % 2 != 0) {
                 System.out.println("ERROR: Uneven amount of quotes in headLine");
-                throw new ScanException(new String("ERROR: Uneven amount of quotes in headLine"));
+                throw new ScanException("ERROR: Uneven amount of quotes in headLine");
             }
             buffer.reset();
             while (buffer.hasRemaining()) {
@@ -1154,8 +1154,8 @@ public class BufferTokenizer {
         buffer.rewind();
         buffer.position(positionSecondLine);
 
-        if (format == "TAB-Format" || format == "KOMMA-Format") {
-            if (format == "TAB-Format") SEPERATOR = TAB;
+        if (format.equals("TAB-Format") || format.equals("KOMMA-Format")) {
+            if (format.equals("TAB-Format")) SEPERATOR = TAB;
             else SEPERATOR = KOMMA;
 
             while (buffer.hasRemaining()) {
@@ -1412,7 +1412,7 @@ public class BufferTokenizer {
                                         if (!expAvailable) {
                                             if (buffer.hasRemaining()) {
                                                 b = buffer.get();
-                                                if (!isNumber(b) && b != (byte) MINUS) {
+                                                if (!isNumber(b) && b != MINUS) {
                                                     numericalColumn[j] = false;
                                                     break;
                                                 } else {
@@ -1474,7 +1474,7 @@ public class BufferTokenizer {
 
             } // end big while
 
-        } else if (format == "UNKNOWN-Format") {
+        } else if (format.equals("UNKNOWN-Format")) {
 
             System.out.println(format);
             throw new UnacceptableFormatException();
@@ -1541,11 +1541,11 @@ public class BufferTokenizer {
                 // SEPERATOR at BOL
                 if (k < error.length) {
                     if (i == 0) {
-                        error[k++] = new String("hardError: SEPERATOR at BOL in headLine");
+                        error[k++] = "hardError: SEPERATOR at BOL in headLine";
                         errorposition = buffer.position();
                         return error;
                     } else {
-                        error[k++] = new String("softError: SEPERATOR at BOL in line " + (i + 1));
+                        error[k++] = "softError: SEPERATOR at BOL in line " + (i + 1);
                         doubleSEPERATOR = true;
                     }
                 } else
@@ -1556,7 +1556,7 @@ public class BufferTokenizer {
             } else if (b == RETURN) {
                 // RETURN at BOL
                 if (k < error.length) {
-                    error[k++] = new String("hardError: RETURN at BOL in line " + (i + 1));
+                    error[k++] = "hardError: RETURN at BOL in line " + (i + 1);
                     errorposition = buffer.position();
                     hardReadError = true;
                     return error;
@@ -1565,7 +1565,7 @@ public class BufferTokenizer {
             } else if (b == NEWLINE) {
                 // NEWLINE at BOL
                 if (k < error.length) {
-                    error[k++] = new String("hardError: NEWLINE at BOL in line " + (i + 1));
+                    error[k++] = "hardError: NEWLINE at BOL in line " + (i + 1);
                     errorposition = buffer.position();
                     hardReadError = true;
                     return error;
@@ -1579,8 +1579,8 @@ public class BufferTokenizer {
                     // change: 17.08.2005
                     if (j >= columns) {
                         if (k < error.length) {
-                            error[k++] = new String("hardError: Too many entries in line "
-                                    + (i + 1));
+                            error[k++] = "hardError: Too many entries in line "
+                                    + (i + 1);
                             errorposition = buffer.position();
                             hardReadError = true;
                             return error;
@@ -1595,11 +1595,11 @@ public class BufferTokenizer {
                             // doubleSEPERATOR
                             if (k < error.length) {
                                 if (i == 0) {
-                                    error[k++] = new String("hardError: doubleSEPERATOR in headLine");
+                                    error[k++] = "hardError: doubleSEPERATOR in headLine";
                                     errorposition = buffer.position();
                                     return error;
-                                } else error[k++] = new String("softError: doubleSEPERATOR in line "
-                                        + (i + 1));
+                                } else error[k++] = "softError: doubleSEPERATOR in line "
+                                        + (i + 1);
                             } else
                                 return error;
                             // go to next line
@@ -1609,11 +1609,11 @@ public class BufferTokenizer {
                             // SEPERATOR at EOL
                             if (k < error.length) {
                                 if (i == 0) {
-                                    error[k++] = new String("hardError: SEPERATOR at EOL in headLine");
+                                    error[k++] = "hardError: SEPERATOR at EOL in headLine";
                                     errorposition = buffer.position();
                                     return error;
-                                } else error[k++] = new String("softError: SEPERATOR at EOL in line "
-                                        + (i + 1));
+                                } else error[k++] = "softError: SEPERATOR at EOL in line "
+                                        + (i + 1);
                             } else
                                 return error;
                             // go to next line
@@ -1623,11 +1623,11 @@ public class BufferTokenizer {
                             // SEPERATOR at EOL
                             if (k < error.length) {
                                 if (i == 0) {
-                                    error[k++] = new String("hardError: SEPERATOR at EOL in headLine");
+                                    error[k++] = "hardError: SEPERATOR at EOL in headLine";
                                     errorposition = buffer.position();
                                     return error;
-                                } else error[k++] = new String("softError: SEPERATOR at EOL in line "
-                                        + (i + 1));
+                                } else error[k++] = "softError: SEPERATOR at EOL in line "
+                                        + (i + 1);
                             } else
                                 return error;
                             // go to next line
@@ -1638,7 +1638,7 @@ public class BufferTokenizer {
                     } else {
                         // SEPERATOR at EOF
                         if (k < error.length) {
-                            error[k++] = new String("softError: SEPERATOR at EOF");
+                            error[k++] = "softError: SEPERATOR at EOF";
                         } else
                             return error;
                     }
@@ -1646,8 +1646,8 @@ public class BufferTokenizer {
                     // Missing entries
                     if (j < columns - 1) {
                         if (k < error.length) {
-                            error[k++] = new String("hardError: Missing entries in line "
-                                    + (i + 1));
+                            error[k++] = "hardError: Missing entries in line "
+                                    + (i + 1);
                             errorposition = buffer.position();
                             hardReadError = true;
                             return error;
@@ -1655,8 +1655,8 @@ public class BufferTokenizer {
                             return error;
                     } else if (j >= columns) {
                         if (k < error.length) {
-                            error[k++] = new String("hardError: Too many entries in line "
-                                    + (i + 1));
+                            error[k++] = "hardError: Too many entries in line "
+                                    + (i + 1);
                             errorposition = buffer.position();
                             hardReadError = true;
                             return error;
@@ -1677,8 +1677,8 @@ public class BufferTokenizer {
                     // Missing entries
                     if (j < columns - 1) {
                         if (k < error.length) {
-                            error[k++] = new String("hardError: Missing entries in line "
-                                    + (i + 1));
+                            error[k++] = "hardError: Missing entries in line "
+                                    + (i + 1);
                             errorposition = buffer.position();
                             hardReadError = true;
                             return error;
@@ -1686,8 +1686,8 @@ public class BufferTokenizer {
                             return error;
                     } else if (j >= columns) {
                         if (k < error.length) {
-                            error[k++] = new String("hardError: Too many entries in line "
-                                    + (i + 1));
+                            error[k++] = "hardError: Too many entries in line "
+                                    + (i + 1);
                             errorposition = buffer.position();
                             hardReadError = true;
                             return error;
@@ -1703,7 +1703,7 @@ public class BufferTokenizer {
         if (doubleSEPERATOR) j++;
         if (j < columns - 1) {
             if (k < error.length) {
-                error[k++] = new String("hardError: Missing entries in last line");
+                error[k++] = "hardError: Missing entries in last line";
                 errorposition = buffer.position();
                 hardReadError = true;
                 return error;
@@ -1712,7 +1712,7 @@ public class BufferTokenizer {
 
         } else if (j >= columns) {
             if (k < error.length) {
-                error[k++] = new String("hardError: Too many entries in last line");
+                error[k++] = "hardError: Too many entries in last line";
                 errorposition = buffer.position();
                 hardReadError = true;
                 return error;
@@ -1721,7 +1721,7 @@ public class BufferTokenizer {
         }
         if (b == SEPERATOR && j < columns) {
             if (k < error.length) {
-                error[k++] = new String("hardError: SEPERATOR at EOF / Missing values in last line");
+                error[k++] = "hardError: SEPERATOR at EOF / Missing values in last line";
                 errorposition = buffer.position();
                 hardReadError = true;
                 return error;
@@ -1729,12 +1729,12 @@ public class BufferTokenizer {
                 return error;
         } else if (b == NEWLINE) {
             if (k < error.length) {
-                error[k++] = new String("softError: NEWLINE at EOF");
+                error[k++] = "softError: NEWLINE at EOF";
             } else
                 return error;
         } else if (b == RETURN) {
             if (k < error.length) {
-                error[k++] = new String("softError: RETURN at EOF");
+                error[k++] = "softError: RETURN at EOF";
             } else
                 return error;
 
@@ -1787,7 +1787,7 @@ public class BufferTokenizer {
                                 break;
                             } else {
                                 if (k < error.length) {
-                                    error[k++] = new String("hardError: error in headLine in j = " + (j + 1));
+                                    error[k++] = "hardError: error in headLine in j = " + (j + 1);
                                     errorposition = buffer.position();
                                     hardReadError = true;
                                     return error;
@@ -1805,7 +1805,7 @@ public class BufferTokenizer {
                     b = buffer.get();
                     if (b != QUOTE) {
                         if (k < error.length) {
-                            error[k++] = new String("hardError: error in headLine in j = " + (j + 1));
+                            error[k++] = "hardError: error in headLine in j = " + (j + 1);
                             errorposition = buffer.position();
                             hardReadError = true;
                             return error;
@@ -1817,7 +1817,7 @@ public class BufferTokenizer {
                 }
             } else {
                 if (k < error.length) {
-                    error[k++] = new String("hardError: error in headLine in j = " + (j + 1) + " (word not quoted)");
+                    error[k++] = "hardError: error in headLine in j = " + (j + 1) + " (word not quoted)";
                     errorposition = buffer.position();
                     hardReadError = true;
                     return error;
@@ -1859,8 +1859,8 @@ public class BufferTokenizer {
                 j++;
                 if (j >= columns) {
                     if (k < error.length) {
-                        error[k++] = new String("hardError: Too many entries in line "
-                                + (i + 1));
+                        error[k++] = "hardError: Too many entries in line "
+                                + (i + 1);
                         errorposition = buffer.position();
                         hardReadError = true;
                         return error;
@@ -1900,7 +1900,7 @@ public class BufferTokenizer {
                 if (numericalColumn[j]) {
                     // Fehler
                     if (k < error.length) {
-                        error[k++] = new String("hardError: QUOTE in numerical column (i,j) = (" + (i + 1) + "," + (j + 1) + ")");
+                        error[k++] = "hardError: QUOTE in numerical column (i,j) = (" + (i + 1) + "," + (j + 1) + ")";
                         errorposition = buffer.position();
                         hardReadError = true;
                         return error;
@@ -1919,7 +1919,7 @@ public class BufferTokenizer {
                             } else {
                                 // Fehler: QUOTE im Wort
                                 if (k < error.length) {
-                                    error[k++] = new String("hardError: QUOTE in word (i,j) = (" + (i + 1) + "," + (j + 1) + ")");
+                                    error[k++] = "hardError: QUOTE in word (i,j) = (" + (i + 1) + "," + (j + 1) + ")";
                                     errorposition = buffer.position();
                                     hardReadError = true;
                                     return error;
@@ -1937,7 +1937,7 @@ public class BufferTokenizer {
                 if (!numericalColumn[j]) {
                     // Fehler
                     if (k < error.length) {
-                        error[k++] = new String("hardError: word not quoted (i,j) = (" + (i + 1) + "," + (j + 1) + ")");
+                        error[k++] = "hardError: word not quoted (i,j) = (" + (i + 1) + "," + (j + 1) + ")";
                         errorposition = buffer.position();
                         hardReadError = true;
                         return error;
@@ -1968,7 +1968,7 @@ public class BufferTokenizer {
                             buffer.position(buffer.position() + 1);
                         } else {
                             if (k < error.length) {
-                                error[k++] = new String("hardError: not a number (i,j) = (" + (i + 1) + "," + (j + 1) + ")");
+                                error[k++] = "hardError: not a number (i,j) = (" + (i + 1) + "," + (j + 1) + ")";
                                 errorposition = buffer.position();
                                 hardReadError = true;
                                 return error;
@@ -1981,7 +1981,7 @@ public class BufferTokenizer {
                             b = buffer.get();
                             if (b == SEPERATOR || b == NEWLINE || b == RETURN) {
                                 if (k < error.length) {
-                                    error[k++] = new String("hardError: not a number (i,j) = (" + (i + 1) + "," + (j + 1) + ")");
+                                    error[k++] = "hardError: not a number (i,j) = (" + (i + 1) + "," + (j + 1) + ")";
                                     errorposition = buffer.position();
                                     hardReadError = true;
                                     return error;
@@ -1994,7 +1994,7 @@ public class BufferTokenizer {
                         if (expAvailable) {
                             // Fehler: dot in exponent
                             if (k < error.length) {
-                                error[k++] = new String("hardError:  dot in exponent (i,j) = (" + (i + 1) + "," + (j + 1) + ")");
+                                error[k++] = "hardError:  dot in exponent (i,j) = (" + (i + 1) + "," + (j + 1) + ")";
                                 errorposition = buffer.position();
                                 hardReadError = true;
                                 return error;
@@ -2004,7 +2004,7 @@ public class BufferTokenizer {
                         if (dotAvailable) {
                             // Fehler: >2 dots
                             if (k < error.length) {
-                                error[k++] = new String("hardError: >=2 dots in number (i,j) = (" + (i + 1) + "," + (j + 1) + ")");
+                                error[k++] = "hardError: >=2 dots in number (i,j) = (" + (i + 1) + "," + (j + 1) + ")";
                                 errorposition = buffer.position();
                                 hardReadError = true;
                                 return error;
@@ -2017,7 +2017,7 @@ public class BufferTokenizer {
                     } else if (b == SEPERATOR || b == RETURN || b == NEWLINE) {
                         if (buffer.get(buffer.position() - 2) == 'e' || buffer.get(buffer.position() - 2) == 'E') // das exp-'e'/'E' steht ohne Exponenten
                             if (k < error.length) {
-                                error[k++] = new String("hardError: no exponent found in (i,j) = (" + (i + 1) + "," + (j + 1) + ")");
+                                error[k++] = "hardError: no exponent found in (i,j) = (" + (i + 1) + "," + (j + 1) + ")";
                                 errorposition = buffer.position();
                                 hardReadError = true;
                                 return error;
@@ -2031,7 +2031,7 @@ public class BufferTokenizer {
                         if (!expAvailable) expAvailable = true;
                         else {
                             if (k < error.length) {
-                                error[k++] = new String("hardError: not a number (i,j) = (" + (i + 1) + "," + (j + 1) + ")");
+                                error[k++] = "hardError: not a number (i,j) = (" + (i + 1) + "," + (j + 1) + ")";
                                 errorposition = buffer.position();
                                 hardReadError = true;
                                 return error;
@@ -2041,7 +2041,7 @@ public class BufferTokenizer {
                     } else {
                         // Fehler: in Zahl
                         if (k < error.length) {
-                            error[k++] = new String("hardError: not a number (i,j) = (" + (i + 1) + "," + (j + 1) + ")");
+                            error[k++] = "hardError: not a number (i,j) = (" + (i + 1) + "," + (j + 1) + ")";
                             errorposition = buffer.position();
                             hardReadError = true;
                             return error;
@@ -2054,8 +2054,8 @@ public class BufferTokenizer {
                 // change: 17.08.2005
                 if (j >= columns) {
                     if (k < error.length) {
-                        error[k++] = new String("hardError: Too many entries in line "
-                                + (i + 1));
+                        error[k++] = "hardError: Too many entries in line "
+                                + (i + 1);
                         errorposition = buffer.position();
                         hardReadError = true;
                         return error;
@@ -2079,7 +2079,7 @@ public class BufferTokenizer {
             } else if (b == RETURN) {
                 if (j > columns - 1) {
                     if (k < error.length) {
-                        error[k++] = new String("hardError: Too many entries in line " + (i + 2));
+                        error[k++] = "hardError: Too many entries in line " + (i + 2);
                         errorposition = buffer.position();
                         hardReadError = true;
                         return error;
@@ -2087,7 +2087,7 @@ public class BufferTokenizer {
                         return error;
                 } else if (j < columns - 1) {
                     if (k < error.length) {
-                        error[k++] = new String("hardError: Missing entries in line " + (i + 2));
+                        error[k++] = "hardError: Missing entries in line " + (i + 2);
                         errorposition = buffer.position();
                         hardReadError = true;
                         return error;
@@ -2109,7 +2109,7 @@ public class BufferTokenizer {
                     b = buffer.get();
                     if (b == RETURN || b == NEWLINE) {
                         if (k < error.length) {
-                            error[k++] = new String("hardError: empty line i = " + (i + 2));
+                            error[k++] = "hardError: empty line i = " + (i + 2);
                             errorposition = buffer.position();
                             hardReadError = true;
                             return error;
@@ -2122,7 +2122,7 @@ public class BufferTokenizer {
             } else if (b == NEWLINE) {
                 if (j > columns - 1) {
                     if (k < error.length) {
-                        error[k++] = new String("hardError: Too many entries in line " + (i + 2));
+                        error[k++] = "hardError: Too many entries in line " + (i + 2);
                         errorposition = buffer.position();
                         hardReadError = true;
                         return error;
@@ -2130,7 +2130,7 @@ public class BufferTokenizer {
                         return error;
                 } else if (j < columns - 1) {
                     if (k < error.length) {
-                        error[k++] = new String("hardError: Missing entries in line " + (i + 2));
+                        error[k++] = "hardError: Missing entries in line " + (i + 2);
                         errorposition = buffer.position();
                         hardReadError = true;
                         return error;
@@ -2144,7 +2144,7 @@ public class BufferTokenizer {
                     b = buffer.get();
                     if (b == RETURN || b == NEWLINE) {
                         if (k < error.length) {
-                            error[k++] = new String("hardError: empty line i = " + (i + 2));
+                            error[k++] = "hardError: empty line i = " + (i + 2);
                             errorposition = buffer.position();
                             hardReadError = true;
                             return error;
@@ -2159,7 +2159,7 @@ public class BufferTokenizer {
                 if (!numericalColumn[j]) {
                     // Fehler
                     if (k < error.length) {
-                        error[k++] = new String("hardError: word not quoted (i,j) = (" + (i + 1) + "," + (j + 1) + ")");
+                        error[k++] = "hardError: word not quoted (i,j) = (" + (i + 1) + "," + (j + 1) + ")";
                         errorposition = buffer.position();
                         hardReadError = true;
                         return error;
@@ -2177,7 +2177,7 @@ public class BufferTokenizer {
                             } else {
                                 // Fehler
                                 if (k < error.length) {
-                                    error[k++] = new String("hardError: word not quoted (i,j) = (" + (i + 1) + "," + (j + 1) + ")");
+                                    error[k++] = "hardError: word not quoted (i,j) = (" + (i + 1) + "," + (j + 1) + ")";
                                     errorposition = buffer.position();
                                     hardReadError = true;
                                     return error;
@@ -2198,7 +2198,7 @@ public class BufferTokenizer {
                                 } else {
                                     // Fehler
                                     if (k < error.length) {
-                                        error[k++] = new String("hardError: word not quoted (i,j) = (" + (i + 1) + "," + (j + 1) + ")");
+                                        error[k++] = "hardError: word not quoted (i,j) = (" + (i + 1) + "," + (j + 1) + ")";
                                         errorposition = buffer.position();
                                         hardReadError = true;
                                         return error;
@@ -2208,7 +2208,7 @@ public class BufferTokenizer {
                             } else {
                                 // Fehler
                                 if (k < error.length) {
-                                    error[k++] = new String("hardError: word not quoted (i,j) = (" + (i + 1) + "," + (j + 1) + ")");
+                                    error[k++] = "hardError: word not quoted (i,j) = (" + (i + 1) + "," + (j + 1) + ")";
                                     errorposition = buffer.position();
                                     hardReadError = true;
                                     return error;
@@ -2218,7 +2218,7 @@ public class BufferTokenizer {
                         } else {
                             // Fehler
                             if (k < error.length) {
-                                error[k++] = new String("hardError: word not quoted (i,j) = (" + (i + 1) + "," + (j + 1) + ")");
+                                error[k++] = "hardError: word not quoted (i,j) = (" + (i + 1) + "," + (j + 1) + ")";
                                 errorposition = buffer.position();
                                 hardReadError = true;
                                 return error;
@@ -2228,7 +2228,7 @@ public class BufferTokenizer {
                     } else {
                         // Fehler
                         if (k < error.length) {
-                            error[k++] = new String("hardError: word not quoted (i,j) = (" + (i + 1) + "," + (j + 1) + ")");
+                            error[k++] = "hardError: word not quoted (i,j) = (" + (i + 1) + "," + (j + 1) + ")";
                             errorposition = buffer.position();
                             hardReadError = true;
                             return error;
@@ -2238,7 +2238,7 @@ public class BufferTokenizer {
                 } else {
                     // Fehler
                     if (k < error.length) {
-                        error[k++] = new String("hardError: word not quoted (i,j) = (" + (i + 1) + "," + (j + 1) + ")");
+                        error[k++] = "hardError: word not quoted (i,j) = (" + (i + 1) + "," + (j + 1) + ")";
                         errorposition = buffer.position();
                         hardReadError = true;
                         return error;
@@ -2248,7 +2248,7 @@ public class BufferTokenizer {
             } else {
                 // Fehler
                 if (k < error.length) {
-                    error[k++] = new String("hardError: error in (i,j) = (" + (i + 1) + "," + (j + 1) + ")");
+                    error[k++] = "hardError: error in (i,j) = (" + (i + 1) + "," + (j + 1) + ")";
                     errorposition = buffer.position();
                     hardReadError = true;
                     return error;
@@ -3659,8 +3659,8 @@ public class BufferTokenizer {
         int countWord = 0, countNumber = 0;
         boolean dotAvailable = false;
         StringBuffer text = new StringBuffer();
-        String text1 = new String();
-        String text2 = new String();
+        String text1 = "";
+        String text2 = "";
         byte b;
         int i = 0, j = 0;
 
@@ -3769,17 +3769,17 @@ public class BufferTokenizer {
         byte SEPERATOR = TAB; // default SEPERATOR
         buffer.rewind();
 
-        if (format == "TAB-Format") {
+        if (format.equals("TAB-Format")) {
             SEPERATOR = TAB;
-        } else if (format == "KOMMA-Format") {
+        } else if (format.equals("KOMMA-Format")) {
             SEPERATOR = KOMMA;
-        } else if (format == "SPACE-Format") {
+        } else if (format.equals("SPACE-Format")) {
             SEPERATOR = SPACE;
-        } else if (format == "KOMMA-QUOTE-Format") {
+        } else if (format.equals("KOMMA-QUOTE-Format")) {
             SEPERATOR = KOMMA;
         }
 
-        if (format == "TAB-Format" || format == "KOMMA-Format") {
+        if (format.equals("TAB-Format") || format.equals("KOMMA-Format")) {
             b = buffer.get();
             if (b == (byte) '/') {
                 if (buffer.hasRemaining()) {

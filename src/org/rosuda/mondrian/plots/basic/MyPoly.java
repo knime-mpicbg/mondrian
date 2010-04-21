@@ -16,12 +16,12 @@ import java.util.StringTokenizer;              //
 public class MyPoly extends Polygon implements Cloneable {
 
     public int Id;
-    public String name;
+    private String name;
     public int npoints;
-    protected Color color = Color.lightGray;
-    protected Color borderColor = Color.black;
-    protected double hilite = 0;
-    public boolean[] flag;                       // This is a HACK !!!!
+    private Color color = Color.lightGray;
+    private Color borderColor = Color.black;
+    private double hilite = 0;
+    private boolean[] flag;                       // This is a HACK !!!!
 
 
     public MyPoly() {
@@ -30,7 +30,7 @@ public class MyPoly extends Polygon implements Cloneable {
     }
 
 
-    public MyPoly(int xpoints[], int ypoints[], int npoints) {
+    private MyPoly(int xpoints[], int ypoints[], int npoints) {
         super(xpoints, ypoints, npoints);
         this.flag = new boolean[1500];
         this.npoints = npoints;

@@ -22,13 +22,9 @@ import java.util.Vector;
 public class Map extends DragBox {
 
     private Vector polys = new Vector(256, 256);  // Store the tiles.
-    private int width, height;                   // The preferred size.
     protected int oldWidth, oldHeight;           // The last size for constructing the polygons.
     private int hiliteId = 0;
-    private int xMin, xMax, yMin, yMax;         // Scalings for map
     public double ratio;
-    private int shiftx, shifty;
-    private double scalex, scaley;
     private DataSet data;
     private int borderAlpha = 5;
     private int[] alphas = {0, 10, 20, 40, 70, 100};
@@ -63,8 +59,8 @@ public class Map extends DragBox {
         super(frame);
         this.polys = polys;
         this.data = data;
-        this.width = width;
-        this.height = height;
+        int width1 = width;
+        int height1 = height;
 
         border = 20;
         if (varList.getSelectedIndices().length > 0)
@@ -75,10 +71,10 @@ public class Map extends DragBox {
 
         frame.setTitle("Map(" + data.setName + ")");
 
-        xMin = ((MyPoly) polys.elementAt(0)).xpoints[0];
-        xMax = ((MyPoly) polys.elementAt(0)).xpoints[0];
-        yMin = ((MyPoly) polys.elementAt(0)).ypoints[0];
-        yMax = ((MyPoly) polys.elementAt(0)).ypoints[0];   // Set scalings for map
+        int xMin = ((MyPoly) polys.elementAt(0)).xpoints[0];
+        int xMax = ((MyPoly) polys.elementAt(0)).xpoints[0];
+        int yMin = ((MyPoly) polys.elementAt(0)).ypoints[0];
+        int yMax = ((MyPoly) polys.elementAt(0)).ypoints[0];
 
         for (int i = 0; i < polys.size(); i++) {
             MyPoly p = (MyPoly) polys.elementAt(i);
@@ -109,7 +105,7 @@ public class Map extends DragBox {
         });
         p.add(Varlist);
 
-        if (((MFrame) frame).hasR()) {
+        if (frame.hasR()) {
             try {
                 RConnection c = new RConnection();
 
@@ -153,7 +149,7 @@ public class Map extends DragBox {
         Collist.addItem("blue");
         Collist.addItem("blue2red");
         Collist.addItem("blueWred");
-        if (((MFrame) frame).hasR()) {
+        if (frame.hasR()) {
             Collist.addItem("heat");
             Collist.addItem("terrain");
             Collist.addItem("topo");
@@ -604,10 +600,10 @@ public class Map extends DragBox {
         smallPolys.removeAllElements();
 
         updateScale();
-        shiftx = (int) this.getLlx();
-        shifty = (int) (this.getLly() + (getUry() - getLly()));
-        scalex = (this.userToWorldX(this.getUrx()) - this.userToWorldX(this.getLlx())) / (this.getUrx() - this.getLlx());
-        scaley = (this.userToWorldY(this.getUry()) - this.userToWorldY(this.getLly())) / (this.getUry() - this.getLly());
+        int shiftx = (int) this.getLlx();
+        int shifty = (int) (this.getLly() + (getUry() - getLly()));
+        double scalex = (this.userToWorldX(this.getUrx()) - this.userToWorldX(this.getLlx())) / (this.getUrx() - this.getLlx());
+        double scaley = (this.userToWorldY(this.getUry()) - this.userToWorldY(this.getLly())) / (this.getUry() - this.getLly());
         //System.out.println("Range User:"+(this.getUry() - this.getLly())+" Range World:"+(this.userToWorldY( this.getUry() ) - this.userToWorldY( this.getLly() )));
         double[] shade = {1.0};
         int[] shadeI = {1};
@@ -769,7 +765,7 @@ public class Map extends DragBox {
                 bw.write("\n", 0, 1);
                 if (match[i] > -1)
                     ws = Integer.toString((int) Id[match[i]]) + "\t/PCountyFIPS" + '\t' +
-                            Integer.toString((int) (P.npoints)) + '\n';
+                            Integer.toString(P.npoints) + '\n';
                 bw.write(ws, 0, ws.length());
                 for (int j = 0; j < P.npoints; j++) {
                     ws = Double.toString((double) P.xpoints[j] / 10000) + "\t" +
@@ -780,9 +776,8 @@ public class Map extends DragBox {
 //                  }
             bw.close();
         }
-        catch (IOException e) {
+        catch (IOException ignored) {
         }
-        ;
     }
 
 

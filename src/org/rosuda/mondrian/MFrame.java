@@ -19,7 +19,7 @@ public class MFrame extends JFrame implements WindowListener {
 
     public Join J;
     private JMenuItem m;
-    public String selString = "";
+    private String selString = "";
     private int counter = 0;
     private boolean same = false, added = false;
 
@@ -148,7 +148,7 @@ public class MFrame extends JFrame implements WindowListener {
     }
 
 
-    private final void lblPlotComponentResized(DragBox DB, final java.awt.event.ComponentEvent evt) {
+    private void lblPlotComponentResized(DragBox DB, final java.awt.event.ComponentEvent evt) {
         if (resizePlotTask != null && !firstTime) {
 //      System.out.println("+++++++++++ Canceled "+resizePlotTask);
             resizePlotTask.cancel();

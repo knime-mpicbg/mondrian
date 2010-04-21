@@ -74,8 +74,8 @@ public class PrintUtilities implements Printable {
             } else {
                 ty = 0.5 * (yScale - scale) * screenSize.height;
             }
-            ((Graphics2D) g2d).translate(tx, ty);
-            ((Graphics2D) g2d).scale(scale, scale);
+            g2d.translate(tx, ty);
+            g2d.scale(scale, scale);
             Dimension bounds = new Dimension((int) dw, (int) dh);
 
             disableDoubleBuffering(componentToBePrinted);

@@ -24,12 +24,14 @@ import java.lang.Throwable;
 import java.net.URL;
 
 
-public class Jlpr extends Object implements Runnable {
+class Jlpr implements Runnable {
 
-    String host, script, label, file;
+    String host;
+    String script;
+    String label;
     Thread menuThread, printThread;
-    Component printThis;
-    String fileName;
+    private Component printThis;
+    private String fileName;
 
 
     /**
@@ -65,7 +67,7 @@ public class Jlpr extends Object implements Runnable {
             return;
         }
 
-        file = fileName;
+        String file = fileName;
 
         try {
             PrintStream f = new PrintStream(new FileOutputStream(file));
@@ -83,9 +85,9 @@ public class Jlpr extends Object implements Runnable {
     }
 
 
-    public void paintInside(Component comp, PSGr g) {
+    void paintInside(Component comp, PSGr g) {
         Point p = new Point(0, 0);
-        p = comp.location();
+        p = comp.getLocation();
 
         // set the origin for this component
         g.translate(p.x, -p.y);
@@ -106,13 +108,13 @@ public class Jlpr extends Object implements Runnable {
     }
 
 
-    public void updateComponent(Component c, PSGr g) {
+    void updateComponent(Component c, PSGr g) {
 
 //    g.setBackground(c.getBackground());
 //    g.emitThis("%" + c.toString());
 
         // draw a few special types of Component
-        Rectangle b = c.bounds();
+        Rectangle b = c.getBounds();
         int halfheight = b.height / 2;
 
         if (c instanceof Button) {
@@ -143,7 +145,7 @@ public class Jlpr extends Object implements Runnable {
         } else if (c instanceof TextComponent) {
             // This one really needs work...
             g.gsave();
-            g.clipRect(c.bounds().x, c.bounds().y, c.bounds().width, c.bounds().height);
+            g.clipRect(c.getBounds().x, c.getBounds().y, c.getBounds().width, c.getBounds().height);
             if (c.getFont() != null)
                 g.setFont(c.getFont());
             g.setColor(Color.white);

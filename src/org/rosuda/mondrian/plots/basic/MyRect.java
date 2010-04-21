@@ -25,9 +25,6 @@ public class MyRect extends Rectangle implements ActionListener {
     private Graphics g;
     private double alpha = 1;
     private boolean alphaSet = false;
-    private JMenuItem infoText;
-    private JPopupMenu popup;
-    private boolean full;
     public boolean censored = false;
     public char dir;
     public double obs = 1;
@@ -38,7 +35,7 @@ public class MyRect extends Rectangle implements ActionListener {
     private Color drawColor = Color.black;
     private JPanel panel;
     public Vector tileIds;
-    public Table tablep;
+    private Table tablep;
     public Color rectColor = Color.lightGray;
     private boolean flip = false;                 // flip the direction of hilite and color brush
     // still needs fix for direction = 'y' (no application yet)
@@ -49,7 +46,7 @@ public class MyRect extends Rectangle implements ActionListener {
                   int x, int y, int w, int h,
                   double obs, double exp, double scale, double p, String info, Vector tileIds, Table tablep) {
         super(x, y, w, h);
-        this.full = full;
+        boolean full1 = full;
         this.dir = dir;
         this.exp = exp;
         this.scale = scale;
@@ -128,7 +125,7 @@ public class MyRect extends Rectangle implements ActionListener {
     }
 
 
-    public void colorBreakdown() {
+    void colorBreakdown() {
 
         double[] Selection;
         int sels = 0;
@@ -287,14 +284,14 @@ public class MyRect extends Rectangle implements ActionListener {
 
 
     public void pop(DragBox panel, int x, int y) {
-        popup = new JPopupMenu();
+        JPopupMenu popup = new JPopupMenu();
 
         String pinfo = getLabel().replaceAll("\t", ":");
 
         StringTokenizer info = new StringTokenizer(pinfo, "\n");
 
         while (info.hasMoreTokens()) {
-            infoText = new JMenuItem(info.nextToken());
+            JMenuItem infoText = new JMenuItem(info.nextToken());
             popup.add(infoText);
             infoText.addActionListener(this);
             //      infoText.setEnabled(false);
@@ -305,7 +302,7 @@ public class MyRect extends Rectangle implements ActionListener {
 
 
     public String getLabel() {
-        String pinfo = info.toString();
+        String pinfo = info;
         if (obs > 0)
             pinfo += "\n" + "Count\t " + obs;
         else

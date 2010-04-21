@@ -81,7 +81,7 @@ public class Query {
         if (conditionString.size() > 0) {
             query += conditionString.elementAt(0);
             for (int i = 1; i < conditionString.size(); i++)
-                query += " " + (String) conditionMode.elementAt(i) + " " + (String) conditionString.elementAt(i);
+                query += " " + conditionMode.elementAt(i) + " " + conditionString.elementAt(i);
         }
         return query;
     }
