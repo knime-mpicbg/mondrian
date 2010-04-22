@@ -1,11 +1,5 @@
 package org.rosuda.mondrian;
 
-//
-//  Mondrian.java
-//	For information on setting Java configuration information, including setting
-//	Java properties, refer to the documentation at
-//		http://developer.apple.com/techpubs/java/java.html
-//
 
 import com.apple.mrj.*;
 
@@ -15,7 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 
-public class Mondrian extends Frame
+public class WelcomeFrame extends Frame
         implements ActionListener,
         MRJAboutHandler,
         MRJQuitHandler {
@@ -117,7 +111,7 @@ public class Mondrian extends Frame
     }
 
 
-    private Mondrian() {
+    private WelcomeFrame() {
         super("Mondrian");
         setLayout(null);
         addMenus();
@@ -212,6 +206,6 @@ public class Mondrian extends Frame
 
 
     public static void main(String args[]) {
-        new Mondrian();
+        new WelcomeFrame();
     }
 }
