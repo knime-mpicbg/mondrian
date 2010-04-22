@@ -11,6 +11,9 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -20,13 +23,14 @@ import java.io.File;
  */
 public class DataFrameConverter {
 
-    private JFrame dataFrames;
-
     MonFrame monFrame;
+    public RConnection rC;
 
 
     public DataFrameConverter(MonFrame monFrame) {
         this.monFrame = monFrame;
+
+        rC = createRConnection();
     }
 
 
@@ -46,14 +50,30 @@ public class DataFrameConverter {
 
         if (rDataFile.exists())
             try {
-                RConnection rC = createRConnection();
-                if (isWindows)
+                if (isWindows) {
                     rC.voidEval("load(\"" + (rDataFile.getAbsolutePath()).replaceAll("\\\\", "\\\\\\\\") + "\")");
-                else
+                } else {
                     rC.voidEval("load(\"" + rDataFile.getAbsolutePath() + "\")");
-                String[] ls = rC.eval("sort(ls())").asStrings();
+                }
 
-                dataFrames = new JFrame("Choose a data.frame");
+                String[] workSpaceVarNames = rC.eval("sort(ls())").asStrings();
+
+                if (workSpaceVarNames.length == 1) {
+                    importRData(workSpaceVarNames[0]);
+                }
+
+                final List<String> dfNames = new ArrayList<String>();
+
+                for (String varName : workSpaceVarNames) {
+                    String varClass = rC.eval("class(" + varName + ")").asString();
+
+                    if (varClass.equals("data.frame")) {
+                        System.out.println(varName + "  " + varClass);
+                        dfNames.add(varName);
+                    }
+                }
+
+                final JDialog dataFrames = new JDialog(monFrame, "Choose a data-frame");
                 dataFrames.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
                 JPanel dfPanel = new JPanel();
@@ -90,23 +110,20 @@ public class DataFrameConverter {
                 chooseButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         dataFrames.dispose();
-                        importRData(rDataFile, (String) list.getSelectedValue());
+                        importRData((String) list.getSelectedValue());
                     }
                 });
 
-                for (int i = 0; i < ls.length; i++) {
-                    String Rclass = rC.eval("class(" + ls[i] + ")").asString();
-                    if (Rclass.equals("data.frame")) {
-                        System.out.println(ls[i] + "  " + Rclass);
-                        model.addElement(ls[i]);
-                    }
+                for (String dfName : dfNames) {
+                    model.addElement(dfName);
                 }
+
 
                 list.addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent e) {
                         if (e.getClickCount() == 2) {
                             dataFrames.dispose();
-                            importRData(rDataFile, (String) list.getSelectedValue());
+                            importRData((String) list.getSelectedValue());
                         }
                     }
                 });
@@ -184,22 +201,21 @@ public class DataFrameConverter {
     }
 
 
-    public void importRData(File Rdata, String rDataSet) {
-        RConnection rC = createRConnection();
+    public void importRData(String dataFrameName) {
+
         try {
-            if (isWindows())
-                rC.voidEval("write.table(" + rDataSet + ", \"" + (Rdata.getParentFile() + File.separator).replaceAll("\\\\", "\\\\\\\\") + ".MondrianTmpImport.txt\", quote=FALSE, sep=\"\\t\", row.names = FALSE)");
-            else
-                rC.voidEval("write.table(" + rDataSet + ", \"" + Rdata.getParentFile() + File.separator + ".MondrianTmpImport.txt\", quote=FALSE, sep=\"\\t\", row.names = FALSE)");
+            File tmpFile = File.createTempFile("mondrian", ".RData");
+            rC.voidEval("write.table(" + dataFrameName + ", '" + tmpFile.getAbsolutePath() + "', quote=FALSE, sep=\"\\t\", row.names = FALSE)");
 
             rC.close();
+            monFrame.loadDataSet(false, tmpFile, dataFrameName);
+            tmpFile.delete();
+
         } catch (RserveException rse) {
             System.out.println("Rserve exception: " + rse.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        File tmpR = new File(Rdata.getParentFile() + File.separator + ".MondrianTmpImport.txt");
-        monFrame.loadDataSet(false, tmpR, rDataSet);
-        tmpR.delete();
     }
 
 

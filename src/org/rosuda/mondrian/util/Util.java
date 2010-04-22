@@ -1,8 +1,15 @@
 package org.rosuda.mondrian.util;
 
 
+import org.rosuda.mondrian.MFrame;
+import org.rosuda.mondrian.MonFrame;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
 import java.awt.image.ImageProducer;
@@ -267,6 +274,35 @@ public class Util {
         //System.out.println("<HTML><TABLE border='0' cellpadding='0' cellspacing='0'>"+infoTxt+" </TABLE></html>");
         return "<HTML><TABLE border='0' cellpadding='0' cellspacing='0'>" + infoTxt + " </TABLE></html>";
     }
-}  
+
+
+    public static void showRefCard(MonFrame j) {
+        final MFrame refCardf = new MFrame(j);
+
+        Icon RefIcon = new ImageIcon(readGif("ReferenceCard.gif"));
+
+        JLabel RefLabel = new JLabel(RefIcon);
+        JScrollPane refScrollPane = new JScrollPane(RefLabel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        refCardf.getContentPane().add("Center", refScrollPane);
+        refCardf.setTitle("Mondrian - Reference Card");
+        refCardf.setResizable(false);
+        refCardf.pack();
+        refCardf.setSize(refCardf.getWidth(), Math.min(refCardf.getHeight(), (Toolkit.getDefaultToolkit().getScreenSize()).height - 34));
+        refCardf.setLocation((Toolkit.getDefaultToolkit().getScreenSize()).width - refCardf.getWidth(), 0);
+        refCardf.show();
+
+        refCardf.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                refCardf.dispose();
+            }
+        });
+        refCardf.addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e) {
+                if (e.getModifiers() == Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() && e.getKeyCode() == KeyEvent.VK_W)
+                    refCardf.dispose();
+            }
+        });
+    }
+}
 
  

@@ -104,10 +104,11 @@
     </target>
 
 
-    <target name="cleanAll" description="remove all generated files">
-        <!--<delete failonerror="false" dir="${dist.dir}"/>-->
-        <!--<delete file="${basedir}/${project.name}.jar"/>-->
-        <!--<delete dir="${classes.dir}" failonerror="false"/>-->
+    <target name="cleanAll" description="Remove all generated files">
+        <property name="jarfile" value="${project.name}.jar"/>
+        
+        <delete file="${jarfile}"/>
+        <delete dir="${classes.dir}" failonerror="false"/>
     </target>
 
 </project>

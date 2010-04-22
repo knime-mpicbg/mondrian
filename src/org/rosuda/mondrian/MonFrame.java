@@ -9,12 +9,14 @@ import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
 import org.rosuda.mondrian.core.*;
-import org.rosuda.mondrian.io.AsciFileLoader;
+import org.rosuda.mondrian.io.AsciiFileLoader;
 import org.rosuda.mondrian.io.DataFrameConverter;
 import org.rosuda.mondrian.io.ProgressIndicator;
 import org.rosuda.mondrian.io.db.DBDatasetLoader;
 import org.rosuda.mondrian.io.db.Query;
 import org.rosuda.mondrian.plots.*;
+import org.rosuda.mondrian.plots.basic.MyPoly;
+import org.rosuda.mondrian.ui.AttributeCellRenderer;
 import org.rosuda.mondrian.ui.PreferencesFrame;
 import org.rosuda.mondrian.util.Util;
 
@@ -28,7 +30,8 @@ import java.awt.event.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Date;
@@ -43,15 +46,16 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
      * Remember # of open windows so we can quit when last one is closed
      */
     protected static int num_windows = 0;
-    protected static Vector dataSets;
-    protected static Vector Mondrians;
-    private Vector Plots = new Vector(10, 0);
-    public Vector selList = new Vector(10, 0);
+    public static Vector<DataSet> dataSets;
+    protected static Vector<MonFrame> mondrians;
+    private Vector<DragBox> plots = new Vector<DragBox>(10, 0);
+
+    public Vector<Selection> selList = new Vector<Selection>(10, 0);
     public Query sqlConditions;
     public boolean selseq = false;
     public boolean alphaHi = false;
     public boolean hasR = false;
-    private Vector polys = new Vector(256, 256);
+    public Vector<MyPoly> polys = new Vector<MyPoly>(256, 256);
     private JList varNames = null;
     private int numCategorical = 0;
     private int weightIndex = 0;
@@ -62,11 +66,11 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     public JMenu windows, help, dv, sam, trans;
     private JMenuItem n;
     private JMenuItem nw;
-    private JMenuItem c;
+    private JMenuItem closeDataSetMenuItem;
     private JMenuItem t;
     private JMenuItem m;
-    private JMenuItem s;
-    private JMenuItem ss;
+    private JMenuItem saveMenuItem;
+    private JMenuItem saveSelectionMenuItem;
     private JMenuItem mv;
     private JMenuItem mn;
     private JMenuItem b;
@@ -90,23 +94,21 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     private int graphicsPerf;
     static String user;
     public boolean mondrianRunning = false;
-    private boolean load = false;
-    private int[] selectBuffer;
+    public int[] selectBuffer;
     private Preferences prefs;
     private String searchText = "";
     private long startT = 0;
-    private Vector setIndices = new Vector(10, 0);
+    private Vector<Integer> setIndices = new Vector<Integer>(10, 0);
 
 
-    public MonFrame(Vector Mondrians, Vector dataSets, boolean load, boolean loadDB, File loadFile) {
+    public MonFrame(Vector<MonFrame> mondrians, Vector<DataSet> dataSets, boolean load, boolean loadDB, File loadFile) {
 
-        Mondrians.addElement(this);
+        mondrians.addElement(this);
 
         MRJApplicationUtils.registerOpenDocumentHandler(this);
 
         //    System.out.println("........... Creating new Instance of MonFrame .........");
 
-        this.load = load;
 
         Toolkit.getDefaultToolkit().setDynamicLayout(false);
 
@@ -138,7 +140,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         Font SF = new Font("SansSerif", Font.BOLD, 12);
         this.setFont(SF);
         MonFrame.dataSets = dataSets;
-        MonFrame.Mondrians = Mondrians;
+        MonFrame.mondrians = mondrians;
         this.setTitle("Mondrian");               // Create the window.
         num_windows++;                           // Count it.
 
@@ -151,25 +153,33 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         file.add(o = new JMenuItem("Open"));
         o.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
-        JMenuItem odf;
-        file.add(odf = new JMenuItem("Open R dataframe"));
-        odf.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        JMenuItem od;
-        file.add(od = new JMenuItem("Open Database"));
-        od.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        if (user.indexOf("theus") > -1 || true)
-            od.setEnabled(true);
-        else
-            od.setEnabled(false);
-        file.add(s = new JMenuItem("Save"));
-        s.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        s.setEnabled(false);
-        file.add(ss = new JMenuItem("Save Selection"));
-        ss.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        ss.setEnabled(false);
-        file.add(c = new JMenuItem("Close Dataset"));
-        c.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        c.setEnabled(false);
+        JMenuItem openRDataFrameMenuItem;
+        file.add(openRDataFrameMenuItem = new JMenuItem("Open R dataframe"));
+        openRDataFrameMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
+        JMenuItem openDataBaseMenuItem;
+        file.add(openDataBaseMenuItem = new JMenuItem("Open Database"));
+        openDataBaseMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        if (user.indexOf("theus") > -1 || true) {
+            openDataBaseMenuItem.setEnabled(true);
+        }
+        else {
+            openDataBaseMenuItem.setEnabled(false);
+        }
+
+        file.add(saveMenuItem = new JMenuItem("Save"));
+        saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        saveMenuItem.setEnabled(false);
+
+        file.add(saveSelectionMenuItem = new JMenuItem("Save Selection"));
+
+        saveSelectionMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        saveSelectionMenuItem.setEnabled(false);
+
+        file.add(closeDataSetMenuItem = new JMenuItem("Close Dataset"));
+        closeDataSetMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        closeDataSetMenuItem.setEnabled(false);
+        
         //    file.add(p = new JMenuItem("Print Window",new JMenuShortcut(KeyEvent.VK_P)));
         JMenuItem q = new JMenuItem("Quit");
         if (((System.getProperty("os.name")).toLowerCase()).indexOf("mac") == -1) {
@@ -451,7 +461,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 loadDataSet(false, null, "");
             }
         });
-        odf.addActionListener(new ActionListener() {     // Load a dataset
+        openRDataFrameMenuItem.addActionListener(new ActionListener() {     // Load a dataset
 
 
             public void actionPerformed(ActionEvent e) {
@@ -459,21 +469,21 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 new DataFrameConverter(MonFrame.this).loadDataFrame();
             }
         });
-        s.addActionListener(new ActionListener() {     // Save the current dataset
+        saveMenuItem.addActionListener(new ActionListener() {     // Save the current dataset
 
 
             public void actionPerformed(ActionEvent e) {
                 Save(false);
             }
         });
-        ss.addActionListener(new ActionListener() {     // Save the current selection
+        saveSelectionMenuItem.addActionListener(new ActionListener() {     // Save the current selection
 
 
             public void actionPerformed(ActionEvent e) {
                 Save(true);
             }
         });
-        od.addActionListener(new ActionListener() {     // Load a database
+        openDataBaseMenuItem.addActionListener(new ActionListener() {     // Load a database
 
 
             public void actionPerformed(ActionEvent e) {
@@ -655,7 +665,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 closeAll();
             }
         });
-        c.addActionListener(new ActionListener() {     // Close this window.
+        closeDataSetMenuItem.addActionListener(new ActionListener() {     // Close this window.
 
 
             public void actionPerformed(ActionEvent e) {
@@ -673,14 +683,21 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
 
             public void actionPerformed(ActionEvent e) {
-                refCard();
+                Util.showRefCard(MonFrame.this);
             }
         });
         oh.addActionListener(new ActionListener() {     // Show Mondrian Webpage.
 
 
             public void actionPerformed(ActionEvent e) {
-                onlineHelp();
+                try {
+                    Desktop.getDesktop().browse(new URL("http://www.rosuda.org/Mondrian").toURI());
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } catch (URISyntaxException e11) {
+                    e11.printStackTrace();
+                }
+
             }
         });
 
@@ -705,8 +722,8 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
         if (dataSets.isEmpty())
             graphicsPerf = setGraphicsPerformance();
-        else if (((DataSet) dataSets.firstElement()).graphicsPerf != 0)
-            graphicsPerf = ((DataSet) dataSets.firstElement()).graphicsPerf;
+        else if (dataSets.firstElement().graphicsPerf != 0)
+            graphicsPerf = dataSets.firstElement().graphicsPerf;
         else
             graphicsPerf = 25000;
 
@@ -746,7 +763,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
      * @param data dataset to open
      */
     public MonFrame(DataSet data) {
-        this((Mondrians == null) ? new Vector(5, 5) : Mondrians, (dataSets == null) ? new Vector(5, 5) : dataSets, false, false, null);
+        this((mondrians == null) ? new Vector<MonFrame>(5, 5) : mondrians, (dataSets == null) ? new Vector<DataSet>(5, 5) : dataSets, false, false, null);
 
         initWithData(data);
     }
@@ -762,19 +779,23 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         dataSetCounter = dataSets.size() - 1;
         selectBuffer = new int[data.k + 15];
         setVarList();
-        this.setTitle("Mondrian(" + ((DataSet) dataSets.elementAt(dataSetCounter)).setName + ")");               //
+        this.setTitle("Mondrian(" + dataSets.elementAt(dataSetCounter).setName + ")");               //
         me.setText(this.getTitle());
-        c.setEnabled(true);
-        s.setEnabled(true);
+        closeDataSetMenuItem.setEnabled(true);
+        saveMenuItem.setEnabled(true);
 
-        int nom = ((DataSet) dataSets.elementAt(dataSetCounter)).countSelection();
-        int denom = ((DataSet) dataSets.elementAt(dataSetCounter)).n;
+        int nom = dataSets.elementAt(dataSetCounter).countSelection();
+        int denom = dataSets.elementAt(dataSetCounter).n;
         String Display = nom + "/" + denom + " (" + Stat.roundToString(100 * nom / denom, 2) + "%)";
         progText.setText(Display);
         progBar.setValue(nom);
 
-        load = false;
         maintainOptionMenu();
+    }
+
+
+    public JLabel getProgText() {
+        return progText;
     }
 
 
@@ -783,29 +804,8 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     }
 
 
-    public void openFileError() {
-        JOptionPane.showMessageDialog(this, "Can't open File\nHas it been moved or deleted?  ");
-    }
-
-
     void showIt() {
         paintAll(this.getGraphics());
-    }
-
-
-    public static byte[] streamToBytes(InputStream strm) throws IOException {
-        byte[] tmpBuf = new byte[2048];
-        byte[] buf = new byte[0];
-
-        int len;
-        while ((len = strm.read(tmpBuf)) > -1) {
-            byte[] newBuf = new byte[buf.length + len];
-            System.arraycopy(buf, 0, newBuf, 0, buf.length);
-            System.arraycopy(tmpBuf, 0, newBuf, buf.length, len);
-            buf = newBuf;
-        }
-
-        return buf;
     }
 
 
@@ -839,74 +839,28 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
             return;
         }
 
-        String message = "Close dataset \"" + ((DataSet) dataSets.elementAt(dataSetCounter)).setName + "\" and\n all corresponding plots?";
+        String message = "Close dataset \"" + dataSets.elementAt(dataSetCounter).setName + "\" and\n all corresponding plots?";
 
         int answer = JOptionPane.showConfirmDialog(this, message);
         if (answer == JOptionPane.YES_OPTION) {
             num_windows--;
-            for (int i = Plots.size() - 1; i >= 0; i--)
-                ((DragBox) Plots.elementAt(i)).frame.close();
+            for (int i = plots.size() - 1; i >= 0; i--)
+                plots.elementAt(i).frame.close();
             dataSets.setElementAt(new DataSet("nullinger"), dataSetCounter);
             this.dispose();
             if (num_windows == 0) {
-                new MonFrame(Mondrians, dataSets, false, false, null);
+                new MonFrame(mondrians, dataSets, false, false, null);
                 //        System.out.println(" -----------------------> disposing MonFrame !!!!!!!!!!!!!!!!");
                 this.dispose();
-                boolean killed = true;
             }
         }
     }
 
 
     public void closeAll() {
-        for (int i = Plots.size() - 1; i >= 0; i--) {
-            ((DragBox) Plots.elementAt(i)).frame.close();
-            Plots.removeElementAt(i);
-        }
-    }
-
-
-    public void refCard() {
-        final MFrame refCardf = new MFrame(this);
-
-        Icon RefIcon = new ImageIcon(Util.readGif("ReferenceCard.gif"));
-
-        JLabel RefLabel = new JLabel(RefIcon);
-        JScrollPane refScrollPane = new JScrollPane(RefLabel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        refCardf.getContentPane().add("Center", refScrollPane);
-        refCardf.setTitle("Mondrian - Reference Card");
-        refCardf.setResizable(false);
-        refCardf.pack();
-        refCardf.setSize(refCardf.getWidth(), Math.min(refCardf.getHeight(), (Toolkit.getDefaultToolkit().getScreenSize()).height - 34));
-        refCardf.setLocation((Toolkit.getDefaultToolkit().getScreenSize()).width - refCardf.getWidth(), 0);
-        refCardf.show();
-
-        refCardf.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                refCardf.dispose();
-            }
-        });
-        refCardf.addKeyListener(new KeyAdapter() {
-            public void keyPressed(KeyEvent e) {
-                if (e.getModifiers() == Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() && e.getKeyCode() == KeyEvent.VK_W)
-                    refCardf.dispose();
-            }
-        });
-    }
-
-
-    public void onlineHelp() {
-
-        try {
-            if (((System.getProperty("os.name")).toLowerCase()).indexOf("mac") > -1)
-                Runtime.getRuntime().exec("open http://www.rosuda.org/Mondrian");
-            else if (((System.getProperty("os.name")).toLowerCase()).indexOf("win") > -1)
-                Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler http://www.rosuda.org/Mondrian");
-            else
-                Runtime.getRuntime().exec("firefox http://www.rosuda.org/Mondrian");
-        }
-        catch (Exception e) {
-            System.out.println("Can't start browser!");
+        for (int i = plots.size() - 1; i >= 0; i--) {
+            plots.elementAt(i).frame.close();
+            plots.removeElementAt(i);
         }
     }
 
@@ -916,7 +870,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
         System.out.println("Transform: " + mode);
         String name = "";
-        DataSet data = ((DataSet) dataSets.elementAt(dataSetCounter));
+        DataSet data = dataSets.elementAt(dataSetCounter);
 
         double[] tData = new double[data.n];
         boolean[] tMiss = new boolean[data.n];
@@ -1008,7 +962,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
 
     public void switchSelection() {
-        if (dataSetCounter > -1 && ((DataSet) dataSets.elementAt(dataSetCounter)).isDB)
+        if (dataSetCounter > -1 && dataSets.elementAt(dataSetCounter).isDB)
             selseq = true;
         else {
             selseq = se.isSelected();
@@ -1027,7 +981,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
     public void selectAll() {
         if (dataSetCounter > -1) {
-            ((DataSet) dataSets.elementAt(dataSetCounter)).selectAll();
+            dataSets.elementAt(dataSetCounter).selectAll();
             updateSelection();
         }
     }
@@ -1035,7 +989,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
     public void toggleSelection() {
         if (dataSetCounter > -1) {
-            ((DataSet) dataSets.elementAt(dataSetCounter)).toggleSelection();
+            dataSets.elementAt(dataSetCounter).toggleSelection();
             updateSelection();
         }
     }
@@ -1043,7 +997,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
     public void clearColors() {
         if (dataSetCounter > -1) {
-            ((DataSet) dataSets.elementAt(dataSetCounter)).colorsOff();
+            dataSets.elementAt(dataSetCounter).colorsOff();
             dataChanged(-1);
         }
     }
@@ -1059,7 +1013,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     public void deriveVariable(boolean color) {
 
         String name;
-        DataSet data = ((DataSet) dataSets.elementAt(dataSetCounter));
+        DataSet data = dataSets.elementAt(dataSetCounter);
         if (color)
             name = "Colors " + dCol++;
         else
@@ -1082,8 +1036,8 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
     public void deleteSelection() {
         if (selList.size() > 0) {
-            for (int i = 0; i < Plots.size(); i++)
-                (((DragBox) Plots.elementAt(i)).Selections).removeAllElements();
+            for (int i = 0; i < plots.size(); i++)
+                (plots.elementAt(i).Selections).removeAllElements();
             for (int i = 0; i < selList.size(); i++)
                 ((Selection) selList.elementAt(i)).status = Selection.KILLED;
             maintainWindowMenu(false);
@@ -1098,38 +1052,36 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         boolean selectAll = false;
         boolean unSelect = false;
         boolean toggleSelection = false;
-        boolean deleteAll = false;
-        boolean switchSel = false;
 
-        for (int i = 0; i < Plots.size(); i++) {
-            if (((DragBox) Plots.elementAt(i)).selectAll) {    // This window has caused the select all event
-                ((DragBox) Plots.elementAt(i)).selectAll = false;
+        for (int i = 0; i < plots.size(); i++) {
+            if (plots.elementAt(i).selectAll) {    // This window has caused the select all event
+                plots.elementAt(i).selectAll = false;
                 selectAll = true;
             }
-            if (((DragBox) Plots.elementAt(i)).unSelect) {    // This window has caused the un select event
-                ((DragBox) Plots.elementAt(i)).unSelect = false;
+            if (plots.elementAt(i).unSelect) {    // This window has caused the un select event
+                plots.elementAt(i).unSelect = false;
                 unSelect = true;
             }
-            if (((DragBox) Plots.elementAt(i)).toggleSelection) {    // This window has caused the toggle selection event
-                ((DragBox) Plots.elementAt(i)).toggleSelection = false;
+            if (plots.elementAt(i).toggleSelection) {    // This window has caused the toggle selection event
+                plots.elementAt(i).toggleSelection = false;
                 toggleSelection = true;
             }
-            if (((DragBox) Plots.elementAt(i)).deleteAll) {    // This window has caused the deletion event
-                ((DragBox) Plots.elementAt(i)).deleteAll = false;
+            if (plots.elementAt(i).deleteAll) {    // This window has caused the deletion event
+                plots.elementAt(i).deleteAll = false;
                 deleteSelection();
                 return;
             }
-            if (((DragBox) Plots.elementAt(i)).switchSel) {    // This window has caused the switch event
-                ((DragBox) Plots.elementAt(i)).switchSel = false;
+            if (plots.elementAt(i).switchSel) {    // This window has caused the switch event
+                plots.elementAt(i).switchSel = false;
                 se.setSelected(!se.isSelected());                // perform the tick mark change manually ...
                 switchSelection();
                 return;
             }
-            if (((DragBox) Plots.elementAt(i)).switchAlpha) {    // This window has caused the switch alpha event
-                ((DragBox) Plots.elementAt(i)).switchAlpha = false;
+            if (plots.elementAt(i).switchAlpha) {    // This window has caused the switch alpha event
+                plots.elementAt(i).switchAlpha = false;
                 ah.setSelected(!ah.isSelected());
                 switchAlpha();
-                ((DragBox) Plots.elementAt(i)).updateSelection();
+                plots.elementAt(i).updateSelection();
                 return;
             }
         }
@@ -1149,11 +1101,11 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
             // Get the latest selection and add it, if its a new selection
             //
-            for (int i = 0; i < Plots.size(); i++)
-                if (((DragBox) Plots.elementAt(i)).frame.isVisible()) {  // Plotwindow still exists
-                    if (((DragBox) Plots.elementAt(i)).selectFlag) {       // This window has caused the selection event
-                        ((DragBox) Plots.elementAt(i)).selectFlag = false;    // We need to get the last selection from this plot
-                        Selection S = (Selection) (((DragBox) Plots.elementAt(i)).Selections.lastElement());
+            for (int i = 0; i < plots.size(); i++)
+                if (plots.elementAt(i).frame.isVisible()) {  // Plotwindow still exists
+                    if (plots.elementAt(i).selectFlag) {       // This window has caused the selection event
+                        plots.elementAt(i).selectFlag = false;    // We need to get the last selection from this plot
+                        Selection S = (Selection) (((DragBox) plots.elementAt(i)).Selections.lastElement());
                         if (selList.indexOf(S) == -1) { // Not in the list yet => new Selection to add !
                             if (!(S.r.width < 3 || S.r.height < 3) && selseq) {
                                 System.out.println("Selection Sequence  !!");
@@ -1163,12 +1115,12 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                                 oneClick = S;
                                 System.out.println("Click Selection  !!");
                                 oneClick.status = Selection.KILLED;
-                                ((DragBox) Plots.elementAt(i)).Selections.removeElementAt(((DragBox) Plots.elementAt(i)).Selections.size() - 1);
+                                plots.elementAt(i).Selections.removeElementAt(plots.elementAt(i).Selections.size() - 1);
                             }
                         }
                     }
                 } else
-                    Plots.removeElementAt(i--);
+                    plots.removeElementAt(i--);
 
             if (selList.size() > 1) {
                 ((Selection) (selList.firstElement())).mode = Selection.MODE_STANDARD;
@@ -1192,7 +1144,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 }
             }
             sqlConditions = new Query();                // Replace ???
-            if (((DataSet) dataSets.elementAt(dataSetCounter)).isDB)
+            if (dataSets.elementAt(dataSetCounter).isDB)
                 for (int i = 0; i < selList.size(); i++) {
                     Selection S = ((Selection) selList.elementAt(i));
                     if (S.mode == Selection.MODE_STANDARD)
@@ -1201,36 +1153,36 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                     if (!condStr.equals(""))
                         sqlConditions.addCondition(Selection.getSQLModeString(S.mode), "(" + condStr + ")");
                 }
-            ((DataSet) (dataSets.elementAt(dataSetCounter))).sqlConditions = sqlConditions;
+            dataSets.elementAt(dataSetCounter).sqlConditions = sqlConditions;
 
             //      System.out.println("Main Update: "+sqlConditions.makeQuery());
 
         } else {
             if (toggleSelection) {
                 System.out.println(" TOGGLE SELECTION ... ");
-                ((DataSet) (dataSets.elementAt(dataSetCounter))).toggleSelection();
+                dataSets.elementAt(dataSetCounter).toggleSelection();
             } else if (unSelect) {
                 System.out.println(" UNSELECT ... ");
-                ((DataSet) (dataSets.elementAt(dataSetCounter))).clearSelection();
+                dataSets.elementAt(dataSetCounter).clearSelection();
             } else {
                 System.out.println(" SELECT ALL ... ");
-                ((DataSet) (dataSets.elementAt(dataSetCounter))).selectAll();
+                dataSets.elementAt(dataSetCounter).selectAll();
             }
-            if (((DataSet) dataSets.elementAt(dataSetCounter)).isDB)
+            if (dataSets.elementAt(dataSetCounter).isDB)
                 sqlConditions.clearConditions();
         }
 
         // Finally get the plots updated
         //
-        for (int i = 0; i < Plots.size(); i++) {
+        for (int i = 0; i < plots.size(); i++) {
             //     progText.setText("Query: "+i);
             progBar.setValue(1);
-            ((DragBox) Plots.elementAt(i)).updateSelection();
+            plots.elementAt(i).updateSelection();
         }
 
-        ((DataSet) dataSets.elementAt(dataSetCounter)).selChanged = true;
-        int nom = ((DataSet) dataSets.elementAt(dataSetCounter)).countSelection();
-        int denom = ((DataSet) dataSets.elementAt(dataSetCounter)).n;
+        dataSets.elementAt(dataSetCounter).selChanged = true;
+        int nom = dataSets.elementAt(dataSetCounter).countSelection();
+        int denom = dataSets.elementAt(dataSetCounter).n;
         String Display = nom + "/" + denom + " (" + Stat.roundToString(100F * nom / denom, 2) + "%)";
         progText.setText(Display);
         progBar.setValue(nom);
@@ -1238,9 +1190,9 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         maintainOptionMenu();
 
         if (nom > 0)
-            ss.setEnabled(true);
+            saveSelectionMenuItem.setEnabled(true);
         else
-            ss.setEnabled(false);
+            saveSelectionMenuItem.setEnabled(false);
     }
 
 
@@ -1253,11 +1205,11 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         System.out.println("Key Event in MonFrame");
 
         // First check whether a color has been set individually
-        for (int i = 0; i < Plots.size(); i++) {
-            int col = ((DragBox) Plots.elementAt(i)).colorSet;
+        for (int i = 0; i < plots.size(); i++) {
+            int col = plots.elementAt(i).colorSet;
             if (col > -1) {
-                ((DragBox) Plots.elementAt(i)).colorSet = -1;
-                DataSet data = ((DataSet) dataSets.elementAt(dataSetCounter));
+                plots.elementAt(i).colorSet = -1;
+                DataSet data = dataSets.elementAt(dataSetCounter);
                 id = -1;
                 if (col < 999) {
                     System.out.println("Setting Colors !!!!");
@@ -1271,14 +1223,14 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
             }
         }
         // Then ordinary update loop
-        for (int i = 0; i < Plots.size(); i++)
-            if (((DragBox) Plots.elementAt(i)).frame.isVisible())  // Plotwindow still exists
-                if (((DragBox) Plots.elementAt(i)).dataFlag)         // This window was already updated
-                    ((DragBox) Plots.elementAt(i)).dataFlag = false;
+        for (int i = 0; i < plots.size(); i++)
+            if (plots.elementAt(i).frame.isVisible())  // Plotwindow still exists
+                if (plots.elementAt(i).dataFlag)         // This window was already updated
+                    plots.elementAt(i).dataFlag = false;
                 else
-                    ((DragBox) Plots.elementAt(i)).dataChanged(id);
+                    plots.elementAt(i).dataChanged(id);
             else
-                Plots.removeElementAt(i);
+                plots.removeElementAt(i);
     }
 
 
@@ -1298,14 +1250,14 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
     public boolean saveDataSet(String file, boolean selection) {
         try {
-            int k = ((DataSet) dataSets.elementAt(dataSetCounter)).k;
-            int n = ((DataSet) dataSets.elementAt(dataSetCounter)).n;
+            int k = dataSets.elementAt(dataSetCounter).k;
+            int n = dataSets.elementAt(dataSetCounter).n;
 
             FileWriter fw = new FileWriter(file);
 
             double[][] dataCopy = new double[k][n];
             boolean[][] missing = new boolean[k][n];
-            DataSet data = ((DataSet) dataSets.elementAt(dataSetCounter));
+            DataSet data = dataSets.elementAt(dataSetCounter);
             double[] selected = data.getSelection();
             for (int j = 0; j < k; j++) {
                 missing[j] = data.getMissings(j);
@@ -1363,30 +1315,29 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
             new DBDatasetLoader(this).loadDataBase();
 
         } else if (dataSetCounter == -1) {
-            if (new AsciFileLoader(this).loadAsciiFile(file)) {
+            if (new AsciiFileLoader(this).loadAsciiFile(file)) {
                 setVarList();
                 if (title.equals(""))
-                    this.setTitle("Mondrian(" + ((DataSet) dataSets.elementAt(dataSetCounter)).setName + ")");               //
+                    this.setTitle("Mondrian(" + dataSets.elementAt(dataSetCounter).setName + ")");               //
                 else
                     this.setTitle("Mondrian(" + title + ")");
                 me.setText(this.getTitle());
-                c.setEnabled(true);
-                s.setEnabled(true);
+                closeDataSetMenuItem.setEnabled(true);
+                saveMenuItem.setEnabled(true);
 
-                int nom = ((DataSet) dataSets.elementAt(dataSetCounter)).countSelection();
-                int denom = ((DataSet) dataSets.elementAt(dataSetCounter)).n;
+                int nom = dataSets.elementAt(dataSetCounter).countSelection();
+                int denom = dataSets.elementAt(dataSetCounter).n;
                 String Display = nom + "/" + denom + " (" + Stat.roundToString(100 * nom / denom, 2) + "%)";
                 progText.setText(Display);
                 progBar.setValue(nom);
 
-                load = false;
                 maintainOptionMenu();
             }
         } else {
-            new MonFrame(Mondrians, dataSets, true, isDB, file);
+            new MonFrame(mondrians, dataSets, true, isDB, file);
         }
         if (dataSetCounter != -1)
-            ((DataSet) dataSets.elementAt(dataSetCounter)).graphicsPerf = graphicsPerf;
+            dataSets.elementAt(dataSetCounter).graphicsPerf = graphicsPerf;
     }
 
 
@@ -1397,7 +1348,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         }
         if (dataSetCounter == -1)
             dataSetCounter = dataSets.size() - 1;
-        final DataSet data = (DataSet) dataSets.elementAt(dataSetCounter);
+        final DataSet data = dataSets.elementAt(dataSetCounter);
         String listNames[] = new String[data.k];
         for (int j = 0; j < data.k; j++) {
             listNames[j] = " " + data.getName(j);
@@ -1446,9 +1397,9 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                         }
                         if (!varNames.isSelectedIndex(index)) {              // Deselection, remove elements from Buffer
                             for (int i = 0; i < data.k; i++)
-                                if (selectBuffer[i] == index)
-                                    for (int k = i; k < data.k - 1; k++)
-                                        selectBuffer[k] = selectBuffer[k + 1];
+                                if (selectBuffer[i] == index) {
+                                    System.arraycopy(selectBuffer, i + 1, selectBuffer, i, data.k - 1 - i);
+                                }
                         }
                         System.out.println(" History: " + selectBuffer[0] + " " + selectBuffer[1] + " " + selectBuffer[2] + " " + selectBuffer[3] + " " + selectBuffer[4]);
                     }
@@ -1487,7 +1438,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                     if (setIndices.size() > 0) {
                         int[] setArray = new int[setIndices.size()];
                         for (int i = 0; i < setIndices.size(); i++)
-                            setArray[i] = ((Integer) (setIndices.elementAt(i))).intValue();
+                            setArray[i] = setIndices.elementAt(i);
                         varNames.setSelectedIndices(setArray);
                         varNames.ensureIndexIsVisible(setArray[setIndices.size() - 1]);
                         varNames.ensureIndexIsVisible(setArray[0]);
@@ -1496,7 +1447,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
             }
         });
 
-        varNames.setCellRenderer(new MCellRenderer());
+        varNames.setCellRenderer(new AttributeCellRenderer(this));
 
         RepaintManager currentManager = RepaintManager.currentManager(varNames);
         currentManager.setDoubleBufferingEnabled(true);
@@ -1526,22 +1477,27 @@ public void handlePrintFile(ApplicationEvent event) {} */
         if (numCategorical == (vars).length - 1) {
             int[] returner = new int[vars.length];
             System.arraycopy(vars, 0, returner, 0, returner.length);
+
             for (int i = 0; i < returner.length - 1; i++) {
                 if (vars[i] == weightIndex) {
-                    for (int j = i; j < returner.length - 1; j++)
-                        returner[j] = vars[j + 1];
+                    System.arraycopy(vars, i + 1, returner, i, returner.length - 1 - i);
+
                     returner[returner.length - 1] = weightIndex;
                     i = returner.length;
+
                 } else
                     returner[i] = vars[i];
             }
             for (int i = 0; i < returner.length; i++) {
                 System.out.println("ind old = " + vars[i] + " ind new = " + returner[i]);
             }
+
             return returner;
+
         } else {
             final Dialog countDialog = new Dialog(this, " Choose Weight Variable", true);
             Choice getCount = new Choice();
+
             for (int j = 0; j < vars.length; j++) {
                 if (data.getName(vars[j]).length() > 1 && data.getName(vars[j]).substring(0, 1).equals("/"))
                     getCount.addItem(data.getName(vars[j]).substring(2));
@@ -1582,15 +1538,17 @@ public void handlePrintFile(ApplicationEvent event) {} */
             countDialog.show();
 
             String[] selecteds = new String[(varNames.getSelectedValues()).length];
-            for (int i = 0; i < (varNames.getSelectedValues()).length; i++)
+            for (int i = 0; i < (varNames.getSelectedValues()).length; i++) {
                 selecteds[i] = (String) (varNames.getSelectedValues())[i];
+            }
+
             int[] returner = new int[vars.length];
             for (int i = 0; i < vars.length; i++) {
                 if ((selecteds[i].trim()).equals(getCount.getSelectedItem())) {
                     returner[vars.length - 1] = vars[i];
-                    for (int j = i; j < vars.length - 1; j++)
-                        returner[j] = vars[j + 1];
+                    System.arraycopy(vars, i + 1, returner, i, vars.length - 1 - i);
                     i = vars.length;
+
                 } else
                     returner[i] = vars[i];
             }
@@ -1616,7 +1574,6 @@ public void handlePrintFile(ApplicationEvent event) {} */
         checkHistoryBuffer();
 
         int p = (varNames.getSelectedIndices()).length;
-        DataSet tempData = ((DataSet) dataSets.elementAt(dataSetCounter));
         final MFrame scatterMf = new MFrame(this);
         int dims = Math.min(200 * p, (Toolkit.getDefaultToolkit().getScreenSize()).height);
         scatterMf.setSize(dims - 20, dims);
@@ -1636,10 +1593,10 @@ public void handlePrintFile(ApplicationEvent event) {} */
                     tmpVars[0] = selectBuffer[p - j - 1];
                     tmpVars[1] = selectBuffer[p - i - 1];
                     //
-                    Scatter2D scat = new Scatter2D(scatterMf, 200, 200, (DataSet) dataSets.elementAt(dataSetCounter), tmpVars, varNames, true);
+                    Scatter2D scat = new Scatter2D(scatterMf, 200, 200, dataSets.elementAt(dataSetCounter), tmpVars, varNames, true);
                     scat.addSelectionListener(this);
                     scat.addDataListener(this);
-                    Plots.addElement(scat);
+                    plots.addElement(scat);
                 }
             }
         scatterMf.setLocation(300, 0);
@@ -1668,17 +1625,16 @@ public void handlePrintFile(ApplicationEvent event) {} */
         int[] passTmpBuffer = new int[k];
         int count = 0;
         for (int i = 0; i < k; i++) {
-            if (((DataSet) dataSets.elementAt(dataSetCounter)).getNumMissings(selectBuffer[k - i - 1]) < ((DataSet) dataSets.elementAt(dataSetCounter)).n)  // make sure not all data is missing
+            if (dataSets.elementAt(dataSetCounter).getNumMissings(selectBuffer[k - i - 1]) < dataSets.elementAt(dataSetCounter).n)  // make sure not all data is missing
                 passTmpBuffer[count++] = selectBuffer[k - i - 1];
         }
         int[] passBuffer = new int[count];
-        for (int i = 0; i < count; i++)
-            passBuffer[i] = passTmpBuffer[i];
+        System.arraycopy(passTmpBuffer, 0, passBuffer, 0, count);
 
-        PC plotw = new PC(pC, (DataSet) dataSets.elementAt(dataSetCounter), passBuffer, mode, varNames);
+        PC plotw = new PC(pC, dataSets.elementAt(dataSetCounter), passBuffer, mode, varNames);
         plotw.addSelectionListener(this);
         plotw.addDataListener(this);
-        Plots.addElement(plotw);
+        plots.addElement(plotw);
         pC.getContentPane().add(plotw);
         pC.show();
     }
@@ -1690,12 +1646,12 @@ public void handlePrintFile(ApplicationEvent event) {} */
         final MFrame mV = new MFrame(this);
         int k = 0;
         for (int i = 0; i < (varNames.getSelectedIndices()).length; i++)
-            if (((DataSet) dataSets.elementAt(dataSetCounter)).n > ((DataSet) dataSets.elementAt(dataSetCounter)).getN((varNames.getSelectedIndices())[i]))
+            if (dataSets.elementAt(dataSetCounter).n > dataSets.elementAt(dataSetCounter).getN((varNames.getSelectedIndices())[i]))
                 k++;
         int[] passVars = new int[k];
         int kk = 0;
         for (int i = 0; i < (varNames.getSelectedIndices()).length; i++)
-            if (((DataSet) dataSets.elementAt(dataSetCounter)).n > ((DataSet) dataSets.elementAt(dataSetCounter)).getN(selectBuffer[i]))
+            if (dataSets.elementAt(dataSetCounter).n > dataSets.elementAt(dataSetCounter).getN(selectBuffer[i]))
                 passVars[k - 1 - kk++] = selectBuffer[i]; //(varNames.getSelectedIndices())[i];
 
         if (k > 0) {
@@ -1710,11 +1666,11 @@ public void handlePrintFile(ApplicationEvent event) {} */
             mV.setSize(300, Math.min(tmpHeight, (Toolkit.getDefaultToolkit().getScreenSize()).height - 30));
             mV.setLocation(150, 150);
 
-            final MissPlot plotw = new MissPlot(mV, (DataSet) dataSets.elementAt(dataSetCounter), passVars);
+            final MissPlot plotw = new MissPlot(mV, dataSets.elementAt(dataSetCounter), passVars);
             plotw.setScrollX();
             plotw.addSelectionListener(this);
             plotw.addDataListener(this);
-            Plots.addElement(plotw);
+            plots.addElement(plotw);
             mV.show();
         } else
             JOptionPane.showMessageDialog(this, "Non of the selected variables\ninclude any missing values");
@@ -1727,7 +1683,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
         final MFrame mondrian = new MFrame(this);
         mondrian.setSize(400, 400);
 
-        DataSet data = (DataSet) dataSets.elementAt(dataSetCounter);
+        DataSet data = dataSets.elementAt(dataSetCounter);
 
         int k = (varNames.getSelectedIndices()).length;
         int[] passBuffer = new int[k];
@@ -1746,7 +1702,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
         final Mosaic plotw = new Mosaic(mondrian, 400, 400, breakdown);
         plotw.addSelectionListener(this);
         plotw.addDataListener(this);
-        Plots.addElement(plotw);
+        plots.addElement(plotw);
         //    mondrian.getContentPane().add(plotw);                      // Add it
         mondrian.setLocation(300, 0);
         mondrian.show();
@@ -1764,7 +1720,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
         final MFrame mondrian = new MFrame(this);
         mondrian.setSize(400, 400);
 
-        DataSet tempData = ((DataSet) dataSets.elementAt(dataSetCounter));
+        DataSet tempData = dataSets.elementAt(dataSetCounter);
 
         int k = (varNames.getSelectedIndices()).length;
         int[] passBuffer = new int[k];
@@ -1780,7 +1736,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
         final Mosaic plotw = new Mosaic(mondrian, 400, 400, breakdown);
         plotw.addSelectionListener(this);
         plotw.addDataListener(this);
-        Plots.addElement(plotw);
+        plots.addElement(plotw);
         //    mondrian.getContentPane().add(plotw);                      // Add it
         mondrian.setLocation(300, 0);
         mondrian.show();
@@ -1800,7 +1756,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
     public void barChart() {
 
-        DataSet tempData = ((DataSet) dataSets.elementAt(dataSetCounter));
+        DataSet tempData = dataSets.elementAt(dataSetCounter);
 
         int[] indices = varNames.getSelectedIndices();
         int lastY = 333;
@@ -1821,7 +1777,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
             plotw.addSelectionListener(this);
             plotw.addDataListener(this);
-            Plots.addElement(plotw);
+            plots.addElement(plotw);
             if (lastY + bars.getHeight() > (Toolkit.getDefaultToolkit().getScreenSize()).height) {
                 col += 1;
                 lastY = 0;
@@ -1842,7 +1798,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
     public void weightedbarChart() {
 
-        DataSet tempData = ((DataSet) dataSets.elementAt(dataSetCounter));
+        DataSet tempData = dataSets.elementAt(dataSetCounter);
 
         int[] vars = getWeightVariable(varNames.getSelectedIndices(), tempData);
         int[] passed = new int[vars.length - 1];
@@ -1866,7 +1822,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
             plotw.addSelectionListener(this);
             plotw.addDataListener(this);
-            Plots.addElement(plotw);
+            plots.addElement(plotw);
             if (lastY + bars.getHeight() > (Toolkit.getDefaultToolkit().getScreenSize()).height) {
                 col += 1;
                 lastY = 0;
@@ -1887,7 +1843,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
     public void weightedHistogram() {
 
-        DataSet tempData = ((DataSet) dataSets.elementAt(dataSetCounter));
+        DataSet tempData = dataSets.elementAt(dataSetCounter);
 
         int[] vars = getWeightVariable(varNames.getSelectedIndices(), tempData);
         if (vars.length > 1) {
@@ -1905,7 +1861,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
     public void histogram() {
 
-        DataSet tempData = ((DataSet) dataSets.elementAt(dataSetCounter));
+        DataSet tempData = dataSets.elementAt(dataSetCounter);
         int[] indices = varNames.getSelectedIndices();
 
         histoCore(tempData, indices, -1);
@@ -1920,7 +1876,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
         for (int i = 0; i < indices.length; i++) {
             final MFrame hists = new MFrame(this);
 
-            int dummy = 0;
+            int dummy;
             dummy = indices[i];
             double start = tempData.getMin(dummy);
             double width = (tempData.getMax(dummy) - tempData.getMin(dummy)) / 8.9;
@@ -1931,7 +1887,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
             plotw.addSelectionListener(this);
             plotw.addDataListener(this);
-            Plots.addElement(plotw);
+            plots.addElement(plotw);
             if (lastX + hists.getWidth() > (Toolkit.getDefaultToolkit().getScreenSize()).width + 50) {       // new Row
                 row += 1;
                 lastX = oldX % 310;
@@ -1959,10 +1915,10 @@ public void handlePrintFile(ApplicationEvent event) {} */
         mapf.setSize(400, 400);
         mapf.setTitle("Map");
 
-        Map map = new Map(mapf, 400, 400, (DataSet) dataSets.elementAt(dataSetCounter), polys, varNames);
+        Map map = new Map(mapf, 400, 400, dataSets.elementAt(dataSetCounter), polys, varNames);
         map.addSelectionListener(this);
         map.addDataListener(this);
-        Plots.addElement(map);
+        plots.addElement(map);
 
         if (map.ratio > 1)
             mapf.setSize((int) (350 * map.ratio), 350 + 56);
@@ -1983,10 +1939,10 @@ public void handlePrintFile(ApplicationEvent event) {} */
         int[] passBuffer = new int[2];
         passBuffer[0] = selectBuffer[1];
         passBuffer[1] = selectBuffer[0];
-        Scatter2D scat = new Scatter2D(scatterf, 400, 400, (DataSet) dataSets.elementAt(dataSetCounter), passBuffer, varNames, false);
+        Scatter2D scat = new Scatter2D(scatterf, 400, 400, dataSets.elementAt(dataSetCounter), passBuffer, varNames, false);
         scat.addSelectionListener(this);
         scat.addDataListener(this);
-        Plots.addElement(scat);
+        plots.addElement(scat);
         scatterf.setLocation(300, 333);
         scatterf.show();
     }
@@ -1995,7 +1951,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
     public void mds() {
 
         int[] varsT = varNames.getSelectedIndices();
-        DataSet dataT = (DataSet) dataSets.elementAt(dataSetCounter);
+        DataSet dataT = dataSets.elementAt(dataSetCounter);
         try {
             RConnection c = new RConnection();
             c.voidEval("library(MASS, pos=1)");
@@ -2033,7 +1989,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
             Scatter2D scat = new Scatter2D(scatterf, 400, 400, dataT, new int[]{dataT.k - 2, dataT.k - 1}, varNames, false);
             scat.addSelectionListener(this);
-            Plots.addElement(scat);
+            plots.addElement(scat);
             scatterf.setLocation(300, 333);
             scatterf.show();
         } catch (RserveException rse) {
@@ -2051,7 +2007,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
     public void pca() {
 
         int[] varsT = varNames.getSelectedIndices();
-        DataSet dataT = (DataSet) dataSets.elementAt(dataSetCounter);
+        DataSet dataT = dataSets.elementAt(dataSetCounter);
         try {
             RConnection c = new RConnection();
             String call = " ~ x1 ";
@@ -2118,7 +2074,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
     public void switchVariableMode() {
         for (int i = 0; i < varNames.getSelectedIndices().length; i++) {
             int index = (varNames.getSelectedIndices())[i];
-            DataSet data = (DataSet) dataSets.elementAt(dataSetCounter);
+            DataSet data = dataSets.elementAt(dataSetCounter);
             if (!data.alpha(index)) {
                 if (data.categorical(index))
                     data.catToNum(index);
@@ -2134,7 +2090,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
     public void getSelectedTypes() {
         numCategorical = 0;
         for (int i = 0; i < varNames.getSelectedIndices().length; i++) {
-            if (((DataSet) dataSets.elementAt(dataSetCounter)).categorical(varNames.getSelectedIndices()[i]))
+            if (dataSets.elementAt(dataSetCounter).categorical(varNames.getSelectedIndices()[i]))
                 numCategorical++;
             else
                 weightIndex = varNames.getSelectedIndices()[i];
@@ -2295,18 +2251,18 @@ public void handlePrintFile(ApplicationEvent event) {} */
                 sc2.setEnabled(false);
                 //        sc.setEnabled(false);
         }
-        if (!((DataSet) dataSets.elementAt(dataSetCounter)).hasMissings)
+        if (!dataSets.elementAt(dataSetCounter).hasMissings)
             mv.setEnabled(false);
 
         // Now handle transform Menue
         int alphs = 0;
-        DataSet data = ((DataSet) dataSets.elementAt(dataSetCounter));
+        DataSet data = dataSets.elementAt(dataSetCounter);
         for (int i = 0; i < varNames.getSelectedIndices().length; i++)
             if (data.alpha(varNames.getSelectedIndices()[i]))
                 alphs++;
         if (alphs == 0 && (varNames.getSelectedIndices().length == 2 || varNames.getSelectedIndices().length == 1)) {
             trans.setEnabled(true);
-            if (alphs == 0 && varNames.getSelectedIndices().length == 2) {
+            if (varNames.getSelectedIndices().length == 2) {
                 transPlus.setText(data.getName(selectBuffer[1]) + " + " + data.getName(selectBuffer[0]));
                 transMinus.setText(data.getName(selectBuffer[1]) + " - " + data.getName(selectBuffer[0]));
                 transTimes.setText(data.getName(selectBuffer[1]) + " * " + data.getName(selectBuffer[0]));
@@ -2353,7 +2309,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
 
     public void maintainOptionMenu() {
-        DataSet data = ((DataSet) dataSets.elementAt(dataSetCounter));
+        DataSet data = dataSets.elementAt(dataSetCounter);
 
         // Selection
         if (data.countSelection() == 0)
@@ -2373,8 +2329,8 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
 
     public void maintainWindowMenu(boolean preserve) {
-        for (int i = 0; i < Plots.size(); i++)
-            ((DragBox) Plots.elementAt(i)).frame.maintainMenu(preserve);
+        for (int i = 0; i < plots.size(); i++)
+            plots.elementAt(i).frame.maintainMenu(preserve);
     }
 
 
@@ -2398,67 +2354,11 @@ public void handlePrintFile(ApplicationEvent event) {} */
     }
 
 
-    public Preferences getPrefences() {
-        return prefs;
-    }
-
-
     public void setDataSet(DataSet data) {
         dataSets.addElement(data);
         setVarList();
         selseq = true;
         se.setSelected(true);
         se.setEnabled(false);
-    }
-
-
-    class MCellRenderer extends JLabel implements ListCellRenderer {
-
-        final DataSet data = (DataSet) dataSets.elementAt(dataSetCounter);
-
-        final ImageIcon alphaIcon = new ImageIcon(Util.readGif("/alpha.gif"));
-        final ImageIcon alphaMissIcon = new ImageIcon(Util.readGif("/alpha-miss.gif"));
-        final ImageIcon catIcon = new ImageIcon(Util.readGif("/cat.gif"));
-        final ImageIcon catMissIcon = new ImageIcon(Util.readGif("/cat-miss.gif"));
-        final ImageIcon numIcon = new ImageIcon(Util.readGif("/num.gif"));
-        final ImageIcon numMissIcon = new ImageIcon(Util.readGif("/num-miss.gif"));
-        // This is the only method defined by ListCellRenderer.
-        // We just reconfigure the JLabel each time we're called.
-
-
-        public Component getListCellRendererComponent(JList list,
-                                                      Object value,            // value to display
-                                                      int index,               // cell index
-                                                      boolean isSelected,      // is the cell selected
-                                                      boolean cellHasFocus)    // the list and the cell have the focus
-        {
-            String s = value.toString();
-            setText(s);
-            if (data.alpha(index))
-                if (data.getN(index) == data.n)
-                    setIcon(alphaIcon);
-                else
-                    setIcon(alphaMissIcon);
-            else if (data.categorical(index))
-                if (data.getN(index) == data.n)
-                    setIcon(catIcon);
-                else
-                    setIcon(catMissIcon);
-            else if (data.getN(index) == data.n)
-                setIcon(numIcon);
-            else
-                setIcon(numMissIcon);
-            if (isSelected) {
-                setBackground(list.getSelectionBackground());
-                setForeground(list.getSelectionForeground());
-            } else {
-                setBackground(list.getBackground());
-                setForeground(list.getForeground());
-            }
-            setEnabled(list.isEnabled());
-            setFont(list.getFont());
-            setOpaque(true);
-            return this;
-        }
     }
 }
