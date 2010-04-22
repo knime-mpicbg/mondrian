@@ -7,7 +7,7 @@ import java.io.PrintStream;
 
 
 /**
- * PSGr is a Graphics subclass that images to PostScript. (C) 1996 E.J. Friedman-Hill and Sandia National Labs
+ * PSGr is a Graphics subclass that images to PostScript. (C) 1996 E.j. Friedman-Hill and Sandia National Labs
  *
  * @author Ernest Friedman-Hill
  * @author ejfried@ca.sandia.gov
@@ -235,8 +235,8 @@ class PSGr_2 extends java.awt.Graphics {
 
 
     /**
-     * Sets the paint mode to alternate between the current color and the new specified color. PostScript does not support
-     * XOR mode.
+     * Sets the paint mode to alternate between the current color and the new specified color. PostScript does not
+     * support XOR mode.
      *
      * @param c1 the second color
      */
@@ -461,8 +461,8 @@ class PSGr_2 extends java.awt.Graphics {
 
 
     /**
-     * Draws the outline of the specified rectangle using the current color. Use drawRect(x, y, width-1, height-1) to draw
-     * the outline inside the specified rectangle.
+     * Draws the outline of the specified rectangle using the current color. Use drawRect(x, y, width-1, height-1) to
+     * draw the outline inside the specified rectangle.
      *
      * @param x      the x coordinate
      * @param y      the y coordinate
@@ -860,8 +860,8 @@ class PSGr_2 extends java.awt.Graphics {
 
 
     /**
-     * Draws the specified String using the current font and color. The x,y position is the starting point of the baseline
-     * of the String.
+     * Draws the specified String using the current font and color. The x,y position is the starting point of the
+     * baseline of the String.
      *
      * @param str the String to be drawn
      * @param x   the x coordinate
@@ -928,7 +928,7 @@ class PSGr_2 extends java.awt.Graphics {
 
 
     boolean doImage(Image img, int x, int y, int width, int height,
-                           ImageObserver observer, Color bgcolor) {
+                    ImageObserver observer, Color bgcolor) {
         os.println("%doImage");
         y = transformY(y);
 
@@ -1068,8 +1068,8 @@ class PSGr_2 extends java.awt.Graphics {
 
 
     /**
-     * Draws the specified image at the specified coordinate (x, y). If the image is incomplete the image observer will be
-     * notified later.
+     * Draws the specified image at the specified coordinate (x, y). If the image is incomplete the image observer will
+     * be notified later.
      *
      * @param img      the specified image to be drawn
      * @param x        the x coordinate
@@ -1110,8 +1110,8 @@ class PSGr_2 extends java.awt.Graphics {
 
 
     /**
-     * Draws the specified image at the specified coordinate (x, y). If the image is incomplete the image observer will be
-     * notified later.
+     * Draws the specified image at the specified coordinate (x, y). If the image is incomplete the image observer will
+     * be notified later.
      *
      * @param img      the specified image to be drawn
      * @param x        the x coordinate

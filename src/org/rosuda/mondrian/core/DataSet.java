@@ -11,7 +11,6 @@ import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.Driver;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.NoSuchElementException;
@@ -332,7 +331,7 @@ public class DataSet {
     }
 
 
-    public String turboRead(String fileName, Join joint) {
+    public String turboRead(String fileName, MonFrame joint) {
         try {
             BufferTokenizer BT = new BufferTokenizer(10, 5, fileName, joint);
             this.n = BT.lines;

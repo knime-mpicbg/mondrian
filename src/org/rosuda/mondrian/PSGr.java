@@ -1,7 +1,7 @@
 package org.rosuda.mondrian;
 
-// PSGr.java by E.J. Friedman-Hill with minor modifications by David Binger
-// Copyright (C) 1997 E.J. Friedman-Hill and David Binger 
+// PSGr.java by E.j. Friedman-Hill with minor modifications by David Binger
+// Copyright (C) 1997 E.j. Friedman-Hill and David Binger
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
@@ -190,7 +190,7 @@ class PSGr extends java.awt.Graphics {
 
 
     final void prt(double d1, double d2, double d3, double d4,
-                          double d5, String s) {
+                   double d5, String s) {
         prt(d1 + " " + d2 + " " + d3 + " " + d4 + " " + d5 + " " + s);
     }
 
@@ -287,8 +287,8 @@ class PSGr extends java.awt.Graphics {
 
 
     /**
-     * Sets the paint mode to alternate between the current color and the new specified color. PostScript does not support
-     * XOR mode.
+     * Sets the paint mode to alternate between the current color and the new specified color. PostScript does not
+     * support XOR mode.
      *
      * @param c1 the second color
      */
@@ -506,8 +506,8 @@ class PSGr extends java.awt.Graphics {
 
 
     /**
-     * Draws the outline of the specified rectangle using the current color. Use drawRect(x, y, width-1, height-1) to draw
-     * the outline inside the specified rectangle.
+     * Draws the outline of the specified rectangle using the current color. Use drawRect(x, y, width-1, height-1) to
+     * draw the outline inside the specified rectangle.
      *
      * @param x      the x coordinate
      * @param y      the y coordinate
@@ -823,8 +823,8 @@ class PSGr extends java.awt.Graphics {
 
 
     /**
-     * Draws the specified String using the current font and color. The x,y position is the starting point of the baseline
-     * of the String.
+     * Draws the specified String using the current font and color. The x,y position is the starting point of the
+     * baseline of the String.
      *
      * @param str the String to be drawn
      * @param x   the x coordinate
@@ -839,8 +839,8 @@ class PSGr extends java.awt.Graphics {
 
 
     /**
-     * Draws the specified String using the current font and color. The x,y position is the starting point of the baseline
-     * of the String.
+     * Draws the specified String using the current font and color. The x,y position is the starting point of the
+     * baseline of the String.
      *
      * @param atr the String to be drawn
      * @param x   the x coordinate
@@ -874,9 +874,9 @@ class PSGr extends java.awt.Graphics {
     /**
      * Draws the specified bytes using the current font and color.
      *
-     * @param img   the data to be drawn
-     * @param x      the x coordinate
-     * @param y      the y coordinate
+     * @param img the data to be drawn
+     * @param x   the x coordinate
+     * @param y   the y coordinate
      * @see #drawString
      * @see #drawChars
      */
@@ -884,7 +884,7 @@ class PSGr extends java.awt.Graphics {
     //    drawString(new String(data, 0, offset, length), x, y);
     //  }
     boolean doImage(Image img, int x, int y, int width, int height,
-                           ImageObserver observer, Color bgcolor) {
+                    ImageObserver observer, Color bgcolor) {
         y = transformY(y);
 
         // This class fetches the pixels in its constructor.
@@ -1010,8 +1010,8 @@ class PSGr extends java.awt.Graphics {
 
 
     /**
-     * Draws the specified image at the specified coordinate (x, y). If the image is incomplete the image observer will be
-     * notified later.
+     * Draws the specified image at the specified coordinate (x, y). If the image is incomplete the image observer will
+     * be notified later.
      *
      * @param img      the specified image to be drawn
      * @param x        the x coordinate
@@ -1051,8 +1051,8 @@ class PSGr extends java.awt.Graphics {
 
 
     /**
-     * Draws the specified image at the specified coordinate (x, y). If the image is incomplete the image observer will be
-     * notified later.
+     * Draws the specified image at the specified coordinate (x, y). If the image is incomplete the image observer will
+     * be notified later.
      *
      * @param img      the specified image to be drawn
      * @param x        the x coordinate

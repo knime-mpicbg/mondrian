@@ -2,7 +2,7 @@ package org.rosuda.mondrian;////////////////////////////////////////////////////
 // Jlpr.java
 // Printer  class to print other applets
 //
-// (C) 1996 E.J.Friedman-Hill and Sandia National Labs
+// (C) 1996 E.j.Friedman-Hill and Sandia National Labs
 //////////////////////////////////////////////////////////////////////
 
 /**
@@ -16,11 +16,6 @@ import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.lang.Object;
-import java.lang.Runnable;
-import java.lang.String;
-import java.lang.Thread;
-import java.lang.Throwable;
 import java.net.URL;
 
 

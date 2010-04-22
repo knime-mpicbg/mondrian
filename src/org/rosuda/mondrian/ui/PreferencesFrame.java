@@ -8,8 +8,8 @@ package org.rosuda.mondrian.ui;
 //  Copyright (c) 2003 __MyCompanyName__. All rights reserved.
 //
 
-import org.rosuda.mondrian.Join;
 import org.rosuda.mondrian.MFrame;
+import org.rosuda.mondrian.MonFrame;
 import org.rosuda.mondrian.core.DragBox;
 import org.rosuda.mondrian.util.Util;
 
@@ -22,7 +22,7 @@ import java.util.prefs.Preferences;         // for preferences
 public class PreferencesFrame extends Frame implements WindowListener, MouseListener, ActionListener, ItemListener {
 
     private PrefCanvas pc;
-    private Join frame;
+    private MonFrame frame;
     private Choice cs;
     private static String[] schemes = {
             "RoSuDa classic", "#ffff99", "#c0c0c0", "#000000", "#00ff00",
@@ -36,7 +36,7 @@ public class PreferencesFrame extends Frame implements WindowListener, MouseList
     private static PreferencesFrame last = null;
 
 
-    public static PreferencesFrame showPrefsDialog(Join frame) {
+    public static PreferencesFrame showPrefsDialog(MonFrame frame) {
         if (last == null)
             last = new PreferencesFrame();
         last.frame = frame;

@@ -1,6 +1,7 @@
 package org.rosuda.mondrian.plots;
 
-import org.rosuda.mondrian.*;
+import org.rosuda.mondrian.MFrame;
+import org.rosuda.mondrian.Table;
 import org.rosuda.mondrian.core.*;
 import org.rosuda.mondrian.io.db.Query;
 import org.rosuda.mondrian.plots.basic.MyRect;
@@ -11,8 +12,6 @@ import org.rosuda.mondrian.util.Util;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.lang.Integer;
-import java.lang.String;
 import java.util.Date;
 import java.util.Vector;
 
@@ -444,7 +443,7 @@ public class Barchart extends DragBox implements ActionListener {
                         brush.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, Event.ALT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
                         brush.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
-                                frame.J.clearColors();
+                                frame.j.clearColors();
                             }
 
 

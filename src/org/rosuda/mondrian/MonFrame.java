@@ -1,17 +1,4 @@
-package org.rosuda.mondrian;// Please use this software or at least parts of it to
-//    - navigate airplanes and supertankers
-//    - control nuclear power plants and chemical plants
-//    - launch cruise missiles automatically
-//
-//      thanks
-//
-//      To Do:
-//               
-//	       - Sorting of Intervalls in Histos ?? (DB)
-//
-//         - PC
-//           - zoom after permuting the axis ???
-//           - zoom back -> common scale ?!
+package org.rosuda.mondrian;
 
 
 import com.apple.mrj.MRJApplicationUtils;
@@ -22,10 +9,12 @@ import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
 import org.rosuda.mondrian.core.*;
+import org.rosuda.mondrian.io.AsciFileLoader;
+import org.rosuda.mondrian.io.DataFrameConverter;
 import org.rosuda.mondrian.io.ProgressIndicator;
+import org.rosuda.mondrian.io.db.DBDatasetLoader;
 import org.rosuda.mondrian.io.db.Query;
 import org.rosuda.mondrian.plots.*;
-import org.rosuda.mondrian.plots.basic.MyPoly;
 import org.rosuda.mondrian.ui.PreferencesFrame;
 import org.rosuda.mondrian.util.Util;
 
@@ -36,19 +25,19 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
-import java.sql.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Date;
-import java.util.*;
+import java.util.Locale;
+import java.util.Vector;
 import java.util.prefs.Preferences;
 
 
-/**
- */
-
-public class Join extends JFrame implements ProgressIndicator, SelectionListener, DataListener, MRJQuitHandler, MRJOpenDocumentHandler {
+public class MonFrame extends JFrame implements ProgressIndicator, SelectionListener, DataListener, MRJQuitHandler, MRJOpenDocumentHandler {
 
     /**
      * Remember # of open windows so we can quit when last one is closed
@@ -70,7 +59,7 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
     private JProgressBar progBar;
     private JLabel progText;
     public JMenuBar menubar;
-    public JMenu windows, help, dv, sam, trans, lastOM;
+    public JMenu windows, help, dv, sam, trans;
     private JMenuItem n;
     private JMenuItem nw;
     private JMenuItem c;
@@ -78,7 +67,6 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
     private JMenuItem m;
     private JMenuItem s;
     private JMenuItem ss;
-    private JMenuItem p;
     private JMenuItem mv;
     private JMenuItem mn;
     private JMenuItem b;
@@ -86,7 +74,6 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
     private JMenuItem pc;
     private JMenuItem pb;
     private JMenuItem byx;
-    private JMenuItem sc;
     private JMenuItem sc2;
     private JMenuItem hi;
     private JMenuItem hiw;
@@ -98,34 +85,26 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
     private JCheckBoxMenuItem os;
     private JCheckBoxMenuItem as;
     private ModelNavigator Mn;
-    private PreferencesFrame Pr;
-    private int thisDataSet = -1;
+    public int dataSetCounter = -1;
     private int dCol = 1, dSel = 1;
     private int graphicsPerf;
     static String user;
     public boolean mondrianRunning = false;
-    private String justFile = "";
     private boolean load = false;
     private int[] selectBuffer;
     private Preferences prefs;
-    private int lastOpenedNum = 6;
-    private String[] lastOpened = new String[lastOpenedNum];
-    private JMenuItem[] lastOpenedMenu = new JMenuItem[lastOpenedNum];
     private String searchText = "";
     private long startT = 0;
     private Vector setIndices = new Vector(10, 0);
-    private JFrame dataFrames;
-    private RConnection rC;
-    private boolean isWindows = false;
 
 
-    public Join(Vector Mondrians, Vector dataSets, boolean load, boolean loadDB, File loadFile) {
+    public MonFrame(Vector Mondrians, Vector dataSets, boolean load, boolean loadDB, File loadFile) {
 
         Mondrians.addElement(this);
 
         MRJApplicationUtils.registerOpenDocumentHandler(this);
 
-        //    System.out.println("........... Creating new Instance of Join .........");
+        //    System.out.println("........... Creating new Instance of MonFrame .........");
 
         this.load = load;
 
@@ -137,9 +116,6 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
 
         // Read Preferences
         prefs = Preferences.userNodeForPackage(this.getClass());
-
-        for (int i = 0; i < lastOpenedNum; i++)
-            lastOpened[i] = prefs.get("lastOpened" + i, "");
 
         if (!prefs.get("color.background", "").equals("")) {
             MFrame.backgroundColor = Util.hrgb2color(prefs.get("color.background", ""));
@@ -161,8 +137,8 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
 
         Font SF = new Font("SansSerif", Font.BOLD, 12);
         this.setFont(SF);
-        Join.dataSets = dataSets;
-        Join.Mondrians = Mondrians;
+        MonFrame.dataSets = dataSets;
+        MonFrame.Mondrians = Mondrians;
         this.setTitle("Mondrian");               // Create the window.
         num_windows++;                           // Count it.
 
@@ -174,31 +150,6 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
         JMenuItem o;
         file.add(o = new JMenuItem("Open"));
         o.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        file.add(lastOM = new JMenu("Open Recent"));
-        for (int i = 0; i < lastOpenedNum; i++) {
-            lastOpenedMenu[i] = new JMenuItem(lastOpened[i]);
-            if (!lastOpened[i].equals("")) {
-                lastOpenedMenu[i].addActionListener(new ActionListener() {     // Open a new window with the selected data
-
-
-                    public void actionPerformed(ActionEvent e) {
-                        String tmp = e.getActionCommand();
-                        int id = tmp.indexOf(" - ");
-                        File lof = new File(tmp.substring(id + 3, tmp.length()) + tmp.substring(0, id));
-                        System.out.println(lof);
-                        if (lof.exists())
-                            loadDataSet(false, lof, "");
-                        else
-                            openFileError();
-                    }
-                });
-                int id = lastOpened[i].indexOf(" - ");
-                File lof = new File(lastOpened[i].substring(id + 3, lastOpened[i].length()) + lastOpened[i].substring(0, id));
-                if (!lastOpened[i].equals("") && lof.exists())
-                    lastOM.add(lastOpenedMenu[i]);
-
-            }
-        }
 
         JMenuItem odf;
         file.add(odf = new JMenuItem("Open R dataframe"));
@@ -505,7 +456,7 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
 
             public void actionPerformed(ActionEvent e) {
                 //        System.out.println(".......... CALL loadDataFrame() FROM Open .........");
-                loadDataFrame();
+                new DataFrameConverter(MonFrame.this).loadDataFrame();
             }
         });
         s.addActionListener(new ActionListener() {     // Save the current dataset
@@ -777,9 +728,14 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
             if (loadDB)
                 loadDataSet(true, null, "");
             else {
-                //        System.out.println(".......... CALL loadDataSet() FROM Join .........");
+                //        System.out.println(".......... CALL loadDataSet() FROM MonFrame .........");
                 loadDataSet(false, loadFile, "");
             }
+    }
+
+
+    public JProgressBar getProgBar() {
+        return progBar;
     }
 
 
@@ -789,8 +745,9 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
      *
      * @param data dataset to open
      */
-    public Join(DataSet data) {
+    public MonFrame(DataSet data) {
         this((Mondrians == null) ? new Vector(5, 5) : Mondrians, (dataSets == null) ? new Vector(5, 5) : dataSets, false, false, null);
+
         initWithData(data);
     }
 
@@ -802,16 +759,16 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
      */
     public void initWithData(DataSet data) {
         dataSets.addElement(data);
-        thisDataSet = dataSets.size() - 1;
+        dataSetCounter = dataSets.size() - 1;
         selectBuffer = new int[data.k + 15];
         setVarList();
-        this.setTitle("Mondrian(" + ((DataSet) dataSets.elementAt(thisDataSet)).setName + ")");               //
+        this.setTitle("Mondrian(" + ((DataSet) dataSets.elementAt(dataSetCounter)).setName + ")");               //
         me.setText(this.getTitle());
         c.setEnabled(true);
         s.setEnabled(true);
 
-        int nom = ((DataSet) dataSets.elementAt(thisDataSet)).countSelection();
-        int denom = ((DataSet) dataSets.elementAt(thisDataSet)).n;
+        int nom = ((DataSet) dataSets.elementAt(dataSetCounter)).countSelection();
+        int denom = ((DataSet) dataSets.elementAt(dataSetCounter)).n;
         String Display = nom + "/" + denom + " (" + Stat.roundToString(100 * nom / denom, 2) + "%)";
         progText.setText(Display);
         progBar.setValue(nom);
@@ -875,25 +832,25 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
     void close() {
         // Modal dialog with OK button
 
-        if (thisDataSet == -1) {
+        if (dataSetCounter == -1) {
             this.dispose();
             if (--num_windows == 0)
                 System.exit(0);
             return;
         }
 
-        String message = "Close dataset \"" + ((DataSet) dataSets.elementAt(thisDataSet)).setName + "\" and\n all corresponding plots?";
+        String message = "Close dataset \"" + ((DataSet) dataSets.elementAt(dataSetCounter)).setName + "\" and\n all corresponding plots?";
 
         int answer = JOptionPane.showConfirmDialog(this, message);
         if (answer == JOptionPane.YES_OPTION) {
             num_windows--;
             for (int i = Plots.size() - 1; i >= 0; i--)
                 ((DragBox) Plots.elementAt(i)).frame.close();
-            dataSets.setElementAt(new DataSet("nullinger"), thisDataSet);
+            dataSets.setElementAt(new DataSet("nullinger"), dataSetCounter);
             this.dispose();
             if (num_windows == 0) {
-                new Join(Mondrians, dataSets, false, false, null);
-                //        System.out.println(" -----------------------> disposing Join !!!!!!!!!!!!!!!!");
+                new MonFrame(Mondrians, dataSets, false, false, null);
+                //        System.out.println(" -----------------------> disposing MonFrame !!!!!!!!!!!!!!!!");
                 this.dispose();
                 boolean killed = true;
             }
@@ -959,7 +916,7 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
 
         System.out.println("Transform: " + mode);
         String name = "";
-        DataSet data = ((DataSet) dataSets.elementAt(thisDataSet));
+        DataSet data = ((DataSet) dataSets.elementAt(dataSetCounter));
 
         double[] tData = new double[data.n];
         boolean[] tMiss = new boolean[data.n];
@@ -1051,7 +1008,7 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
 
 
     public void switchSelection() {
-        if (thisDataSet > -1 && ((DataSet) dataSets.elementAt(thisDataSet)).isDB)
+        if (dataSetCounter > -1 && ((DataSet) dataSets.elementAt(dataSetCounter)).isDB)
             selseq = true;
         else {
             selseq = se.isSelected();
@@ -1069,24 +1026,24 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
 
 
     public void selectAll() {
-        if (thisDataSet > -1) {
-            ((DataSet) dataSets.elementAt(thisDataSet)).selectAll();
+        if (dataSetCounter > -1) {
+            ((DataSet) dataSets.elementAt(dataSetCounter)).selectAll();
             updateSelection();
         }
     }
 
 
     public void toggleSelection() {
-        if (thisDataSet > -1) {
-            ((DataSet) dataSets.elementAt(thisDataSet)).toggleSelection();
+        if (dataSetCounter > -1) {
+            ((DataSet) dataSets.elementAt(dataSetCounter)).toggleSelection();
             updateSelection();
         }
     }
 
 
     public void clearColors() {
-        if (thisDataSet > -1) {
-            ((DataSet) dataSets.elementAt(thisDataSet)).colorsOff();
+        if (dataSetCounter > -1) {
+            ((DataSet) dataSets.elementAt(dataSetCounter)).colorsOff();
             dataChanged(-1);
         }
     }
@@ -1102,7 +1059,7 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
     public void deriveVariable(boolean color) {
 
         String name;
-        DataSet data = ((DataSet) dataSets.elementAt(thisDataSet));
+        DataSet data = ((DataSet) dataSets.elementAt(dataSetCounter));
         if (color)
             name = "Colors " + dCol++;
         else
@@ -1235,7 +1192,7 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
                 }
             }
             sqlConditions = new Query();                // Replace ???
-            if (((DataSet) dataSets.elementAt(thisDataSet)).isDB)
+            if (((DataSet) dataSets.elementAt(dataSetCounter)).isDB)
                 for (int i = 0; i < selList.size(); i++) {
                     Selection S = ((Selection) selList.elementAt(i));
                     if (S.mode == Selection.MODE_STANDARD)
@@ -1244,22 +1201,22 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
                     if (!condStr.equals(""))
                         sqlConditions.addCondition(Selection.getSQLModeString(S.mode), "(" + condStr + ")");
                 }
-            ((DataSet) (dataSets.elementAt(thisDataSet))).sqlConditions = sqlConditions;
+            ((DataSet) (dataSets.elementAt(dataSetCounter))).sqlConditions = sqlConditions;
 
             //      System.out.println("Main Update: "+sqlConditions.makeQuery());
 
         } else {
             if (toggleSelection) {
                 System.out.println(" TOGGLE SELECTION ... ");
-                ((DataSet) (dataSets.elementAt(thisDataSet))).toggleSelection();
+                ((DataSet) (dataSets.elementAt(dataSetCounter))).toggleSelection();
             } else if (unSelect) {
                 System.out.println(" UNSELECT ... ");
-                ((DataSet) (dataSets.elementAt(thisDataSet))).clearSelection();
+                ((DataSet) (dataSets.elementAt(dataSetCounter))).clearSelection();
             } else {
                 System.out.println(" SELECT ALL ... ");
-                ((DataSet) (dataSets.elementAt(thisDataSet))).selectAll();
+                ((DataSet) (dataSets.elementAt(dataSetCounter))).selectAll();
             }
-            if (((DataSet) dataSets.elementAt(thisDataSet)).isDB)
+            if (((DataSet) dataSets.elementAt(dataSetCounter)).isDB)
                 sqlConditions.clearConditions();
         }
 
@@ -1271,9 +1228,9 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
             ((DragBox) Plots.elementAt(i)).updateSelection();
         }
 
-        ((DataSet) dataSets.elementAt(thisDataSet)).selChanged = true;
-        int nom = ((DataSet) dataSets.elementAt(thisDataSet)).countSelection();
-        int denom = ((DataSet) dataSets.elementAt(thisDataSet)).n;
+        ((DataSet) dataSets.elementAt(dataSetCounter)).selChanged = true;
+        int nom = ((DataSet) dataSets.elementAt(dataSetCounter)).countSelection();
+        int denom = ((DataSet) dataSets.elementAt(dataSetCounter)).n;
         String Display = nom + "/" + denom + " (" + Stat.roundToString(100F * nom / denom, 2) + "%)";
         progText.setText(Display);
         progBar.setValue(nom);
@@ -1289,18 +1246,18 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
 
     public void dataChanged(int id) {
 
-        //System.out.println("Join got the event !!!!"+id);
+        //System.out.println("MonFrame got the event !!!!"+id);
 
         maintainOptionMenu();
 
-        System.out.println("Key Event in Join");
+        System.out.println("Key Event in MonFrame");
 
         // First check whether a color has been set individually
         for (int i = 0; i < Plots.size(); i++) {
             int col = ((DragBox) Plots.elementAt(i)).colorSet;
             if (col > -1) {
                 ((DragBox) Plots.elementAt(i)).colorSet = -1;
-                DataSet data = ((DataSet) dataSets.elementAt(thisDataSet));
+                DataSet data = ((DataSet) dataSets.elementAt(dataSetCounter));
                 id = -1;
                 if (col < 999) {
                     System.out.println("Setting Colors !!!!");
@@ -1341,14 +1298,14 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
 
     public boolean saveDataSet(String file, boolean selection) {
         try {
-            int k = ((DataSet) dataSets.elementAt(thisDataSet)).k;
-            int n = ((DataSet) dataSets.elementAt(thisDataSet)).n;
+            int k = ((DataSet) dataSets.elementAt(dataSetCounter)).k;
+            int n = ((DataSet) dataSets.elementAt(dataSetCounter)).n;
 
             FileWriter fw = new FileWriter(file);
 
             double[][] dataCopy = new double[k][n];
             boolean[][] missing = new boolean[k][n];
-            DataSet data = ((DataSet) dataSets.elementAt(thisDataSet));
+            DataSet data = ((DataSet) dataSets.elementAt(dataSetCounter));
             double[] selected = data.getSelection();
             for (int j = 0; j < k; j++) {
                 missing[j] = data.getMissings(j);
@@ -1403,20 +1360,21 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
         //    System.out.println(".......... IN loadDataSet("+thisDataSet+") IN .........");
 
         if (isDB) {
-            loadDataBase();
-        } else if (thisDataSet == -1) {
-            if (loadAsciiFile(file)) {
+            new DBDatasetLoader(this).loadDataBase();
+
+        } else if (dataSetCounter == -1) {
+            if (new AsciFileLoader(this).loadAsciiFile(file)) {
                 setVarList();
                 if (title.equals(""))
-                    this.setTitle("Mondrian(" + ((DataSet) dataSets.elementAt(thisDataSet)).setName + ")");               //
+                    this.setTitle("Mondrian(" + ((DataSet) dataSets.elementAt(dataSetCounter)).setName + ")");               //
                 else
                     this.setTitle("Mondrian(" + title + ")");
                 me.setText(this.getTitle());
                 c.setEnabled(true);
                 s.setEnabled(true);
 
-                int nom = ((DataSet) dataSets.elementAt(thisDataSet)).countSelection();
-                int denom = ((DataSet) dataSets.elementAt(thisDataSet)).n;
+                int nom = ((DataSet) dataSets.elementAt(dataSetCounter)).countSelection();
+                int denom = ((DataSet) dataSets.elementAt(dataSetCounter)).n;
                 String Display = nom + "/" + denom + " (" + Stat.roundToString(100 * nom / denom, 2) + "%)";
                 progText.setText(Display);
                 progBar.setValue(nom);
@@ -1425,174 +1383,10 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
                 maintainOptionMenu();
             }
         } else {
-            new Join(Mondrians, dataSets, true, isDB, file);
+            new MonFrame(Mondrians, dataSets, true, isDB, file);
         }
-        if (thisDataSet != -1)
-            ((DataSet) dataSets.elementAt(thisDataSet)).graphicsPerf = graphicsPerf;
-    }
-
-
-    public void importRData(File Rdata, String rDataSet) {
-
-        try {
-            if (isWindows)
-                rC.voidEval("write.table(" + rDataSet + ", \"" + (Rdata.getParentFile() + File.separator).replaceAll("\\\\", "\\\\\\\\") + ".MondrianTmpImport.txt\", quote=FALSE, sep=\"\\t\", row.names = FALSE)");
-            else
-                rC.voidEval("write.table(" + rDataSet + ", \"" + Rdata.getParentFile() + File.separator + ".MondrianTmpImport.txt\", quote=FALSE, sep=\"\\t\", row.names = FALSE)");
-
-            rC.close();
-        } catch (RserveException rse) {
-            System.out.println("Rserve exception: " + rse.getMessage());
-        }
-
-        File tmpR = new File(Rdata.getParentFile() + File.separator + ".MondrianTmpImport.txt");
-        loadDataSet(false, tmpR, rDataSet);
-        tmpR.delete();
-    }
-
-
-    public void loadDataFrame() {
-        System.out.println("Load data.frame()");
-
-        JFileChooser f = new JFileChooser("~/.");
-        f.setFileHidingEnabled(false);
-        f.setSelectedFile(new File("~/.RData"));
-        f.showDialog(null, "Open .RData File");
-
-        final File rDataFile = f.getSelectedFile();
-
-        System.out.println("->" + rDataFile.getAbsolutePath() + "<-");
-
-        String osname = System.getProperty("os.name");
-        if (osname != null && osname.length() >= 7 && osname.substring(0, 7).equals("Windows")) {
-            isWindows = true;
-        }
-
-        if (rDataFile.exists())
-            try {
-                rC = new RConnection();
-                if (isWindows)
-                    rC.voidEval("load(\"" + (rDataFile.getAbsolutePath()).replaceAll("\\\\", "\\\\\\\\") + "\")");
-                else
-                    rC.voidEval("load(\"" + rDataFile.getAbsolutePath() + "\")");
-                String[] ls = rC.eval("sort(ls())").asStrings();
-
-                dataFrames = new JFrame("Choose a data.frame");
-                dataFrames.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-                JPanel dfPanel = new JPanel();
-                GridBagLayout dfLayout = new GridBagLayout();
-                GridBagConstraints dfCLayout = new GridBagConstraints();
-                dfPanel.setLayout(dfLayout);
-                DefaultListModel model = new DefaultListModel();
-                final JList list = new JList(model);
-                list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-                list.addKeyListener(new KeyAdapter() {
-                    public void keyPressed(KeyEvent e) {
-                        if (e.getModifiers() == Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() && e.getKeyCode() == KeyEvent.VK_W ||
-                                (e.getKeyCode() == KeyEvent.VK_ESCAPE)) dataFrames.dispose();
-                    }
-                });
-
-                JScrollPane pane = new JScrollPane(list);
-                final JButton chooseButton = new JButton("Load");
-                chooseButton.setDefaultCapable(true);
-                getRootPane().setDefaultButton(chooseButton);
-                chooseButton.setEnabled(false);
-
-                JButton cancelButton = new JButton("Cancel");
-                cancelButton.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        dataFrames.dispose();
-                    }
-                });
-
-                chooseButton.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        dataFrames.dispose();
-                        importRData(rDataFile, (String) list.getSelectedValue());
-                    }
-                });
-
-                for (int i = 0; i < ls.length; i++) {
-                    String Rclass = rC.eval("class(" + ls[i] + ")").asString();
-                    if (Rclass.equals("data.frame")) {
-                        System.out.println(ls[i] + "  " + Rclass);
-                        model.addElement(ls[i]);
-                    }
-                }
-
-                list.addMouseListener(new MouseAdapter() {
-                    public void mouseClicked(MouseEvent e) {
-                        if (e.getClickCount() == 2) {
-                            dataFrames.dispose();
-                            importRData(rDataFile, (String) list.getSelectedValue());
-                        }
-                    }
-                });
-
-                list.addListSelectionListener(new ListSelectionListener() {
-                    public void valueChanged(ListSelectionEvent e) {
-                        if (list.getSelectedIndex() > -1)
-                            chooseButton.setEnabled(true);
-                        else
-                            chooseButton.setEnabled(false);
-                    }
-                });
-
-
-                dfCLayout.gridx = 0;
-                dfCLayout.gridy = 0;
-                dfCLayout.gridwidth = 2;
-                dfCLayout.gridheight = 1;
-                dfCLayout.fill = GridBagConstraints.BOTH;
-                dfCLayout.weightx = 1;
-                dfCLayout.weighty = 50;
-                dfCLayout.anchor = GridBagConstraints.NORTH;
-                dfLayout.setConstraints(pane, dfCLayout);
-
-                dfPanel.add(pane);
-
-                dfCLayout.gridx = 0;
-                dfCLayout.gridy = 1;
-                dfCLayout.gridwidth = 1;
-                dfCLayout.gridheight = 1;
-                dfCLayout.fill = GridBagConstraints.BOTH;
-                dfCLayout.weightx = 1;
-                dfCLayout.weighty = 1;
-                dfCLayout.anchor = GridBagConstraints.SOUTH;
-                dfLayout.setConstraints(cancelButton, dfCLayout);
-
-                dfPanel.add(cancelButton);
-
-                dfCLayout.gridx = 1;
-                dfCLayout.gridy = 1;
-                dfCLayout.gridwidth = 1;
-                dfCLayout.gridheight = 1;
-                dfCLayout.fill = GridBagConstraints.BOTH;
-                dfCLayout.weightx = 1;
-                dfCLayout.weighty = 1;
-                dfCLayout.anchor = GridBagConstraints.SOUTH;
-                dfLayout.setConstraints(chooseButton, dfCLayout);
-
-                dfPanel.add(chooseButton);
-
-                dataFrames.setContentPane(dfPanel);
-                dataFrames.setSize(260, 300);
-                dataFrames.setResizable(false);
-
-                dataFrames.setLocation((int) ((Toolkit.getDefaultToolkit().getScreenSize()).getWidth() / 2) - 130,
-                        (int) ((Toolkit.getDefaultToolkit().getScreenSize()).getHeight() / 2) - 150);
-
-                dataFrames.setVisible(true);
-
-            } catch (RserveException rse) {
-                System.out.println("Rserve exception: " + rse.getMessage());
-            }
-            catch (REXPMismatchException mme) {
-                System.out.println("Mismatch exception : " + mme.getMessage());
-            }
+        if (dataSetCounter != -1)
+            ((DataSet) dataSets.elementAt(dataSetCounter)).graphicsPerf = graphicsPerf;
     }
 
 
@@ -1601,9 +1395,9 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
             paint(this.getGraphics());
             return;
         }
-        if (thisDataSet == -1)
-            thisDataSet = dataSets.size() - 1;
-        final DataSet data = (DataSet) dataSets.elementAt(thisDataSet);
+        if (dataSetCounter == -1)
+            dataSetCounter = dataSets.size() - 1;
+        final DataSet data = (DataSet) dataSets.elementAt(dataSetCounter);
         String listNames[] = new String[data.k];
         for (int j = 0; j < data.k; j++) {
             listNames[j] = " " + data.getName(j);
@@ -1716,458 +1510,6 @@ public class Join extends JFrame implements ProgressIndicator, SelectionListener
     }
 
 
-    Driver d;
-    Connection con;
-
-
-    public boolean DBConnect(String URL, String Username, String Passwd) {
-        try {
-            // Connect to the database at that URL.
-            //	  URL="jdbc:mysql://137.250.124.51:3306/datasets";
-            //      System.out.println("Database trying to connect ...: "+URL+"?user="+Username+"&password="+Passwd);
-            con = DriverManager.getConnection(URL, Username, Passwd);
-            //      con = DriverManager.getConnection(URL+"?user="+Username+"&password="+Passwd);
-            System.out.println("Database Connected");
-            return true;
-        } catch (Exception ex) {
-            System.out.println("Connection Exception: " + ex);
-            return false;
-        }
-    }
-
-
-    public boolean LoadDriver(String Driver) {
-        try {
-            d = (Driver) Class.forName(Driver).newInstance();
-            System.out.println("Driver Registered");
-            return true;
-        } catch (Exception ex) {
-            System.out.println("Driver Exception: " + ex);
-            return false;
-        }
-    }
-
-
-    public void loadDataBase() {
-        if (thisDataSet == -1) {
-            final JFrame DBFrame = new JFrame();
-            DBFrame.addWindowListener(new WindowAdapter() {
-                public void windowClosing(WindowEvent e) {
-                    DBFrame.dispose();
-                }
-            });
-
-            DBFrame.setTitle("DB Connection");
-            GridBagLayout gbl = new GridBagLayout();
-            DBFrame.getContentPane().setLayout(gbl);
-
-            GridBagConstraints gbc = new GridBagConstraints();
-            gbc.weightx = 20;
-            gbc.weighty = 100;
-            gbc.fill = GridBagConstraints.NONE;
-            gbc.anchor = GridBagConstraints.EAST;
-
-            Util.add(DBFrame, new JLabel(" Driver: "), gbc, 0, 0, 1, 1);
-            Util.add(DBFrame, new JLabel(" URL: "), gbc, 0, 1, 1, 1);
-            Util.add(DBFrame, new JLabel(" User: "), gbc, 0, 2, 1, 1);
-            Util.add(DBFrame, new JLabel(" Pwd: "), gbc, 2, 2, 1, 1);
-            Util.add(DBFrame, new JLabel(" DB: "), gbc, 0, 3, 1, 1);
-            Util.add(DBFrame, new JLabel(" Table: "), gbc, 0, 4, 1, 1);
-
-            final JTextField DriverName = new JTextField("org.gjt.mm.mysql.Driver", 35);
-            final JTextField URL = new JTextField("jdbc:mysql://137.250.124.51:3306/datasets", 35);
-            final JTextField Username = new JTextField("theusm", 16);
-            final JPasswordField Passwd = new JPasswordField("", 16);
-            final Choice DBList = new Choice();
-            DBList.addItem("Not Connected");
-            DBList.setEnabled(false);
-            final Choice tableList = new Choice();
-            tableList.addItem("Choose DB");
-            tableList.setEnabled(false);
-            final JButton Select = new JButton("Select");
-            Select.setEnabled(false);
-            final JButton Cancel = new JButton("Cancel");
-            gbc.fill = GridBagConstraints.BOTH;
-            gbc.anchor = GridBagConstraints.CENTER;
-            Util.add(DBFrame, DriverName, gbc, 1, 0, 3, 1);
-            Util.add(DBFrame, URL, gbc, 1, 1, 3, 1);
-            Util.add(DBFrame, Username, gbc, 1, 2, 1, 1);
-            Util.add(DBFrame, Passwd, gbc, 3, 2, 1, 1);
-            Util.add(DBFrame, DBList, gbc, 1, 3, 3, 1);
-            Util.add(DBFrame, tableList, gbc, 1, 4, 3, 1);
-            gbc.fill = GridBagConstraints.NONE;
-            Util.add(DBFrame, Select, gbc, 1, 5, 1, 1);
-            Util.add(DBFrame, Cancel, gbc, 3, 5, 1, 1);
-
-            final JButton Load = new JButton("Load");
-            DBFrame.getRootPane().setDefaultButton(Load);
-            final JButton Connect = new JButton("Connect");
-            Connect.setEnabled(false);
-            gbc.fill = GridBagConstraints.BOTH;
-            gbc.anchor = GridBagConstraints.CENTER;
-            Util.add(DBFrame, Load, gbc, 4, 0, 1, 1);
-            Util.add(DBFrame, Connect, gbc, 4, 2, 1, 1);
-
-            DBFrame.pack();
-            DBFrame.show();
-            Load.addActionListener(new ActionListener() {     //
-
-
-                public void actionPerformed(ActionEvent e) {
-                    if (LoadDriver(DriverName.getText())) {
-                        Connect.setEnabled(true);
-                        DBFrame.getRootPane().setDefaultButton(Connect);
-                    }
-                }
-            });
-
-            Cancel.addActionListener(new ActionListener() {     //
-
-
-                public void actionPerformed(ActionEvent e) {
-                    DBFrame.dispose();
-                }
-            });
-
-            Connect.addActionListener(new ActionListener() {     //
-
-
-                public void actionPerformed(ActionEvent e) {
-                    if (DBConnect(URL.getText(), Username.getText(), Passwd.getText())) {
-                        try {
-                            // Create statement
-                            Statement stmt = con.createStatement();
-
-                            // Execute query
-                            String query = "show databases";
-
-                            // Obtain the result set
-                            ResultSet rs = stmt.executeQuery(query);
-
-                            DBList.removeAll();
-                            while (rs.next()) {
-                                DBList.addItem(rs.getString(1));
-                            }
-                            DBList.setEnabled(true);
-
-                            rs.close();
-
-                            // Close statement
-                            stmt.close();
-                        } catch (Exception ex) {
-                            System.out.println("Driver Exception: " + ex);
-                        }
-                    }
-                }
-            });
-
-            DBList.addItemListener(new ItemListener() {     //
-
-
-                public void itemStateChanged(ItemEvent e) {
-                    try {
-                        // Create statement
-                        Statement stmt = con.createStatement();
-
-                        // Execute query
-                        String query = "show tables from " + DBList.getSelectedItem();
-
-                        // Obtain the result set
-                        ResultSet rs = stmt.executeQuery(query);
-
-                        tableList.removeAll();
-                        while (rs.next()) {
-                            tableList.addItem(rs.getString(1));
-                        }
-                        tableList.setEnabled(true);
-
-                        rs.close();
-
-                        // Close statement
-                        stmt.close();
-                        con.close();                                // disconnect from DB and connect to selected DB
-                        String url = URL.getText();
-                        DBConnect(url.substring(0, url.lastIndexOf("/") + 1) + DBList.getSelectedItem(), Username.getText(), Passwd.getText());
-                    } catch (Exception ex) {
-                        System.out.println("Can't get tables out of DB: " + ex);
-                    }
-                }
-            });
-
-            tableList.addItemListener(new ItemListener() {     //
-
-
-                public void itemStateChanged(ItemEvent e) {
-                    Select.setEnabled(true);
-                    try {
-                        // Create statement
-                        Statement stmt = con.createStatement();
-
-                        // Execute query
-                        String query = "show fields from " + tableList.getSelectedItem() + " from " + DBList.getSelectedItem();
-
-                        // Obtain the result set
-                        ResultSet rs = stmt.executeQuery(query);
-
-                        while (rs.next()) {
-                            System.out.println(rs.getString(1) + " - " + rs.getString(2));
-                        }
-
-                        rs.close();
-
-                        // Close statement
-                        stmt.close();
-
-                        DBFrame.getRootPane().setDefaultButton(Select);
-                    } catch (Exception ex) {
-                        System.out.println("Can't retreive columns of table >" + tableList.getSelectedItem() + "<: " + ex);
-                    }
-                }
-            });
-
-            Select.addActionListener(new ActionListener() {     //
-
-
-                public void actionPerformed(ActionEvent e) {
-                    DataSet data = new DataSet(con, DBList.getSelectedItem(), tableList.getSelectedItem());
-                    dataSets.addElement(data);
-                    setVarList();
-                    DBFrame.dispose();
-                    selseq = true;
-                    se.setSelected(true);
-                    se.setEnabled(false);
-                }
-            });
-        }
-    }
-
-
-    boolean loadAsciiFile(File file) {
-
-        boolean[] alpha;
-        DataSet data;
-        String filename = "";
-        String path = "";
-
-        if (file == null) {
-            FileDialog f = new FileDialog(this, "Load Data", FileDialog.LOAD);
-            //      JFileChooser f = new JFileChooser(this, "Load Data", FileDialog.LOAD);
-            f.setFile("");
-            f.show();
-            //System.out.println("->"+f.getDirectory()+"<-.->" + f.getFile());
-            if (f.getFile() != null) {
-                justFile = f.getFile();
-                path = f.getDirectory();
-                filename = f.getDirectory() + justFile;
-            } else
-                filename = "";
-        } else {
-            filename = file.getAbsolutePath();
-            justFile = file.getName();
-            path = file.getParent() + File.separator;
-        }
-
-        if (!filename.equals("")) {
-
-            boolean isInMenu = false;
-            for (int i = 0; i < lastOpenedNum; i++)
-                if (lastOpenedMenu[i].getText().equals(justFile + " - " + path))
-                    isInMenu = true;
-
-            if (!isInMenu)
-                for (int i = lastOpenedNum - 1; i >= 0; i--) {
-                    if (i == 0)
-                        lastOpened[i] = justFile + " - " + path;
-                    else
-                        lastOpened[i] = lastOpened[i - 1];
-                    if (!lastOpened[i].equals("")) {
-                        prefs.put("lastOpened" + i, lastOpened[i]);
-                        if ((lastOpenedMenu[i].getText()).equals(""))
-                            lastOM.add(lastOpenedMenu[i]);
-                        lastOpenedMenu[i].setText(lastOpened[i]);
-                    }
-                }
-
-            String line = "";
-
-            if (true) {                                          // new reader
-                progBar.setMinimum(0);
-                progBar.setMaximum(100);
-                data = new DataSet(justFile);
-                dataSets.addElement(data);
-                progText.setText("Loading ...");
-
-                String mapFile = data.turboRead(filename, this);
-                if (mapFile == null)
-                    JOptionPane.showMessageDialog(this, "No mapfile found although an index column\nwas specified via '/P'.");
-                else if (mapFile.indexOf("ERROR") == 0) {
-                    JOptionPane.showMessageDialog(this, mapFile.substring(mapFile.indexOf(":") + 2), "Open File Error", JOptionPane.ERROR_MESSAGE);
-                    progText.setText("");
-                    setProgress(0.0);
-                    return false;
-                }
-                progText.setText("");
-                progBar.setValue(0);
-                progBar.setMaximum(data.n);
-
-                selectBuffer = new int[data.k + 15];
-
-                if (mapFile != null)
-                    if (!mapFile.equals(""))
-                        if ((new File(path + mapFile).exists())) {                          // more lines detected -> read the polygon
-                            try {
-                                BufferedReader br = new BufferedReader(new FileReader(path + mapFile));
-                                br.mark(1000000);
-                                progText.setText("Polygons ...");
-
-                                double xMin = 10e10;
-                                double xMax = -10e10;
-                                double yMin = 10e10;
-                                double yMax = -10e10;
-
-                                String tLine = br.readLine();
-                                try {
-                                    StringTokenizer head = new StringTokenizer(tLine, "\t");
-
-                                    try {
-                                        int Id = Integer.valueOf(head.nextToken()).intValue();
-                                        String name = head.nextToken();
-                                        int npoints = Integer.valueOf(head.nextToken()).intValue();
-                                        double[] x = new double[npoints];
-                                        double[] y = new double[npoints];
-
-                                        for (int i = 0; i < npoints; i++) {
-                                            tLine = br.readLine();
-                                            StringTokenizer coord = new StringTokenizer(tLine);
-                                            x[i] = Float.valueOf(coord.nextToken()).floatValue();
-                                            xMin = Math.min(xMin, x[i]);
-                                            xMax = Math.max(xMax, x[i]);
-                                            y[i] = Float.valueOf(coord.nextToken()).floatValue();
-                                            yMin = Math.min(yMin, y[i]);
-                                            yMax = Math.max(yMax, y[i]);
-                                        }
-                                    }
-                                    catch (NoSuchElementException e) {
-                                        System.out.println("Poly Read Error: " + line);
-                                    }
-                                }
-                                catch (IOException e) {
-                                    System.out.println("Error: " + e);
-                                    System.exit(1);
-                                }
-
-                                br.reset();
-                                int count = 0;
-                                while (line != null) {
-                                    MyPoly p = new MyPoly();
-                                    p.read(br, xMin, 100000 / Math.min(xMax - xMin, yMax - yMin), yMin, 100000 / Math.min(xMax - xMin, yMax - yMin));
-                                    if (count++ % Math.max(data.n / 20, 1) == 0)
-                                        progBar.setValue(Math.min(count, data.n));
-                                    polys.addElement(p);
-                                    line = br.readLine();                          // Read seperator (single blank line)
-                                }
-                            }
-                            catch (IOException e) {
-                                System.out.println("Error: " + e);
-                                System.exit(1);
-                            }
-                        } else
-                            JOptionPane.showMessageDialog(this, "Can't open mapfile: " + mapFile + "\nPlease check file name and location\n(the datafile will still be loaded)");
-                return true;
-            } else {                                               // old reader
-                try {
-                    BufferedReader br = new BufferedReader(new FileReader(filename));
-                    data = new DataSet(justFile);
-                    dataSets.addElement(data);
-                    progText.setText("Peeking ...");
-                    alpha = data.sniff(br);
-                    progBar.setMaximum(data.n);
-                    br = new BufferedReader(new FileReader(filename));
-                    progText.setText("Loading ...");
-                    data.read(br, alpha, progBar);
-
-                    br.mark(1000000);
-                    line = br.readLine();
-
-                    while (line != null && (line.trim()).equals("")) {       // skip empty lines
-                        br.mark(1000000);
-                        line = br.readLine();
-                    }
-
-                    if (line != null) {                          // more lines detected -> read the polygon
-
-                        progText.setText("Polygons ...");
-
-                        //====================== Check Scaling of the Polygon ===============================//
-                        String tLine;
-
-                        double xMin = 10e10;
-                        double xMax = -10e10;
-                        double yMin = 10e10;
-                        double yMax = -10e10;
-
-                        try {
-                            tLine = line;
-
-                            StringTokenizer head = new StringTokenizer(tLine, "\t");
-
-                            try {
-                                int Id = Integer.valueOf(head.nextToken()).intValue();
-                                String name = head.nextToken();
-                                int npoints = Integer.valueOf(head.nextToken()).intValue();
-                                double[] x = new double[npoints];
-                                double[] y = new double[npoints];
-
-                                for (int i = 0; i < npoints; i++) {
-                                    tLine = br.readLine();
-                                    StringTokenizer coord = new StringTokenizer(tLine);
-                                    x[i] = Float.valueOf(coord.nextToken()).floatValue();
-                                    xMin = Math.min(xMin, x[i]);
-                                    xMax = Math.max(xMax, x[i]);
-                                    y[i] = Float.valueOf(coord.nextToken()).floatValue();
-                                    yMin = Math.min(yMin, y[i]);
-                                    yMax = Math.max(yMax, y[i]);
-                                }
-                                //                  System.out.println("Read: "+npoints+" Points - xMin: "+xMin+"xMax: "+xMax+"yMin: "+yMin+"yMax: "+yMax);
-                            }
-                            catch (NoSuchElementException e) {
-                                System.out.println("Poly Read Error: " + line);
-                            }
-                        }
-                        catch (IOException e) {
-                            System.out.println("Error: " + e);
-                            System.exit(1);
-                        }
-                        //==================================================================//
-
-                        br.reset();
-                        int count = 0;
-                        while (line != null) {
-                            MyPoly p = new MyPoly();
-                            p.read(br, xMin, 100000 / Math.min(xMax - xMin, yMax - yMin), yMin, 100000 / Math.min(xMax - xMin, yMax - yMin));
-                            if (count++ % Math.max(data.n / 20, 1) == 0)
-                                progBar.setValue(Math.min(count, data.n));
-                            //MyPoly newP = p.thinHard();
-                            polys.addElement(p);
-                            line = br.readLine();                          // Read seperator (single blank line)
-                        }
-                    }
-                }
-
-                catch (IOException e) {
-                    System.out.println("Error: " + e);
-                    System.exit(1);
-                }
-                progText.setText("");
-                progBar.setValue(0);
-
-                return true;
-            }
-        } else
-            return false;
-    }
-
-
     public void setProgress(double progress) {
         progBar.setValue((int) (100 * progress));
     }
@@ -2274,7 +1616,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
         checkHistoryBuffer();
 
         int p = (varNames.getSelectedIndices()).length;
-        DataSet tempData = ((DataSet) dataSets.elementAt(thisDataSet));
+        DataSet tempData = ((DataSet) dataSets.elementAt(dataSetCounter));
         final MFrame scatterMf = new MFrame(this);
         int dims = Math.min(200 * p, (Toolkit.getDefaultToolkit().getScreenSize()).height);
         scatterMf.setSize(dims - 20, dims);
@@ -2294,7 +1636,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
                     tmpVars[0] = selectBuffer[p - j - 1];
                     tmpVars[1] = selectBuffer[p - i - 1];
                     //
-                    Scatter2D scat = new Scatter2D(scatterMf, 200, 200, (DataSet) dataSets.elementAt(thisDataSet), tmpVars, varNames, true);
+                    Scatter2D scat = new Scatter2D(scatterMf, 200, 200, (DataSet) dataSets.elementAt(dataSetCounter), tmpVars, varNames, true);
                     scat.addSelectionListener(this);
                     scat.addDataListener(this);
                     Plots.addElement(scat);
@@ -2326,14 +1668,14 @@ public void handlePrintFile(ApplicationEvent event) {} */
         int[] passTmpBuffer = new int[k];
         int count = 0;
         for (int i = 0; i < k; i++) {
-            if (((DataSet) dataSets.elementAt(thisDataSet)).getNumMissings(selectBuffer[k - i - 1]) < ((DataSet) dataSets.elementAt(thisDataSet)).n)  // make sure not all data is missing
+            if (((DataSet) dataSets.elementAt(dataSetCounter)).getNumMissings(selectBuffer[k - i - 1]) < ((DataSet) dataSets.elementAt(dataSetCounter)).n)  // make sure not all data is missing
                 passTmpBuffer[count++] = selectBuffer[k - i - 1];
         }
         int[] passBuffer = new int[count];
         for (int i = 0; i < count; i++)
             passBuffer[i] = passTmpBuffer[i];
 
-        PC plotw = new PC(pC, (DataSet) dataSets.elementAt(thisDataSet), passBuffer, mode, varNames);
+        PC plotw = new PC(pC, (DataSet) dataSets.elementAt(dataSetCounter), passBuffer, mode, varNames);
         plotw.addSelectionListener(this);
         plotw.addDataListener(this);
         Plots.addElement(plotw);
@@ -2348,12 +1690,12 @@ public void handlePrintFile(ApplicationEvent event) {} */
         final MFrame mV = new MFrame(this);
         int k = 0;
         for (int i = 0; i < (varNames.getSelectedIndices()).length; i++)
-            if (((DataSet) dataSets.elementAt(thisDataSet)).n > ((DataSet) dataSets.elementAt(thisDataSet)).getN((varNames.getSelectedIndices())[i]))
+            if (((DataSet) dataSets.elementAt(dataSetCounter)).n > ((DataSet) dataSets.elementAt(dataSetCounter)).getN((varNames.getSelectedIndices())[i]))
                 k++;
         int[] passVars = new int[k];
         int kk = 0;
         for (int i = 0; i < (varNames.getSelectedIndices()).length; i++)
-            if (((DataSet) dataSets.elementAt(thisDataSet)).n > ((DataSet) dataSets.elementAt(thisDataSet)).getN(selectBuffer[i]))
+            if (((DataSet) dataSets.elementAt(dataSetCounter)).n > ((DataSet) dataSets.elementAt(dataSetCounter)).getN(selectBuffer[i]))
                 passVars[k - 1 - kk++] = selectBuffer[i]; //(varNames.getSelectedIndices())[i];
 
         if (k > 0) {
@@ -2368,7 +1710,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
             mV.setSize(300, Math.min(tmpHeight, (Toolkit.getDefaultToolkit().getScreenSize()).height - 30));
             mV.setLocation(150, 150);
 
-            final MissPlot plotw = new MissPlot(mV, (DataSet) dataSets.elementAt(thisDataSet), passVars);
+            final MissPlot plotw = new MissPlot(mV, (DataSet) dataSets.elementAt(dataSetCounter), passVars);
             plotw.setScrollX();
             plotw.addSelectionListener(this);
             plotw.addDataListener(this);
@@ -2385,7 +1727,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
         final MFrame mondrian = new MFrame(this);
         mondrian.setSize(400, 400);
 
-        DataSet data = (DataSet) dataSets.elementAt(thisDataSet);
+        DataSet data = (DataSet) dataSets.elementAt(dataSetCounter);
 
         int k = (varNames.getSelectedIndices()).length;
         int[] passBuffer = new int[k];
@@ -2422,7 +1764,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
         final MFrame mondrian = new MFrame(this);
         mondrian.setSize(400, 400);
 
-        DataSet tempData = ((DataSet) dataSets.elementAt(thisDataSet));
+        DataSet tempData = ((DataSet) dataSets.elementAt(dataSetCounter));
 
         int k = (varNames.getSelectedIndices()).length;
         int[] passBuffer = new int[k];
@@ -2458,7 +1800,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
     public void barChart() {
 
-        DataSet tempData = ((DataSet) dataSets.elementAt(thisDataSet));
+        DataSet tempData = ((DataSet) dataSets.elementAt(dataSetCounter));
 
         int[] indices = varNames.getSelectedIndices();
         int lastY = 333;
@@ -2500,7 +1842,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
     public void weightedbarChart() {
 
-        DataSet tempData = ((DataSet) dataSets.elementAt(thisDataSet));
+        DataSet tempData = ((DataSet) dataSets.elementAt(dataSetCounter));
 
         int[] vars = getWeightVariable(varNames.getSelectedIndices(), tempData);
         int[] passed = new int[vars.length - 1];
@@ -2545,7 +1887,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
     public void weightedHistogram() {
 
-        DataSet tempData = ((DataSet) dataSets.elementAt(thisDataSet));
+        DataSet tempData = ((DataSet) dataSets.elementAt(dataSetCounter));
 
         int[] vars = getWeightVariable(varNames.getSelectedIndices(), tempData);
         if (vars.length > 1) {
@@ -2563,7 +1905,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
     public void histogram() {
 
-        DataSet tempData = ((DataSet) dataSets.elementAt(thisDataSet));
+        DataSet tempData = ((DataSet) dataSets.elementAt(dataSetCounter));
         int[] indices = varNames.getSelectedIndices();
 
         histoCore(tempData, indices, -1);
@@ -2617,7 +1959,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
         mapf.setSize(400, 400);
         mapf.setTitle("Map");
 
-        Map map = new Map(mapf, 400, 400, (DataSet) dataSets.elementAt(thisDataSet), polys, varNames);
+        Map map = new Map(mapf, 400, 400, (DataSet) dataSets.elementAt(dataSetCounter), polys, varNames);
         map.addSelectionListener(this);
         map.addDataListener(this);
         Plots.addElement(map);
@@ -2641,7 +1983,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
         int[] passBuffer = new int[2];
         passBuffer[0] = selectBuffer[1];
         passBuffer[1] = selectBuffer[0];
-        Scatter2D scat = new Scatter2D(scatterf, 400, 400, (DataSet) dataSets.elementAt(thisDataSet), passBuffer, varNames, false);
+        Scatter2D scat = new Scatter2D(scatterf, 400, 400, (DataSet) dataSets.elementAt(dataSetCounter), passBuffer, varNames, false);
         scat.addSelectionListener(this);
         scat.addDataListener(this);
         Plots.addElement(scat);
@@ -2653,7 +1995,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
     public void mds() {
 
         int[] varsT = varNames.getSelectedIndices();
-        DataSet dataT = (DataSet) dataSets.elementAt(thisDataSet);
+        DataSet dataT = (DataSet) dataSets.elementAt(dataSetCounter);
         try {
             RConnection c = new RConnection();
             c.voidEval("library(MASS, pos=1)");
@@ -2709,7 +2051,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
     public void pca() {
 
         int[] varsT = varNames.getSelectedIndices();
-        DataSet dataT = (DataSet) dataSets.elementAt(thisDataSet);
+        DataSet dataT = (DataSet) dataSets.elementAt(dataSetCounter);
         try {
             RConnection c = new RConnection();
             String call = " ~ x1 ";
@@ -2776,7 +2118,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
     public void switchVariableMode() {
         for (int i = 0; i < varNames.getSelectedIndices().length; i++) {
             int index = (varNames.getSelectedIndices())[i];
-            DataSet data = (DataSet) dataSets.elementAt(thisDataSet);
+            DataSet data = (DataSet) dataSets.elementAt(dataSetCounter);
             if (!data.alpha(index)) {
                 if (data.categorical(index))
                     data.catToNum(index);
@@ -2792,7 +2134,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
     public void getSelectedTypes() {
         numCategorical = 0;
         for (int i = 0; i < varNames.getSelectedIndices().length; i++) {
-            if (((DataSet) dataSets.elementAt(thisDataSet)).categorical(varNames.getSelectedIndices()[i]))
+            if (((DataSet) dataSets.elementAt(dataSetCounter)).categorical(varNames.getSelectedIndices()[i]))
                 numCategorical++;
             else
                 weightIndex = varNames.getSelectedIndices()[i];
@@ -2836,9 +2178,9 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
 
     public void maintainPlotMenu() {
-        if (thisDataSet == -1) {
+        if (dataSetCounter == -1) {
             if (dataSets.size() > 0)
-                thisDataSet = dataSets.size() - 1;
+                dataSetCounter = dataSets.size() - 1;
             else return; // invalid state, don't bother
         }
         getSelectedTypes();
@@ -2953,12 +2295,12 @@ public void handlePrintFile(ApplicationEvent event) {} */
                 sc2.setEnabled(false);
                 //        sc.setEnabled(false);
         }
-        if (!((DataSet) dataSets.elementAt(thisDataSet)).hasMissings)
+        if (!((DataSet) dataSets.elementAt(dataSetCounter)).hasMissings)
             mv.setEnabled(false);
 
         // Now handle transform Menue
         int alphs = 0;
-        DataSet data = ((DataSet) dataSets.elementAt(thisDataSet));
+        DataSet data = ((DataSet) dataSets.elementAt(dataSetCounter));
         for (int i = 0; i < varNames.getSelectedIndices().length; i++)
             if (data.alpha(varNames.getSelectedIndices()[i]))
                 alphs++;
@@ -3011,7 +2353,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
 
     public void maintainOptionMenu() {
-        DataSet data = ((DataSet) dataSets.elementAt(thisDataSet));
+        DataSet data = ((DataSet) dataSets.elementAt(dataSetCounter));
 
         // Selection
         if (data.countSelection() == 0)
@@ -3045,7 +2387,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
     public void handleOpenFile(File inFile) {
         //  handleOpenFile does not get an Event if a file is dropped on a non-running Mondrian.app, so we need to get it here, but only in this singular situation!
         //
-        //    System.out.println(".......... CALL loadDataSet("+inFile+") FROM handleOpenFile IN Join .........");
+        //    System.out.println(".......... CALL loadDataSet("+inFile+") FROM handleOpenFile IN MonFrame .........");
         if (mondrianRunning)
             return;
         while (!mondrianRunning)
@@ -3056,9 +2398,23 @@ public void handlePrintFile(ApplicationEvent event) {} */
     }
 
 
+    public Preferences getPrefences() {
+        return prefs;
+    }
+
+
+    public void setDataSet(DataSet data) {
+        dataSets.addElement(data);
+        setVarList();
+        selseq = true;
+        se.setSelected(true);
+        se.setEnabled(false);
+    }
+
+
     class MCellRenderer extends JLabel implements ListCellRenderer {
 
-        final DataSet data = (DataSet) dataSets.elementAt(thisDataSet);
+        final DataSet data = (DataSet) dataSets.elementAt(dataSetCounter);
 
         final ImageIcon alphaIcon = new ImageIcon(Util.readGif("/alpha.gif"));
         final ImageIcon alphaMissIcon = new ImageIcon(Util.readGif("/alpha-miss.gif"));

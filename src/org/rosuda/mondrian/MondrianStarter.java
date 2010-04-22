@@ -1,6 +1,7 @@
 package org.rosuda.mondrian;
 
-import com.apple.mrj.*;
+import com.apple.mrj.MRJApplicationUtils;
+import com.apple.mrj.MRJOpenDocumentHandler;
 
 import java.io.File;
 import java.util.Vector;
@@ -22,15 +23,15 @@ public class MondrianStarter implements MRJOpenDocumentHandler {
 
     public MondrianStarter(String[] args) {
 
-        Join First = new Join(Mondrians, dataSets, false, false, null);
+        MonFrame first = new MonFrame(Mondrians, dataSets, false, false, null);
 
-//    System.out.println(" Join Created / Register Handler ...");
+//    System.out.println(" MonFrame Created / Register Handler ...");
 
         MRJApplicationUtils.registerOpenDocumentHandler(this);
 
         if (args.length == 1) {
             File iFile = new File(args[0]);
-            if (iFile.canRead()) First.loadDataSet(false, iFile, "");
+            if (iFile.canRead()) first.loadDataSet(false, iFile, "");
         }
 
         try {
@@ -42,10 +43,10 @@ public class MondrianStarter implements MRJOpenDocumentHandler {
 
 
     public void handleOpenFile(File inFile) {
-        Join theJoin = ((Join) Mondrians.lastElement());
-//    while( !theJoin.mondrianRunning ) {System.out.println(" wait for Mondrian to initialize ...");}   // Wait until Mondrian initialized
+        MonFrame theMonFrame = ((MonFrame) Mondrians.lastElement());
+//    while( !theMonFrame.mondrianRunning ) {System.out.println(" wait for Mondrian to initialize ...");}   // Wait until Mondrian initialized
 //    System.out.println(".......... CALL loadDataSet("+inFile+") FROM handleOpenFile .........");
-        theJoin.loadDataSet(false, inFile, "");
+        theMonFrame.loadDataSet(false, inFile, "");
     }
 
 }

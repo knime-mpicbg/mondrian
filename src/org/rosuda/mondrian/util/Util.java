@@ -28,6 +28,16 @@ public class Util {
         f.getContentPane().add(c, gbc);
     }
 
+
+    public static void add(JDialog f, Component c, GridBagConstraints gbc, int x, int y, int w, int h) {
+        gbc.gridx = x;
+        gbc.gridy = y;
+        gbc.gridwidth = w;
+        gbc.gridheight = h;
+
+        f.getContentPane().add(c, gbc);
+    }
+
 /*  public static Image readGif(String name) {
 
   Image image=null;
