@@ -77,8 +77,9 @@
                     name="Mondrian"
                     shortname="Mondrian"
                     mainclass="org.rosuda.mondrian.MondrianStarter"
+                    icon="Mondrian.icns"
                     jvmversion="1.6+"
-                    version="5.0"
+                    version="6.0 BETA"
                     vmoptions="-Xmx1024m -Xms512m -Dcom.apple.macos.useScreenMenuBar=true -Dapple.laf.useScreenMenuBar=true">
 
 
@@ -106,7 +107,7 @@
 
     <target name="cleanAll" description="Remove all generated files">
         <property name="jarfile" value="${project.name}.jar"/>
-        
+
         <delete file="${jarfile}"/>
         <delete dir="${classes.dir}" failonerror="false"/>
     </target>

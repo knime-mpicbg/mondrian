@@ -95,7 +95,6 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     static String user;
     public boolean mondrianRunning = false;
     public int[] selectBuffer;
-    private Preferences prefs;
     private String searchText = "";
     private long startT = 0;
     private Vector<Integer> setIndices = new Vector<Integer>(10, 0);
@@ -117,7 +116,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         PreferencesFrame.setScheme(2);
 
         // Read Preferences
-        prefs = Preferences.userNodeForPackage(this.getClass());
+        Preferences prefs = Preferences.userNodeForPackage(this.getClass());
 
         if (!prefs.get("color.background", "").equals("")) {
             MFrame.backgroundColor = Util.hrgb2color(prefs.get("color.background", ""));
@@ -1038,7 +1037,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
             for (int i = 0; i < plots.size(); i++)
                 (plots.elementAt(i).Selections).removeAllElements();
             for (int i = 0; i < selList.size(); i++)
-                ((Selection) selList.elementAt(i)).status = Selection.KILLED;
+                selList.elementAt(i).status = Selection.KILLED;
             maintainWindowMenu(false);
             updateSelection();
         }
@@ -1088,8 +1087,8 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         if (!(unSelect || selectAll || toggleSelection)) {
 
             for (int i = selList.size() - 1; i >= 0; i--) {
-                if ((((Selection) selList.elementAt(i)).status == Selection.KILLED) ||
-                        !((Selection) selList.elementAt(i)).d.frame.isVisible()) {
+                if ((selList.elementAt(i).status == Selection.KILLED) ||
+                        !selList.elementAt(i).d.frame.isVisible()) {
                     selList.removeElementAt(i);
                 }
             }
@@ -1122,7 +1121,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                     plots.removeElementAt(i--);
 
             if (selList.size() > 1) {
-                ((Selection) (selList.firstElement())).mode = Selection.MODE_STANDARD;
+                selList.firstElement().mode = Selection.MODE_STANDARD;
             }
             // Do the update over all selections
             //
@@ -1135,7 +1134,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 maintainWindowMenu(false);
 
                 for (int i = 0; i < selList.size(); i++) {
-                    Selection S = ((Selection) selList.elementAt(i));
+                    Selection S = selList.elementAt(i);
                     S.step = i + 1;
                     S.total = selList.size();
                     (S.d).maintainSelection(S);
@@ -1145,7 +1144,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
             sqlConditions = new Query();                // Replace ???
             if (dataSets.elementAt(dataSetCounter).isDB)
                 for (int i = 0; i < selList.size(); i++) {
-                    Selection S = ((Selection) selList.elementAt(i));
+                    Selection S = selList.elementAt(i);
                     if (S.mode == Selection.MODE_STANDARD)
                         sqlConditions.clearConditions();
                     String condStr = S.condition.getConditions();

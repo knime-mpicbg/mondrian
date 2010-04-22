@@ -5,3 +5,4 @@ v1.2 (not yet released)
 - started git-repository
 - created ant-buiild.xml for deployment
 - New: data-frame dialog just shows up if there were several data-frames in the RData-file
+- New: RData-files can be used as command-line arguments
