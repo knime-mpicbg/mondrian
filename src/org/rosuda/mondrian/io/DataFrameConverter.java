@@ -46,149 +46,156 @@ public class DataFrameConverter {
 
         System.out.println("->" + rDataFile.getAbsolutePath() + "<-");
 
+        loadDataFrame(rDataFile);
+    }
+
+
+    public void loadDataFrame(File rDataFile) {
         boolean isWindows = isWindows();
 
-        if (rDataFile.exists())
-            try {
-                if (isWindows) {
-                    rC.voidEval("load(\"" + (rDataFile.getAbsolutePath()).replaceAll("\\\\", "\\\\\\\\") + "\")");
-                } else {
-                    rC.voidEval("load(\"" + rDataFile.getAbsolutePath() + "\")");
+        if (!rDataFile.canRead()) {
+            throw new IllegalArgumentException("Can not read/find file " + rDataFile);
+        }
+        try {
+            if (isWindows) {
+                rC.voidEval("load(\"" + (rDataFile.getAbsolutePath()).replaceAll("\\\\", "\\\\\\\\") + "\")");
+            } else {
+                rC.voidEval("load(\"" + rDataFile.getAbsolutePath() + "\")");
+            }
+
+            String[] workSpaceVarNames = rC.eval("sort(ls())").asStrings();
+
+            if (workSpaceVarNames.length == 1) {
+                importRData(workSpaceVarNames[0]);
+            }
+
+            final List<String> dfNames = new ArrayList<String>();
+
+            for (String varName : workSpaceVarNames) {
+                String varClass = rC.eval("class(" + varName + ")").asString();
+
+                if (varClass.equals("data.frame")) {
+                    System.out.println(varName + "  " + varClass);
+                    dfNames.add(varName);
                 }
+            }
 
-                String[] workSpaceVarNames = rC.eval("sort(ls())").asStrings();
+            final JDialog dataFrames = new JDialog(monFrame, "Choose a data-frame");
+            dataFrames.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-                if (workSpaceVarNames.length == 1) {
-                    importRData(workSpaceVarNames[0]);
+            JPanel dfPanel = new JPanel();
+            GridBagLayout dfLayout = new GridBagLayout();
+            GridBagConstraints dfCLayout = new GridBagConstraints();
+            dfPanel.setLayout(dfLayout);
+            DefaultListModel model = new DefaultListModel();
+            final JList list = new JList(model);
+            list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+            list.addKeyListener(new KeyAdapter() {
+                public void keyPressed(KeyEvent e) {
+                    if (e.getModifiers() == Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() && e.getKeyCode() == KeyEvent.VK_W ||
+                            (e.getKeyCode() == KeyEvent.VK_ESCAPE)) dataFrames.dispose();
                 }
+            });
 
-                final List<String> dfNames = new ArrayList<String>();
-
-                for (String varName : workSpaceVarNames) {
-                    String varClass = rC.eval("class(" + varName + ")").asString();
-
-                    if (varClass.equals("data.frame")) {
-                        System.out.println(varName + "  " + varClass);
-                        dfNames.add(varName);
-                    }
-                }
-
-                final JDialog dataFrames = new JDialog(monFrame, "Choose a data-frame");
-                dataFrames.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-                JPanel dfPanel = new JPanel();
-                GridBagLayout dfLayout = new GridBagLayout();
-                GridBagConstraints dfCLayout = new GridBagConstraints();
-                dfPanel.setLayout(dfLayout);
-                DefaultListModel model = new DefaultListModel();
-                final JList list = new JList(model);
-                list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-                list.addKeyListener(new KeyAdapter() {
-                    public void keyPressed(KeyEvent e) {
-                        if (e.getModifiers() == Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() && e.getKeyCode() == KeyEvent.VK_W ||
-                                (e.getKeyCode() == KeyEvent.VK_ESCAPE)) dataFrames.dispose();
-                    }
-                });
-
-                JScrollPane pane = new JScrollPane(list);
-                final JButton chooseButton = new JButton("Load");
-                chooseButton.setDefaultCapable(true);
-                //original code
+            JScrollPane pane = new JScrollPane(list);
+            final JButton chooseButton = new JButton("Load");
+            chooseButton.setDefaultCapable(true);
+            //original code
 //                getRootPane().setDefaultButton(chooseButton);
-                dataFrames.getRootPane().setDefaultButton(chooseButton);
+            dataFrames.getRootPane().setDefaultButton(chooseButton);
 
-                chooseButton.setEnabled(false);
+            chooseButton.setEnabled(false);
 
-                JButton cancelButton = new JButton("Cancel");
-                cancelButton.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        dataFrames.dispose();
-                    }
-                });
+            JButton cancelButton = new JButton("Cancel");
+            cancelButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    dataFrames.dispose();
+                }
+            });
 
-                chooseButton.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
+            chooseButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    dataFrames.dispose();
+                    importRData((String) list.getSelectedValue());
+                }
+            });
+
+            for (String dfName : dfNames) {
+                model.addElement(dfName);
+            }
+
+
+            list.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    if (e.getClickCount() == 2) {
                         dataFrames.dispose();
                         importRData((String) list.getSelectedValue());
                     }
-                });
-
-                for (String dfName : dfNames) {
-                    model.addElement(dfName);
                 }
+            });
+
+            list.addListSelectionListener(new ListSelectionListener() {
+                public void valueChanged(ListSelectionEvent e) {
+                    if (list.getSelectedIndex() > -1)
+                        chooseButton.setEnabled(true);
+                    else
+                        chooseButton.setEnabled(false);
+                }
+            });
 
 
-                list.addMouseListener(new MouseAdapter() {
-                    public void mouseClicked(MouseEvent e) {
-                        if (e.getClickCount() == 2) {
-                            dataFrames.dispose();
-                            importRData((String) list.getSelectedValue());
-                        }
-                    }
-                });
+            dfCLayout.gridx = 0;
+            dfCLayout.gridy = 0;
+            dfCLayout.gridwidth = 2;
+            dfCLayout.gridheight = 1;
+            dfCLayout.fill = GridBagConstraints.BOTH;
+            dfCLayout.weightx = 1;
+            dfCLayout.weighty = 50;
+            dfCLayout.anchor = GridBagConstraints.NORTH;
+            dfLayout.setConstraints(pane, dfCLayout);
 
-                list.addListSelectionListener(new ListSelectionListener() {
-                    public void valueChanged(ListSelectionEvent e) {
-                        if (list.getSelectedIndex() > -1)
-                            chooseButton.setEnabled(true);
-                        else
-                            chooseButton.setEnabled(false);
-                    }
-                });
+            dfPanel.add(pane);
 
+            dfCLayout.gridx = 0;
+            dfCLayout.gridy = 1;
+            dfCLayout.gridwidth = 1;
+            dfCLayout.gridheight = 1;
+            dfCLayout.fill = GridBagConstraints.BOTH;
+            dfCLayout.weightx = 1;
+            dfCLayout.weighty = 1;
+            dfCLayout.anchor = GridBagConstraints.SOUTH;
+            dfLayout.setConstraints(cancelButton, dfCLayout);
 
-                dfCLayout.gridx = 0;
-                dfCLayout.gridy = 0;
-                dfCLayout.gridwidth = 2;
-                dfCLayout.gridheight = 1;
-                dfCLayout.fill = GridBagConstraints.BOTH;
-                dfCLayout.weightx = 1;
-                dfCLayout.weighty = 50;
-                dfCLayout.anchor = GridBagConstraints.NORTH;
-                dfLayout.setConstraints(pane, dfCLayout);
+            dfPanel.add(cancelButton);
 
-                dfPanel.add(pane);
+            dfCLayout.gridx = 1;
+            dfCLayout.gridy = 1;
+            dfCLayout.gridwidth = 1;
+            dfCLayout.gridheight = 1;
+            dfCLayout.fill = GridBagConstraints.BOTH;
+            dfCLayout.weightx = 1;
+            dfCLayout.weighty = 1;
+            dfCLayout.anchor = GridBagConstraints.SOUTH;
+            dfLayout.setConstraints(chooseButton, dfCLayout);
 
-                dfCLayout.gridx = 0;
-                dfCLayout.gridy = 1;
-                dfCLayout.gridwidth = 1;
-                dfCLayout.gridheight = 1;
-                dfCLayout.fill = GridBagConstraints.BOTH;
-                dfCLayout.weightx = 1;
-                dfCLayout.weighty = 1;
-                dfCLayout.anchor = GridBagConstraints.SOUTH;
-                dfLayout.setConstraints(cancelButton, dfCLayout);
+            dfPanel.add(chooseButton);
 
-                dfPanel.add(cancelButton);
+            dataFrames.setContentPane(dfPanel);
+            dataFrames.setSize(260, 300);
+            dataFrames.setResizable(false);
 
-                dfCLayout.gridx = 1;
-                dfCLayout.gridy = 1;
-                dfCLayout.gridwidth = 1;
-                dfCLayout.gridheight = 1;
-                dfCLayout.fill = GridBagConstraints.BOTH;
-                dfCLayout.weightx = 1;
-                dfCLayout.weighty = 1;
-                dfCLayout.anchor = GridBagConstraints.SOUTH;
-                dfLayout.setConstraints(chooseButton, dfCLayout);
+            dataFrames.setLocation((int) ((Toolkit.getDefaultToolkit().getScreenSize()).getWidth() / 2) - 130,
+                    (int) ((Toolkit.getDefaultToolkit().getScreenSize()).getHeight() / 2) - 150);
 
-                dfPanel.add(chooseButton);
+            dataFrames.setVisible(true);
 
-                dataFrames.setContentPane(dfPanel);
-                dataFrames.setSize(260, 300);
-                dataFrames.setResizable(false);
-
-                dataFrames.setLocation((int) ((Toolkit.getDefaultToolkit().getScreenSize()).getWidth() / 2) - 130,
-                        (int) ((Toolkit.getDefaultToolkit().getScreenSize()).getHeight() / 2) - 150);
-
-                dataFrames.setVisible(true);
-
-            } catch (RserveException rse) {
-                System.out.println("Rserve exception: " + rse.getMessage());
-            }
-            catch (REXPMismatchException mme) {
-                System.out.println("Mismatch exception : " + mme.getMessage());
-            }
+        } catch (RserveException rse) {
+            System.out.println("Rserve exception: " + rse.getMessage());
+        }
+        catch (REXPMismatchException mme) {
+            System.out.println("Mismatch exception : " + mme.getMessage());
+        }
     }
 
 
@@ -221,11 +228,8 @@ public class DataFrameConverter {
 
     private static boolean isWindows() {
         String osname = System.getProperty("os.name");
-        if (osname != null && osname.length() >= 7 && osname.substring(0, 7).equals("Windows")) {
-            return true;
-        }
 
-        return
-                false;
+        return osname != null && osname.length() >= 7 && osname.substring(0, 7).equals("Windows");
+
     }
 }

@@ -162,8 +162,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         openDataBaseMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         if (user.indexOf("theus") > -1 || true) {
             openDataBaseMenuItem.setEnabled(true);
-        }
-        else {
+        } else {
             openDataBaseMenuItem.setEnabled(false);
         }
 
@@ -179,7 +178,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         file.add(closeDataSetMenuItem = new JMenuItem("Close Dataset"));
         closeDataSetMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         closeDataSetMenuItem.setEnabled(false);
-        
+
         //    file.add(p = new JMenuItem("Print Window",new JMenuShortcut(KeyEvent.VK_P)));
         JMenuItem q = new JMenuItem("Quit");
         if (((System.getProperty("os.name")).toLowerCase()).indexOf("mac") == -1) {
@@ -1313,7 +1312,6 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
         if (isDB) {
             new DBDatasetLoader(this).loadDataBase();
-
         } else if (dataSetCounter == -1) {
             if (new AsciiFileLoader(this).loadAsciiFile(file)) {
                 setVarList();

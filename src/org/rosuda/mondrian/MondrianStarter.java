@@ -2,6 +2,8 @@ package org.rosuda.mondrian;
 
 import com.apple.mrj.MRJApplicationUtils;
 import com.apple.mrj.MRJOpenDocumentHandler;
+import org.rosuda.mondrian.core.DataSet;
+import org.rosuda.mondrian.io.DataFrameConverter;
 
 import java.io.File;
 import java.util.Vector;
@@ -9,29 +11,34 @@ import java.util.Vector;
 
 public class MondrianStarter implements MRJOpenDocumentHandler {
 
-    protected Vector dataSets = new Vector(5, 5);
-    public Vector Mondrians = new Vector(5, 5);
-
 
     /**
      * A very simple main() method for our program.
      */
     public static void main(String[] args) {
-        new MondrianStarter(args);
+        new MondrianStarter(args.length > 0 ? args[0] : null);
     }
 
 
-    public MondrianStarter(String[] args) {
+    public MondrianStarter(String dataFileName) {
 
-        MonFrame first = new MonFrame(Mondrians, dataSets, false, false, null);
+        System.err.println("file");
+        MonFrame monFrame = new MonFrame(new Vector<MonFrame>(), new Vector<DataSet>(), false, false, null);
 
 //    System.out.println(" MonFrame Created / Register Handler ...");
 
         MRJApplicationUtils.registerOpenDocumentHandler(this);
 
-        if (args.length == 1) {
-            File iFile = new File(args[0]);
-            if (iFile.canRead()) first.loadDataSet(false, iFile, "");
+        if (dataFileName != null) {
+            File dataFile = new File(dataFileName);
+
+            if (dataFile.canRead()) {
+                if (dataFile.getName().endsWith(".RData")) {
+                    new DataFrameConverter(monFrame).loadDataFrame(dataFile);
+                } else {
+                    monFrame.loadDataSet(false, dataFile, "");
+                }
+            }
         }
 
         try {
@@ -43,7 +50,7 @@ public class MondrianStarter implements MRJOpenDocumentHandler {
 
 
     public void handleOpenFile(File inFile) {
-        MonFrame theMonFrame = ((MonFrame) Mondrians.lastElement());
+        MonFrame theMonFrame = ((MonFrame) new Vector(5, 5).lastElement());
 //    while( !theMonFrame.mondrianRunning ) {System.out.println(" wait for Mondrian to initialize ...");}   // Wait until Mondrian initialized
 //    System.out.println(".......... CALL loadDataSet("+inFile+") FROM handleOpenFile .........");
         theMonFrame.loadDataSet(false, inFile, "");
