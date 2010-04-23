@@ -76,7 +76,7 @@
         <jarbundler dir="${target.dir}"
                     name="Mondrian"
                     shortname="Mondrian"
-                    mainclass="de.mpicbg.sweng.mondriandrian.MondrianStarter"
+                    mainclass="de.mpicbg.sweng.mondrian.MondrianStarter"
                     icon="Mondrian.icns"
                     jvmversion="1.6+"
                     version="6.0 BETA"
