@@ -4,6 +4,7 @@ package de.mpicbg.sweng.mondrian;
 //
 
 import de.mpicbg.sweng.mondrian.core.DragBox;
+import de.mpicbg.sweng.mondrian.ui.ResizePlotTask;
 
 import javax.swing.*;
 import java.awt.*;
