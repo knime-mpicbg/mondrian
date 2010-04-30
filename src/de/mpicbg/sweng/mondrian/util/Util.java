@@ -279,7 +279,7 @@ public class Util {
     public static void showRefCard(MonFrame j) {
         final MFrame refCardf = new MFrame(j);
 
-        Icon RefIcon = new ImageIcon(readGif("ReferenceCard.gif"));
+        Icon RefIcon = new ImageIcon(readGif("/ReferenceCard.gif"));
 
         JLabel RefLabel = new JLabel(RefIcon);
         JScrollPane refScrollPane = new JScrollPane(RefLabel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);

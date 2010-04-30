@@ -6,6 +6,7 @@ import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.io.DataFrameConverter;
 import de.mpicbg.sweng.mondrian.plots.*;
 
+import javax.swing.*;
 import java.io.File;
 import java.util.Vector;
 
@@ -23,29 +24,37 @@ public class MondrianStarter implements MRJOpenDocumentHandler {
 
     public MondrianStarter(String dataFileName) {
 
-        System.err.println("file");
         MonFrame monFrame = new MonFrame(new Vector<MonFrame>(), new Vector<DataSet>(), false, false, null);
 
+        monFrame.regiserPlotFactory(new MissPlotFactory());
+        monFrame.plotMenu.add(new JSeparator());
 
-        monFrame.regiserPlotFactory(new MapPlotFactory());
         monFrame.regiserPlotFactory(new BarchartFactory());
         monFrame.regiserPlotFactory(new WeightedBarCharFactory());
+        monFrame.plotMenu.add(new JSeparator());
+
         monFrame.regiserPlotFactory(new HistogramFactory());
         monFrame.regiserPlotFactory(new WeightedHistogramFactory());
-        monFrame.regiserPlotFactory(new PCAPlotFactory());
-        monFrame.regiserPlotFactory(new MissPlotFactory());
-        monFrame.regiserPlotFactory(new MosaicPlotFactory());
-        monFrame.regiserPlotFactory(new WeightedMosaicPlotFactory());
+        monFrame.plotMenu.add(new JSeparator());
+
         monFrame.regiserPlotFactory(new ScatterplotFactory());
         monFrame.regiserPlotFactory(new SplomFactory());
-        monFrame.regiserPlotFactory(new TwoDimMDSFactory());
+        monFrame.plotMenu.add(new JSeparator());
+
+
+        monFrame.regiserPlotFactory(new MosaicPlotFactory());
+        monFrame.regiserPlotFactory(new WeightedMosaicPlotFactory());
+        monFrame.plotMenu.add(new JSeparator());
 
         monFrame.regiserPlotFactory(new BoxplotByXYFactory());
         monFrame.regiserPlotFactory(new ParallelBoxplotFactory());
         monFrame.regiserPlotFactory(new ParallelPlotFactory());
+        monFrame.plotMenu.add(new JSeparator());
 
+        monFrame.regiserPlotFactory(new TwoDimMDSFactory());
+        monFrame.regiserPlotFactory(new MapPlotFactory());
+        monFrame.regiserPlotFactory(new PCAPlotFactory());
 
-//    System.out.println(" MonFrame Created / Register Handler ...");
 
         MRJApplicationUtils.registerOpenDocumentHandler(this);
 

@@ -49,7 +49,9 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
      */
     protected static int num_windows = 0;
     public static Vector<DataSet> dataSets;
-    protected static Vector<MonFrame> mondrians;
+
+    private java.util.List<Mondrian> mondrians = new ArrayList<Mondrian>();
+    protected static Vector<MonFrame> monFrames;
     public Vector<DragBox> plots = new Vector<DragBox>();
 
     private java.util.List<PlotFactory> plotFacRegistry = new ArrayList<PlotFactory>();
@@ -97,9 +99,9 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     public JMenu plotMenu;
 
 
-    public MonFrame(Vector<MonFrame> mondrians, Vector<DataSet> dataSets, boolean load, boolean loadDB, File loadFile) {
+    public MonFrame(Vector<MonFrame> monFrames, Vector<DataSet> dataSets, boolean load, boolean loadDB, File loadFile) {
 
-        mondrians.addElement(this);
+        monFrames.addElement(this);
 
         MRJApplicationUtils.registerOpenDocumentHandler(this);
 
@@ -129,7 +131,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         Font SF = new Font("SansSerif", Font.BOLD, 12);
         this.setFont(SF);
         MonFrame.dataSets = dataSets;
-        MonFrame.mondrians = mondrians;
+        MonFrame.monFrames = monFrames;
         this.setTitle("Mondrian");               // Create the window.
         num_windows++;                           // Count it.
 
@@ -149,11 +151,8 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         JMenuItem openDataBaseMenuItem;
         file.add(openDataBaseMenuItem = new JMenuItem("Open Database"));
         openDataBaseMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        if (user.indexOf("theus") > -1 || true) {
-            openDataBaseMenuItem.setEnabled(true);
-        } else {
-            openDataBaseMenuItem.setEnabled(false);
-        }
+        openDataBaseMenuItem.setEnabled(true);
+
 
         file.add(saveMenuItem = new JMenuItem("Save"));
         saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -193,7 +192,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         plotMenu = new JMenu("Plot");
         menubar.add(plotMenu);                         // Add to menubar.
 
-        transformMenu = TransformAction.createTrafoMenu();
+        transformMenu = TransformAction.createTrafoMenu(this);
 
         menubar.add(transformMenu);
 
@@ -539,7 +538,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
      * @param data dataset to open
      */
     public MonFrame(DataSet data) {
-        this((mondrians == null) ? new Vector<MonFrame>(5, 5) : mondrians, (dataSets == null) ? new Vector<DataSet>(5, 5) : dataSets, false, false, null);
+        this((monFrames == null) ? new Vector<MonFrame>(5, 5) : monFrames, (dataSets == null) ? new Vector<DataSet>(5, 5) : dataSets, false, false, null);
 
         initWithData(data);
     }
@@ -625,7 +624,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
             dataSets.setElementAt(new DataSet("nullinger"), dataSetCounter);
             this.dispose();
             if (num_windows == 0) {
-                new MonFrame(mondrians, dataSets, false, false, null);
+                new MonFrame(monFrames, dataSets, false, false, null);
                 //        System.out.println(" -----------------------> disposing MonFrame !!!!!!!!!!!!!!!!");
                 this.dispose();
             }
@@ -1013,7 +1012,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 maintainOptionMenu();
             }
         } else {
-            new MonFrame(mondrians, dataSets, true, isDB, file);
+            new MonFrame(monFrames, dataSets, true, isDB, file);
         }
         if (dataSetCounter != -1)
             dataSets.elementAt(dataSetCounter).graphicsPerf = graphicsPerf;

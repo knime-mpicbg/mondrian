@@ -136,19 +136,19 @@ public class TransformAction extends AbstractAction {
     }
 
 
-    public static JMenu createTrafoMenu() {
+    public static JMenu createTrafoMenu(MonFrame monFrame) {
         JMenu transformMenu = new JMenu("Transform");
 
         transformMenu.setEnabled(false);
-        transformMenu.add(new JMenuItem(new TransformAction("x + y", 1, this, 2)));
-        transformMenu.add(new JMenuItem(new TransformAction("x - y", 2, this, 2)));
-        transformMenu.add(new JMenuItem(new TransformAction("x * y", 3, this, 2)));
-        transformMenu.add(new JMenuItem(new TransformAction("x / y", 4, this, 2)));
+        transformMenu.add(new JMenuItem(new TransformAction("x + y", 1, monFrame, 2)));
+        transformMenu.add(new JMenuItem(new TransformAction("x - y", 2, monFrame, 2)));
+        transformMenu.add(new JMenuItem(new TransformAction("x * y", 3, monFrame, 2)));
+        transformMenu.add(new JMenuItem(new TransformAction("x / y", 4, monFrame, 2)));
         transformMenu.addSeparator();
-        transformMenu.add(new JMenuItem(new TransformAction("- x", 5, this, 1)));
-        transformMenu.add(new JMenuItem(new TransformAction("1/x", 6, this, 1)));
-        transformMenu.add(new JMenuItem(new TransformAction("log(x)", 7, this, 1)));
-        transformMenu.add(new JMenuItem(new TransformAction("exp(x)", 8, this, 1)));
+        transformMenu.add(new JMenuItem(new TransformAction("- x", 5, monFrame, 1)));
+        transformMenu.add(new JMenuItem(new TransformAction("1/x", 6, monFrame, 1)));
+        transformMenu.add(new JMenuItem(new TransformAction("log(x)", 7, monFrame, 1)));
+        transformMenu.add(new JMenuItem(new TransformAction("exp(x)", 8, monFrame, 1)));
 
         return transformMenu;
     }
