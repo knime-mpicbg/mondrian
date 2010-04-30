@@ -1,8 +1,9 @@
 package de.mpicbg.sweng.mondrian.io;
 
 import de.mpicbg.sweng.mondrian.MonController;
-import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.DataSet;
+import de.mpicbg.sweng.mondrian.core.MapCache;
 import de.mpicbg.sweng.mondrian.plots.basic.MyPoly;
 
 import javax.swing.*;
@@ -25,25 +26,27 @@ public class AsciiFileLoader {
     private String justFile = "";
 
 
-    private MonFrame monFrame;
+    private Mondrian mondrian;
+    private JFrame parent;
 
 
-    public AsciiFileLoader(MonFrame monFrame) {
-        this.monFrame = monFrame;
+    public AsciiFileLoader(Mondrian mondrian, JFrame parent) {
+        this.mondrian = mondrian;
+        this.parent = parent;
     }
 
 
     public boolean loadAsciiFile(File file) {
 
         DataSet data;
-        String filename = "";
+        String filename;
         String path = "";
 
         if (file == null) {
-            FileDialog f = new FileDialog(monFrame, "Load Data", FileDialog.LOAD);
+            FileDialog f = new FileDialog(parent, "Load Data", FileDialog.LOAD);
             //      JFileChooser f = new JFileChooser(this, "Load Data", FileDialog.LOAD);
             f.setFile("");
-            f.show();
+            f.setVisible(true);
             //System.out.println("->"+f.getDirectory()+"<-.->" + f.getFile());
             if (f.getFile() != null) {
                 justFile = f.getFile();
@@ -62,27 +65,29 @@ public class AsciiFileLoader {
         }
         String line = "";
 
-        monFrame.getProgBar().setMinimum(0);
-        monFrame.getProgBar().setMaximum(100);
+        mondrian.getProgBar().setMinimum(0);
+        mondrian.getProgBar().setMaximum(100);
         data = new DataSet(justFile);
         MonController.dataSets.addElement(data);
-        monFrame.getProgText().setText("Loading ...");
+        mondrian.getProgBar().setString("Loading ...");
 
-        String mapFile = data.turboRead(filename, monFrame);
+        String mapFile = data.turboRead(filename, mondrian);
         if (mapFile == null)
-            JOptionPane.showMessageDialog(monFrame, "No mapfile found although an index column\nwas specified via '/P'.");
+            JOptionPane.showMessageDialog(mondrian.getParent(), "No mapfile found although an index column\nwas specified via '/P'.");
+
         else if (mapFile.indexOf("ERROR") == 0) {
-            JOptionPane.showMessageDialog(monFrame, mapFile.substring(mapFile.indexOf(":") + 2), "Open File Error", JOptionPane.ERROR_MESSAGE);
-            monFrame.getProgText().setText("");
-            monFrame.setProgress(0.0);
+            JOptionPane.showMessageDialog(mondrian.getParent(), mapFile.substring(mapFile.indexOf(":") + 2), "Open File Error", JOptionPane.ERROR_MESSAGE);
+            mondrian.setProgText("");
+            mondrian.setProgress(0.0);
             return false;
         }
 
-        monFrame.getProgText().setText("");
-        monFrame.getProgBar().setValue(0);
-        monFrame.getProgBar().setMaximum(data.n);
+        mondrian.getProgText().setText("");
+        mondrian.getProgBar().setValue(0);
+        mondrian.getProgBar().setMaximum(data.n);
 
-        monFrame.selectBuffer = new int[data.k + 15];
+        //todo do we need this
+//        mondrian.selectBuffer = new int[data.k + 15];
 
         if (mapFile != null)
             if (!mapFile.equals(""))
@@ -90,7 +95,7 @@ public class AsciiFileLoader {
                     try {
                         BufferedReader br = new BufferedReader(new FileReader(path + mapFile));
                         br.mark(1000000);
-                        monFrame.getProgText().setText("Polygons ...");
+                        mondrian.getProgText().setText("Polygons ...");
 
                         double xMin = 10e10;
                         double xMax = -10e10;
@@ -135,8 +140,9 @@ public class AsciiFileLoader {
                             MyPoly p = new MyPoly();
                             p.read(br, xMin, 100000 / Math.min(xMax - xMin, yMax - yMin), yMin, 100000 / Math.min(xMax - xMin, yMax - yMin));
                             if (count++ % Math.max(data.n / 20, 1) == 0)
-                                monFrame.getProgBar().setValue(Math.min(count, data.n));
-                            monFrame.polys.addElement(p);
+                                mondrian.getProgBar().setValue(Math.min(count, data.n));
+
+                            MapCache.getInstance().getPolys(data).addElement(p);
                             line = br.readLine();                          // Read seperator (single blank line)
                         }
                     }
@@ -145,7 +151,7 @@ public class AsciiFileLoader {
                         System.exit(1);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(monFrame, "Can't open mapfile: " + mapFile + "\nPlease check file name and location\n(the datafile will still be loaded)");
+                    JOptionPane.showMessageDialog(mondrian.getParent(), "Can't open mapfile: " + mapFile + "\nPlease check file name and location\n(the datafile will still be loaded)");
                 }
 
         return true;

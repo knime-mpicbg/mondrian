@@ -1,8 +1,8 @@
 package de.mpicbg.sweng.mondrian.ui;
 
 import de.mpicbg.sweng.mondrian.MDialog;
-import de.mpicbg.sweng.mondrian.MonController;
 import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.core.DragBox;
 import de.mpicbg.sweng.mondrian.core.PlotFactory;
@@ -43,19 +43,18 @@ public class PlotAction extends AbstractAction {
         // this was done for each plot in the originial version; why is not clear yet
         monFrame.checkHistoryBuffer();
 
-        MDialog plotFrame = new MDialog(monFrame);
+        Mondrian mondrian = monFrame.getController().getCurrent();
+
+        MDialog plotFrame = new MDialog(monFrame, mondrian);
         Font SF = new Font("SansSerif", Font.PLAIN, 11);
         plotFrame.setFont(SF);
 
-        PlotPanel plotPanel = plotFactory.createPlotPanel(monFrame, plotFrame, MonController.dataSets.elementAt(monFrame.dataSetCounter), monFrame.varNames);
+        PlotPanel plotPanel = plotFactory.createPlotPanel(monFrame, plotFrame, mondrian.getDataSet(), mondrian.getSelector().getVarNames());
 
 
         if (plotPanel != null) {
             for (PlotPanel plot : plotPanel.getPlots()) {
-                plot.addDataListener(monFrame);
-                plot.addSelectionListener(monFrame);
-
-                monFrame.plots.addElement((DragBox) plot);
+                monFrame.getController().getCurrent().addPlot((DragBox) plot);
             }
             plotFrame.getContentPane().add(plotPanel);
 
@@ -63,10 +62,6 @@ public class PlotAction extends AbstractAction {
             plotFrame.setSize(plotPanel.getMinimumSize());
             plotFrame.setVisible(true);
         }
-
-        // what is this
-        monFrame.varNames = null;
-        monFrame.setVarList();
     }
 
 

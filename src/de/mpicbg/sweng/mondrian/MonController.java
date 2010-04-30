@@ -16,7 +16,9 @@ public class MonController {
 
     MonFrame monFrame;
 
+
     List<Mondrian> mondrians = new ArrayList<Mondrian>();
+
     public static Vector<DataSet> dataSets;
 
 
@@ -36,6 +38,17 @@ public class MonController {
 
 
     public DataSet getCurrentDataSet() {
-        return dataSets.elementAt(monFrame.dataSetCounter);
+        return getCurrent().getDataSet();
+        // before dataSets.elementAt(monFrame.dataSetCounter)
+    }
+
+
+    public int getNumInstances() {
+        return mondrians.size();
+    }
+
+
+    public void removeInstance(Mondrian mondrian) {
+        mondrians.remove(mondrian);
     }
 }

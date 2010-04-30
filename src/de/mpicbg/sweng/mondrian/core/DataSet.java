@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.core;
 
-import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.io.ScanException;
 import de.mpicbg.sweng.mondrian.io.UnacceptableFormatException;
 import de.mpicbg.sweng.mondrian.io.db.Query;
@@ -333,9 +333,9 @@ public class DataSet {
     }
 
 
-    public String turboRead(String fileName, MonFrame joint) {
+    public String turboRead(String fileName, Mondrian mondrian) {
         try {
-            BufferTokenizer BT = new BufferTokenizer(10, 5, fileName, joint);
+            BufferTokenizer BT = new BufferTokenizer(10, 5, fileName, mondrian);
             this.n = BT.lines;
             this.k = BT.columns;
 

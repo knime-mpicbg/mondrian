@@ -27,14 +27,15 @@ public class MDialog extends JDialog implements WindowListener {
     private Timer resizePlotTimer = new Timer();
     private TimerTask resizePlotTask;
     private boolean firstTime = true;
+    private Mondrian mondrian;
 
     //  static Color backgroundColor = new Color(223, 184, 96);
 
 
-    public MDialog(MonFrame parentFrame) {
-        if (((System.getProperty("os.name")).toLowerCase()).indexOf("mac") > -1)
-            this.setJMenuBar(parentFrame.menubar);
+    public MDialog(MonFrame parentFrame, Mondrian mondrian) {
+        this.mondrian = mondrian;
         this.parentFrame = parentFrame;
+
         this.setBackground(ColorManager.backgroundColor);
         addWindowListener(this);
     }
@@ -63,11 +64,11 @@ public class MDialog extends JDialog implements WindowListener {
     public void close() {
         System.out.println("Window Closed!!");
 
-        parentFrame.windows.remove(m);
-        if (parentFrame.windows.getItemCount() < 3)
+        parentFrame.windowMenu.remove(m);
+        if (parentFrame.windowMenu.getItemCount() < 3)
             parentFrame.closeAllMenuItem.setEnabled(false);
         if (!selString.equals(""))
-            parentFrame.updateSelection();
+            mondrian.updateSelection();
         this.setVisible(false);
         this.dispose();
     }
@@ -91,17 +92,17 @@ public class MDialog extends JDialog implements WindowListener {
         m = new JMenuItem(getTitle());
         parentFrame.closeAllMenuItem.setEnabled(true);
 
-        for (int i = 2; i < parentFrame.windows.getItemCount(); i++)
-            if (((parentFrame.windows.getItem(i)).getText()).substring(0, 2).equals((m.getText()).substring(0, 2)))
+        for (int i = 2; i < parentFrame.windowMenu.getItemCount(); i++)
+            if (((parentFrame.windowMenu.getItem(i)).getText()).substring(0, 2).equals((m.getText()).substring(0, 2)))
                 same = true;
             else if (same) {
-                parentFrame.windows.insert(m, i);
+                parentFrame.windowMenu.insert(m, i);
                 added = true;
                 same = false;
             }
 
         if (!added) {
-            parentFrame.windows.add(m);
+            parentFrame.windowMenu.add(m);
             added = true;
         }
 

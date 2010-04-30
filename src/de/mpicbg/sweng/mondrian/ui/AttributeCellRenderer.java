@@ -1,7 +1,5 @@
 package de.mpicbg.sweng.mondrian.ui;
 
-import de.mpicbg.sweng.mondrian.MonController;
-import de.mpicbg.sweng.mondrian.MonFrame;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.util.Utils;
 
@@ -26,8 +24,8 @@ public class AttributeCellRenderer extends JLabel implements ListCellRenderer {
     final ImageIcon numMissIcon = new ImageIcon(Utils.readGif("/num-miss.gif"));
 
 
-    public AttributeCellRenderer(MonFrame monFrame) {
-        data = MonController.dataSets.elementAt(monFrame.dataSetCounter);
+    public AttributeCellRenderer(DataSet data) {
+        this.data = data;
     }
 
 

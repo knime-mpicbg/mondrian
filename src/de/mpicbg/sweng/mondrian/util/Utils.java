@@ -1,9 +1,6 @@
 package de.mpicbg.sweng.mondrian.util;
 
 
-import de.mpicbg.sweng.mondrian.MFrame;
-import de.mpicbg.sweng.mondrian.MonFrame;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -277,8 +274,8 @@ public class Utils {
     }
 
 
-    public static void showRefCard(MonFrame j) {
-        final MFrame refCardf = new MFrame(j);
+    public static void showRefCard() {
+        final JFrame refCardf = new JFrame();
 
         Icon RefIcon = new ImageIcon(readGif("/ReferenceCard.gif"));
 

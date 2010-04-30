@@ -1,6 +1,7 @@
 package de.mpicbg.sweng.mondrian.ui;
 
 import de.mpicbg.sweng.mondrian.MonController;
+import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 
 import javax.swing.*;
@@ -47,15 +48,20 @@ public class SaveDataSetAction extends AbstractAction {
             f = new FileDialog(monController.getMonFrame(), "Save Selection", FileDialog.SAVE);
         else
             f = new FileDialog(monController.getMonFrame(), "Save Data", FileDialog.SAVE);
-        f.show();
-        if (f.getFile() != null)
+        f.setVisible(true);
+
+        if (f.getFile() != null) {
             saveDataSet(f.getDirectory() + f.getFile(), selection);
+        }
     }
 
 
     public boolean saveDataSet(String file, boolean selection) {
         try {
-            DataSet dataSet = monController.getCurrentDataSet();
+            Mondrian mondrian = monController.getCurrent();
+            DataSet dataSet = mondrian.getDataSet();
+            JList varNames = mondrian.getSelector().getVarNames();
+
             int k = dataSet.k;
             int n = dataSet.n;
 
@@ -103,6 +109,7 @@ public class SaveDataSetAction extends AbstractAction {
                     fw.write(line + (i == (n - 1) ? "" : "\r"));
                 }
             }
+
             fw.close();
 
         } catch (Exception ex) {

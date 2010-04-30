@@ -61,8 +61,8 @@ public class MFrame extends JFrame implements WindowListener {
     public void close() {
         System.out.println("Window Closed!!");
 
-        j.windows.remove(m);
-        if (j.windows.getItemCount() < 3)
+        j.windowMenu.remove(m);
+        if (j.windowMenu.getItemCount() < 3)
             j.closeAllMenuItem.setEnabled(false);
         if (!selString.equals(""))
             j.updateSelection();
@@ -89,17 +89,17 @@ public class MFrame extends JFrame implements WindowListener {
         m = new JMenuItem(getTitle());
         j.closeAllMenuItem.setEnabled(true);
 
-        for (int i = 2; i < j.windows.getItemCount(); i++)
-            if (((j.windows.getItem(i)).getText()).substring(0, 2).equals((m.getText()).substring(0, 2)))
+        for (int i = 2; i < j.windowMenu.getItemCount(); i++)
+            if (((j.windowMenu.getItem(i)).getText()).substring(0, 2).equals((m.getText()).substring(0, 2)))
                 same = true;
             else if (same) {
-                j.windows.insert(m, i);
+                j.windowMenu.insert(m, i);
                 added = true;
                 same = false;
             }
 
         if (!added) {
-            j.windows.add(m);
+            j.windowMenu.add(m);
             added = true;
         }
 
