@@ -22,6 +22,8 @@ public class PlotAction extends AbstractAction {
         this.plotFactory = plotFactory;
         this.monFrame = monFrame;
 
+        // actions are enabled if the user changes the variable selection
+        setEnabled(false);
 
         // configure the action
         putValue(NAME, plotFactory.getPlotName()); //$NON-NLS-1$
