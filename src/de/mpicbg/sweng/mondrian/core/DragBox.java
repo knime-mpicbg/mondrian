@@ -7,7 +7,7 @@ package de.mpicbg.sweng.mondrian.core;
 import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.plots.Barchart;
 import de.mpicbg.sweng.mondrian.plots.Histogram;
-import de.mpicbg.sweng.mondrian.plots.ParallelCoordinates;
+import de.mpicbg.sweng.mondrian.plots.ParallelPlot;
 import de.mpicbg.sweng.mondrian.ui.PlotPanel;
 import de.mpicbg.sweng.mondrian.util.StatUtil;
 import de.mpicbg.sweng.mondrian.util.Util;
@@ -1501,7 +1501,7 @@ abstract class DragBox
             gbXPanel.setConstraints(tfXMaxI, gbcXPanel);
             pnXPanel.add(tfXMaxI);
 
-            if (DB instanceof ParallelCoordinates) {
+            if (DB instanceof ParallelPlot) {
                 tfXMinI.setEnabled(false);
                 tfXMaxI.setEnabled(false);
             }

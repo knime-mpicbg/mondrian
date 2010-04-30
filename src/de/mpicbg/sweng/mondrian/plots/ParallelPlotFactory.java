@@ -38,7 +38,7 @@ public class ParallelPlotFactory extends AbstractPlotFactory {
         int[] passBuffer = new int[count];
         System.arraycopy(passTmpBuffer, 0, passBuffer, 0, count);
 
-        return new ParallelCoordinates(plotFrame, dataSet, passBuffer, getMode(), varNames);
+        return new ParallelPlot(plotFrame, dataSet, passBuffer, getMode(), varNames);
     }
 
 

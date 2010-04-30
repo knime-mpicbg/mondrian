@@ -10,8 +10,6 @@ import de.mpicbg.sweng.mondrian.io.DataFrameConverter;
 import de.mpicbg.sweng.mondrian.io.ProgressIndicator;
 import de.mpicbg.sweng.mondrian.io.db.DBDatasetLoader;
 import de.mpicbg.sweng.mondrian.io.db.Query;
-import de.mpicbg.sweng.mondrian.plots.MapPlot;
-import de.mpicbg.sweng.mondrian.plots.ParallelCoordinates;
 import de.mpicbg.sweng.mondrian.plots.basic.MyPoly;
 import de.mpicbg.sweng.mondrian.ui.AttributeCellRenderer;
 import de.mpicbg.sweng.mondrian.ui.PlotAction;
@@ -128,12 +126,6 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         System.out.println("Starting RServe ... ");
         RService.init();
 
-        user = System.getProperty("user.name");
-        System.out.println(user + " on " + System.getProperty("os.name"));
-
-//    Properties sysProps = System.getProperties();
-//    sysProps.list(System.out);
-
         Font SF = new Font("SansSerif", Font.BOLD, 12);
         this.setFont(SF);
         MonFrame.dataSets = dataSets;
@@ -197,25 +189,11 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
             });
         }
         menubar.add(file);                         // Add to menubar.
-        //
+
         plotMenu = new JMenu("Plot");
-        plotMenu.add(mapPlotMenuItem = new JMenuItem("Map"));
-        mapPlotMenuItem.setEnabled(false);
         menubar.add(plotMenu);                         // Add to menubar.
-        //
 
-        transformMenu = new JMenu("Transform");
-
-        transformMenu.setEnabled(false);
-        transformMenu.add(transPlus = new JMenuItem(new TransformAction("x + y", 1, this, 2)));
-        transformMenu.add(transMinus = new JMenuItem(new TransformAction("x - y", 2, this, 2)));
-        transformMenu.add(transTimes = new JMenuItem(new TransformAction("x * y", 3, this, 2)));
-        transformMenu.add(transDiv = new JMenuItem(new TransformAction("x / y", 4, this, 2)));
-        transformMenu.addSeparator();
-        transformMenu.add(transNeg = new JMenuItem(new TransformAction("- x", 5, this, 1)));
-        transformMenu.add(transInv = new JMenuItem(new TransformAction("1/x", 6, this, 1)));
-        transformMenu.add(transLog = new JMenuItem(new TransformAction("log(x)", 7, this, 1)));
-        transformMenu.add(transExp = new JMenuItem(new TransformAction("exp(x)", 8, this, 1)));
+        transformMenu = TransformAction.createTrafoMenu();
 
         menubar.add(transformMenu);
 
@@ -361,13 +339,6 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
             public void actionPerformed(ActionEvent e) {
                 loadDataSet(true, null, "");
-            }
-        });
-        mapPlotMenuItem.addActionListener(new ActionListener() {     // Open a new window to draw an interactive maps
-
-
-            public void actionPerformed(ActionEvent e) {
-                mapPlot();
             }
         });
 
@@ -1275,61 +1246,6 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
     public void preferenceFrame() {
         PreferencesFrame.showPrefsDialog(this);
-    }
-
-
-    public void pc(String mode) {
-        checkHistoryBuffer();
-
-        final MFrame pC = new MFrame(this);
-
-        int totWidth = (Toolkit.getDefaultToolkit().getScreenSize()).width;
-        int tmpWidth = 50 * (1 + (varNames.getSelectedIndices()).length);
-        if (tmpWidth > totWidth)
-            if (20 * (1 + (varNames.getSelectedIndices()).length) < totWidth)
-                tmpWidth = totWidth;
-            else
-                tmpWidth = 20 * (1 + (varNames.getSelectedIndices()).length);
-
-        pC.setSize(tmpWidth, 400);
-        pC.setLocation(300, 0);
-
-        int k = (varNames.getSelectedIndices()).length;
-        int[] passTmpBuffer = new int[k];
-        int count = 0;
-        for (int i = 0; i < k; i++) {
-            if (dataSets.elementAt(dataSetCounter).getNumMissings(selectBuffer[k - i - 1]) < dataSets.elementAt(dataSetCounter).n)  // make sure not all data is missing
-                passTmpBuffer[count++] = selectBuffer[k - i - 1];
-        }
-        int[] passBuffer = new int[count];
-        System.arraycopy(passTmpBuffer, 0, passBuffer, 0, count);
-
-        ParallelCoordinates plotw = new ParallelCoordinates(pC, dataSets.elementAt(dataSetCounter), passBuffer, mode, varNames);
-        plotw.addSelectionListener(this);
-        plotw.addDataListener(this);
-        plots.addElement(plotw);
-        pC.getContentPane().add(plotw);
-        pC.show();
-    }
-
-
-    public void mapPlot() {
-        final MFrame mapf = new MFrame(this);
-        mapf.setSize(400, 400);
-        mapf.setTitle("Map");
-
-        MapPlot mapPlot = new MapPlot(mapf, 400, 400, dataSets.elementAt(dataSetCounter), polys, varNames);
-        mapPlot.addSelectionListener(this);
-        mapPlot.addDataListener(this);
-        plots.addElement(mapPlot);
-
-        if (mapPlot.ratio > 1)
-            mapf.setSize((int) (350 * mapPlot.ratio), 350 + 56);
-        else
-            mapf.setSize(350, (int) (350 / mapPlot.ratio) + 56);
-        mapf.setLocation(0, 333);
-
-        mapf.show();
     }
 
 

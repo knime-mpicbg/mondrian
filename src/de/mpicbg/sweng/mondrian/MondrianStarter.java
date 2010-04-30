@@ -27,6 +27,7 @@ public class MondrianStarter implements MRJOpenDocumentHandler {
         MonFrame monFrame = new MonFrame(new Vector<MonFrame>(), new Vector<DataSet>(), false, false, null);
 
 
+        monFrame.regiserPlotFactory(new MapPlotFactory());
         monFrame.regiserPlotFactory(new BarchartFactory());
         monFrame.regiserPlotFactory(new WeightedBarCharFactory());
         monFrame.regiserPlotFactory(new HistogramFactory());

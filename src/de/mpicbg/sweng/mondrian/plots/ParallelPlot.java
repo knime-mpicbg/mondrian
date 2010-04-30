@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.Vector;
 
 
-public class ParallelCoordinates extends DragBox implements ActionListener {
+public class ParallelPlot extends DragBox implements ActionListener {
 
     protected int width, height;                   // The preferred size.
     protected int oldWidth, oldHeight;             // The last size for constructing the polygons.
@@ -69,7 +69,7 @@ public class ParallelCoordinates extends DragBox implements ActionListener {
     private static EventQueue evtq;
 
 
-    public ParallelCoordinates(MFrame frame, DataSet data, int[] vars, String mode, JList varList) {
+    public ParallelPlot(MFrame frame, DataSet data, int[] vars, String mode, JList varList) {
         super(frame);
         Dimension size = frame.getSize();
         this.width = size.width;
