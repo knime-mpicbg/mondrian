@@ -87,6 +87,7 @@ public class MissPlot extends DragBox implements ActionListener {
         }
 
         frame.setTitle(titletext);
+        setScrollX();
 
         EventQueue evtq = Toolkit.getDefaultToolkit().getSystemEventQueue();
     }

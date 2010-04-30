@@ -57,11 +57,7 @@ public class PlotAction extends AbstractAction {
             }
             plotFrame.getContentPane().add(plotPanel);
 
-
-            plotFrame.setTitle(plotPanel.getName());
-
-            // create a new frame for it
-
+            plotFrame.setTitle(plotPanel.getName() != null ? plotPanel.getName() : plotFactory.getPlotName());
             plotFrame.setSize(plotPanel.getMinimumSize());
             plotFrame.setVisible(true);
         }
@@ -69,7 +65,6 @@ public class PlotAction extends AbstractAction {
         // what is this
         monFrame.varNames = null;
         monFrame.setVarList();
-
     }
 
 

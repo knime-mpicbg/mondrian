@@ -15,51 +15,47 @@ import javax.swing.*;
  *
  * @author Holger Brandl
  */
-public class MosaicPlotFactory extends AbstractPlotFactory {
+public class WeightedMosaicPlotFactory extends AbstractPlotFactory {
 
     public String getPlotName() {
-        return "New Mosaic";
+        return "Weighted Mosaic Plot";
     }
 
 
     public String getShortDescription() {
-        return "A mosaic plot";
+        return "A weighted mosaic plot";
     }
 
 
     public PlotPanel createPlotPanel(MonFrame monFrame, MFrame plotFrame, DataSet dataSet, JList varNames) {
-
         int k = (varNames.getSelectedIndices()).length;
         int[] passBuffer = new int[k];
         for (int i = 0; i < k; i++)
             passBuffer[i] = monFrame.selectBuffer[k - i - 1];
 
-        Table breakdown = dataSet.breakDown(dataSet.setName, passBuffer, -1);
-        for (int i = 0; i < (varNames.getSelectedIndices()).length - 1; i++) {
+        //    int[] vars = getWeightVariable(varNames.getSelectedIndices(), data);
+        int[] vars = monFrame.getWeightVariable(passBuffer, dataSet);
+        int[] passed = new int[vars.length - 1];
+        System.arraycopy(vars, 0, passed, 0, vars.length - 1);
+        int weight = vars[vars.length - 1];
+
+        Table breakdown = dataSet.breakDown(dataSet.setName, passed, weight);
+        for (int i = 0; i < passed.length - 1; i++)
             breakdown.addInteraction(new int[]{i}, false);
-        }
-        breakdown.addInteraction(new int[]{(varNames.getSelectedIndices()).length - 1}, true);
 
-        //    mondrian.getContentPane().add(plotw);                      // Add it
+        breakdown.addInteraction(new int[]{passed.length - 1}, true);
 
-        //todo renable this
-//        mondrian.addWindowListener(new WindowAdapter() {
-//            public void windowActivated(WindowEvent e) {
-//                plotw.processWindowEvent(e);
-//            }
-//        });
+        return new MosaicPlot(plotFrame, 400, 400, breakdown);
 
-        //todo renenable this
-//        if (modelNavigator == null)
+        // todo reenable this
+//                if (modelNavigator == null)
 //            modelNavigator = new ModelNavigator();
 //        plotw.addModelListener(modelNavigator);
 //        modelNavigatorButton.setEnabled(true);
-
-        return new MosaicPlot(plotFrame, 400, 400, breakdown);
     }
 
 
     public boolean isCompliant(int numVariables, int numCategoricalVariables) {
-        return numVariables > 2 && (numVariables - 1) == numCategoricalVariables;
+        return numVariables > 2 && numVariables == numCategoricalVariables;
     }
 }

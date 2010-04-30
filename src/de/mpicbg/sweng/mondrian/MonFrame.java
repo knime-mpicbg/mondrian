@@ -10,16 +10,16 @@ import de.mpicbg.sweng.mondrian.io.DataFrameConverter;
 import de.mpicbg.sweng.mondrian.io.ProgressIndicator;
 import de.mpicbg.sweng.mondrian.io.db.DBDatasetLoader;
 import de.mpicbg.sweng.mondrian.io.db.Query;
-import de.mpicbg.sweng.mondrian.plots.*;
+import de.mpicbg.sweng.mondrian.plots.MapPlot;
+import de.mpicbg.sweng.mondrian.plots.ParallelCoordinates;
 import de.mpicbg.sweng.mondrian.plots.basic.MyPoly;
 import de.mpicbg.sweng.mondrian.ui.AttributeCellRenderer;
 import de.mpicbg.sweng.mondrian.ui.PlotAction;
 import de.mpicbg.sweng.mondrian.ui.PreferencesFrame;
+import de.mpicbg.sweng.mondrian.ui.transform.TransformAction;
 import de.mpicbg.sweng.mondrian.util.StatUtil;
 import de.mpicbg.sweng.mondrian.util.Util;
 import de.mpicbg.sweng.mondrian.util.r.RService;
-import org.rosuda.REngine.REXPMismatchException;
-import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
 
@@ -71,24 +71,14 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     public JMenu windows, help, dv, sam, trans;
 
     private JMenuItem saveMenuItem;
+    private JMenuItem saveSelectionMenuItem;
+
     private JMenuItem modelNavigatorButton;
+    private JMenuItem closeDataSetMenuItem;
 
 
     // plot menu items // todo these should all go into the factory
-    private JMenuItem mosaicPlotMenuItem;
-    private JMenuItem weightedMosaicPlotMenuItem;
-    private JMenuItem closeDataSetMenuItem;
     private JMenuItem mapPlotMenuItem;
-    private JMenuItem saveSelectionMenuItem;
-    private JMenuItem missingValuePlotMenuItem;
-    private JMenuItem weightedBarchartMenuItem;
-    private JMenuItem parCoordinatesMenuItem;
-    private JMenuItem parallelBoxplotMenuItem;
-    private JMenuItem boxplotByXYMenuItem;
-    private JMenuItem scatterplotMenuItem;
-    private JMenuItem histogramMenuItem;
-    private JMenuItem weightedHistogramMenuItem;
-    private JMenuItem twoDimMDSMenuItem;
 
     public JMenuItem closeAllMenuItem, colorsMenuItem, selectionMenuItem, me, transPlus, transMinus, transTimes, transDiv, transNeg, transInv, transLog, transExp;
     private JCheckBoxMenuItem selSeqCheckItem;
@@ -156,9 +146,9 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         // Create menu items, with menu shortcuts, and add to the menu.
         JMenu file = menubar.add(new JMenu("File"));
         //   JMenu file = new JMenu("File");            // Create a File menu.
-        JMenuItem o;
-        file.add(o = new JMenuItem("Open"));
-        o.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        JMenuItem openMenuItem;
+        file.add(openMenuItem = new JMenuItem("Open"));
+        openMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
         JMenuItem openRDataFrameMenuItem;
         file.add(openRDataFrameMenuItem = new JMenuItem("Open R dataframe"));
@@ -209,28 +199,6 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         menubar.add(file);                         // Add to menubar.
         //
         plotMenu = new JMenu("Plot");
-        plotMenu.add(missingValuePlotMenuItem = new JMenuItem("Missing Value Plot"));
-        missingValuePlotMenuItem.setEnabled(false);
-        plotMenu.addSeparator();
-        plotMenu.add(histogramMenuItem = new JMenuItem("Histogram"));
-        histogramMenuItem.setEnabled(false);
-        plotMenu.add(weightedHistogramMenuItem = new JMenuItem("Weighted Histogram"));
-        weightedHistogramMenuItem.setEnabled(false);
-        plotMenu.addSeparator();
-        plotMenu.addSeparator();
-        plotMenu.add(mosaicPlotMenuItem = new JMenuItem("Mosaic Plot"));
-        mosaicPlotMenuItem.setEnabled(false);
-        plotMenu.add(weightedMosaicPlotMenuItem = new JMenuItem("Weighted Mosaic Plot"));
-        weightedMosaicPlotMenuItem.setEnabled(false);
-        plotMenu.addSeparator();
-        plotMenu.add(parCoordinatesMenuItem = new JMenuItem("Parallel Coordinates"));
-        parCoordinatesMenuItem.setEnabled(false);
-        plotMenu.add(parallelBoxplotMenuItem = new JMenuItem("Parallel Boxplot"));
-        parallelBoxplotMenuItem.setEnabled(false);
-        plotMenu.add(boxplotByXYMenuItem = new JMenuItem("Boxplot y by x"));
-        boxplotByXYMenuItem.setEnabled(false);
-        plotMenu.addSeparator();
-
         plotMenu.add(mapPlotMenuItem = new JMenuItem("Map"));
         mapPlotMenuItem.setEnabled(false);
         menubar.add(plotMenu);                         // Add to menubar.
@@ -238,18 +206,16 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         JMenu calc = new JMenu("Calc");            // Create a Calc menu.
         calc.add(trans = new JMenu("transform"));
         trans.setEnabled(false);
-        trans.add(transPlus = new JMenuItem("x + y"));
-        trans.add(transMinus = new JMenuItem("x - y"));
-        trans.add(transTimes = new JMenuItem("x * y"));
-        trans.add(transDiv = new JMenuItem("x / y"));
+        trans.add(transPlus = new JMenuItem(new TransformAction("x + y", 1, this, 2)));
+        trans.add(transMinus = new JMenuItem(new TransformAction("x - y", 2, this, 2)));
+        trans.add(transTimes = new JMenuItem(new TransformAction("x * y", 3, this, 2)));
+        trans.add(transDiv = new JMenuItem(new TransformAction("x / y", 4, this, 2)));
         trans.addSeparator();                     // Put a separator in the menu
-        trans.add(transNeg = new JMenuItem("- x"));
-        trans.add(transInv = new JMenuItem("1/x"));
-        trans.add(transLog = new JMenuItem("log(x)"));
-        trans.add(transExp = new JMenuItem("exp(x)"));
+        trans.add(transNeg = new JMenuItem(new TransformAction("- x", 5, this, 2)));
+        trans.add(transInv = new JMenuItem(new TransformAction("1/x", 6, this, 2)));
+        trans.add(transLog = new JMenuItem(new TransformAction("log(x)", 7, this, 2)));
+        trans.add(transExp = new JMenuItem(new TransformAction("exp(x)", 8, this, 2)));
 
-        calc.add(twoDimMDSMenuItem = new JMenuItem("2-dim MDS"));
-        twoDimMDSMenuItem.setEnabled(false);
         //
         menubar.add(calc);                         // Add to menubar.
 
@@ -359,72 +325,8 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         getContentPane().add("South", progPanel);
 
         // Create and register action listener objects for the menu items.
-        missingValuePlotMenuItem.addActionListener(new ActionListener() {     // Open a new missing value plot window
 
-
-            public void actionPerformed(ActionEvent e) {
-                missPlot();
-            }
-        });
-        mosaicPlotMenuItem.addActionListener(new ActionListener() {     // Open a new mosaic plot window
-
-
-            public void actionPerformed(ActionEvent e) {
-
-                mosaicPlot();
-            }
-        });
-        weightedMosaicPlotMenuItem.addActionListener(new ActionListener() {     // Open a new weighted mosaic plot window
-
-
-            public void actionPerformed(ActionEvent e) {
-                weightedMosaicPlot();
-            }
-        });
-        weightedBarchartMenuItem.addActionListener(new ActionListener() {     // Open a new mosaic plot window
-
-
-            public void actionPerformed(ActionEvent e) {
-                weightedbarChart();
-            }
-        });
-        histogramMenuItem.addActionListener(new ActionListener() {     // Open a histogram window
-
-
-            public void actionPerformed(ActionEvent e) {
-                histogram();
-            }
-        });
-        weightedHistogramMenuItem.addActionListener(new ActionListener() {     // Open a weighted histogram window
-
-
-            public void actionPerformed(ActionEvent e) {
-                weightedHistogram();
-            }
-        });
-        parCoordinatesMenuItem.addActionListener(new ActionListener() {     // Open a parallel coordinate plot window
-
-
-            public void actionPerformed(ActionEvent e) {
-                pc("Poly");
-            }
-        });
-        parallelBoxplotMenuItem.addActionListener(new ActionListener() {     // Open a parallel boxplot plot window
-
-
-            public void actionPerformed(ActionEvent e) {
-                pc("Box");
-            }
-        });
-        boxplotByXYMenuItem.addActionListener(new ActionListener() {     // Open a boxplot plot y by x window
-
-
-            public void actionPerformed(ActionEvent e) {
-                pc("Box");
-            }
-        });
-
-        o.addActionListener(new ActionListener() {     // Load a dataset
+        openMenuItem.addActionListener(new ActionListener() {     // Load a dataset
 
 
             public void actionPerformed(ActionEvent e) {
@@ -468,70 +370,8 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 mapPlot();
             }
         });
-        twoDimMDSMenuItem.addActionListener(new ActionListener() {     // Open a new window for a 2-dim MDS
 
 
-            public void actionPerformed(ActionEvent e) {
-                mds();
-            }
-        });
-
-        transPlus.addActionListener(new ActionListener() {     // x + y
-
-
-            public void actionPerformed(ActionEvent e) {
-                transform(1);
-            }
-        });
-        transMinus.addActionListener(new ActionListener() {     // x - y
-
-
-            public void actionPerformed(ActionEvent e) {
-                transform(2);
-            }
-        });
-        transTimes.addActionListener(new ActionListener() {     // x * y
-
-
-            public void actionPerformed(ActionEvent e) {
-                transform(3);
-            }
-        });
-        transDiv.addActionListener(new ActionListener() {     // x / y
-
-
-            public void actionPerformed(ActionEvent e) {
-                transform(4);
-            }
-        });
-        transNeg.addActionListener(new ActionListener() {     // - x
-
-
-            public void actionPerformed(ActionEvent e) {
-                transform(5);
-            }
-        });
-        transInv.addActionListener(new ActionListener() {     // 1/x
-
-
-            public void actionPerformed(ActionEvent e) {
-                transform(6);
-            }
-        });
-        transLog.addActionListener(new ActionListener() {     // log(x)
-
-
-            public void actionPerformed(ActionEvent e) {
-                transform(7);
-            }
-        });
-        transExp.addActionListener(new ActionListener() {     // exp(x)
-
-
-            public void actionPerformed(ActionEvent e) {
-                transform(8);
-            }
-        });
         selSeqCheckItem.addActionListener(new ActionListener() {     // Change the selection mode
 
 
@@ -827,102 +667,6 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
             plots.elementAt(i).frame.close();
             plots.removeElementAt(i);
         }
-    }
-
-
-    public void transform(int mode) {
-        checkHistoryBuffer();
-
-        System.out.println("Transform: " + mode);
-        String name = "";
-        DataSet data = dataSets.elementAt(dataSetCounter);
-
-        double[] tData = new double[data.n];
-        boolean[] tMiss = new boolean[data.n];
-        String name1 = data.getName(selectBuffer[1]);
-        String name2 = data.getName(selectBuffer[0]);
-        switch (mode) {
-            case 1:
-                name = name1 + " + " + name2;
-                break;
-            case 2:
-                name = name1 + " - " + name2;
-                break;
-            case 3:
-                name = name1 + " * " + name2;
-                break;
-            case 4:
-                name = name1 + " / " + name2;
-                break;
-            case 5:
-                name = "-" + name2;
-                break;
-            case 6:
-                name = "1/" + name2;
-                break;
-            case 7:
-                name = "log(" + name2 + ")";
-                break;
-            case 8:
-                name = "exp(" + name2 + ")";
-                break;
-        }
-        double[] var1 = data.getRawNumbers(selectBuffer[1]);
-        double[] var2 = data.getRawNumbers(selectBuffer[0]);
-        boolean[] miss1 = data.getMissings(selectBuffer[1]);
-        boolean[] miss2 = data.getMissings(selectBuffer[0]);
-        for (int i = 0; i < data.n; i++) {
-            if (miss2[i] || ((mode < 5) && (miss1[i] || miss2[i])))
-                tMiss[i] = true;
-            else
-                tMiss[i] = false;
-            switch (mode) {
-                case 1:
-                    tData[i] = var1[i] + var2[i];
-                    break;
-                case 2:
-                    tData[i] = var1[i] - var2[i];
-                    break;
-                case 3:
-                    tData[i] = var1[i] * var2[i];
-                    break;
-                case 4:
-                    if (var2[i] != 0)
-                        tData[i] = var1[i] / var2[i];
-                    else
-                        tMiss[i] = true;
-                    break;
-                case 5:
-                    tData[i] = -var2[i];
-                    break;
-                case 6:
-                    if (var2[i] != 0)
-                        tData[i] = 1 / var2[i];
-                    else
-                        tMiss[i] = true;
-                    break;
-                case 7:
-                    if (var2[i] > 0)
-                        tData[i] = Math.log(var2[i]);
-                    else
-                        tMiss[i] = true;
-                    break;
-                case 8:
-                    tData[i] = Math.exp(var2[i]);
-                    break;
-            }
-        }
-        for (int i = 0; i < data.n; i++)
-            if (tMiss[i])
-                tData[i] = Double.MAX_VALUE;
-        boolean what;
-        if (mode < 5)
-            what = data.categorical(selectBuffer[0]) && data.categorical(selectBuffer[1]);
-        else
-            what = data.categorical(selectBuffer[0]);
-        data.addVariable(name, false, what, tData, tMiss);
-        varNames = null;
-        setVarList();
     }
 
 
@@ -1569,205 +1313,6 @@ public void handlePrintFile(ApplicationEvent event) {} */
     }
 
 
-    public void missPlot() {
-        checkHistoryBuffer();
-
-        final MFrame mV = new MFrame(this);
-        int k = 0;
-        for (int i = 0; i < (varNames.getSelectedIndices()).length; i++)
-            if (dataSets.elementAt(dataSetCounter).n > dataSets.elementAt(dataSetCounter).getN((varNames.getSelectedIndices())[i]))
-                k++;
-        int[] passVars = new int[k];
-        int kk = 0;
-        for (int i = 0; i < (varNames.getSelectedIndices()).length; i++)
-            if (dataSets.elementAt(dataSetCounter).n > dataSets.elementAt(dataSetCounter).getN(selectBuffer[i]))
-                passVars[k - 1 - kk++] = selectBuffer[i]; //(varNames.getSelectedIndices())[i];
-
-        if (k > 0) {
-            int totHeight = (Toolkit.getDefaultToolkit().getScreenSize()).height;
-            int tmpHeight = 35 * (1 + k) + 15;
-            if (tmpHeight > totHeight)
-                if (20 * (1 + k) < totHeight)
-                    tmpHeight = totHeight;
-                else
-                    tmpHeight = 20 * (1 + k);
-
-            mV.setSize(300, Math.min(tmpHeight, (Toolkit.getDefaultToolkit().getScreenSize()).height - 30));
-            mV.setLocation(150, 150);
-
-            final MissPlot plotw = new MissPlot(mV, dataSets.elementAt(dataSetCounter), passVars);
-            plotw.setScrollX();
-            plotw.addSelectionListener(this);
-            plotw.addDataListener(this);
-            plots.addElement(plotw);
-            mV.show();
-        } else
-            JOptionPane.showMessageDialog(this, "Non of the selected variables\ninclude any missing values");
-    }
-
-
-    public void weightedMosaicPlot() {
-        checkHistoryBuffer();
-
-        final MFrame mondrian = new MFrame(this);
-        mondrian.setSize(400, 400);
-
-        DataSet data = dataSets.elementAt(dataSetCounter);
-
-        int k = (varNames.getSelectedIndices()).length;
-        int[] passBuffer = new int[k];
-        for (int i = 0; i < k; i++)
-            passBuffer[i] = selectBuffer[k - i - 1];
-
-        //    int[] vars = getWeightVariable(varNames.getSelectedIndices(), data);
-        int[] vars = getWeightVariable(passBuffer, data);
-        int[] passed = new int[vars.length - 1];
-        System.arraycopy(vars, 0, passed, 0, vars.length - 1);
-        int weight = vars[vars.length - 1];
-        Table breakdown = data.breakDown(data.setName, passed, weight);
-        for (int i = 0; i < passed.length - 1; i++)
-            breakdown.addInteraction(new int[]{i}, false);
-        breakdown.addInteraction(new int[]{passed.length - 1}, true);
-        final MosaicPlot plotw = new MosaicPlot(mondrian, 400, 400, breakdown);
-        plotw.addSelectionListener(this);
-        plotw.addDataListener(this);
-        plots.addElement(plotw);
-        //    mondrian.getContentPane().add(plotw);                      // Add it
-        mondrian.setLocation(300, 0);
-        mondrian.show();
-
-        if (modelNavigator == null)
-            modelNavigator = new ModelNavigator();
-        plotw.addModelListener(modelNavigator);
-        modelNavigatorButton.setEnabled(true);
-    }
-
-
-    public void mosaicPlot() {
-        checkHistoryBuffer();
-
-        final MFrame mondrian = new MFrame(this);
-        mondrian.setSize(400, 400);
-
-    }
-
-
-    public void barChart() {
-
-        DataSet tempData = dataSets.elementAt(dataSetCounter);
-
-        int[] indices = varNames.getSelectedIndices();
-        int lastY = 333;
-        int col = 0;
-        for (int i = 0; i < indices.length; i++) {
-            final MFrame bars = new MFrame(this);
-
-            int[] dummy = {0};
-            dummy[0] = indices[i];
-
-            Table breakdown = tempData.breakDown(tempData.setName, dummy, -1);
-
-            int totHeight = (Toolkit.getDefaultToolkit().getScreenSize()).height;
-            int tmpHeight = Math.min(totHeight - 30, 60 + breakdown.levels[0] * 30);
-
-            bars.setSize(300, tmpHeight);
-            final Barchart plotw = new Barchart(bars, 300, tmpHeight, breakdown);
-
-            plotw.addSelectionListener(this);
-            plotw.addDataListener(this);
-            plots.addElement(plotw);
-            if (lastY + bars.getHeight() > (Toolkit.getDefaultToolkit().getScreenSize()).height) {
-                col += 1;
-                lastY = 0;
-            }
-            if (300 * col > (Toolkit.getDefaultToolkit().getScreenSize()).width - 50) {
-                col = 0;
-                lastY = 353;
-            }
-            bars.setLocation(300 * col, lastY);
-
-            bars.show();
-            if (lastY == 0)
-                lastY += bars.getY();
-            lastY += bars.getHeight();
-        }
-    }
-
-
-    public void weightedbarChart() {
-
-    }
-
-
-    public void weightedHistogram() {
-
-        DataSet tempData = dataSets.elementAt(dataSetCounter);
-
-        int[] vars = getWeightVariable(varNames.getSelectedIndices(), tempData);
-        if (vars.length > 1) {
-            int[] passed = new int[vars.length - 1];
-            System.arraycopy(vars, 0, passed, 0, vars.length - 1);
-            int weight = vars[vars.length - 1];
-
-            //      System.out.println(passed[0]+", "+weight);
-
-            histoCore(tempData, passed, weight);
-        } else
-            histoCore(tempData, vars, vars[0]);
-    }
-
-
-    public void histogram() {
-
-        DataSet tempData = dataSets.elementAt(dataSetCounter);
-        int[] indices = varNames.getSelectedIndices();
-
-        histoCore(tempData, indices, -1);
-    }
-
-
-    public void histoCore(DataSet tempData, int[] indices, int weight) {
-        int lastX = 310, oldX = 0;
-        int row = 0;
-        int menuOffset = 0, xOff = 0;
-
-        for (int i = 0; i < indices.length; i++) {
-            final MFrame hists = new MFrame(this);
-
-            int dummy;
-            dummy = indices[i];
-            double start = tempData.getMin(dummy);
-            double width = (tempData.getMax(dummy) - tempData.getMin(dummy)) / 8.9;
-            Table discrete = tempData.discretize(tempData.setName, dummy, start, width, weight);
-
-            hists.setSize(310, 250);
-            final Histogram plotw = new Histogram(hists, 250, 310, discrete, start, width, weight);
-
-            plotw.addSelectionListener(this);
-            plotw.addDataListener(this);
-            plots.addElement(plotw);
-            if (lastX + hists.getWidth() > (Toolkit.getDefaultToolkit().getScreenSize()).width + 50) {       // new Row
-                row += 1;
-                lastX = oldX % 310;
-            }
-            if (250 * row > (Toolkit.getDefaultToolkit().getScreenSize()).height - 125) {                                    // new Page
-                row = 0;
-                lastX = 310 + xOff;
-                xOff += menuOffset;
-            }
-            hists.setLocation(lastX, xOff + 250 * row);
-            lastX += hists.getWidth();
-            oldX = lastX;
-
-            hists.show();
-            if (i == 0) {
-                menuOffset = hists.getY();
-                xOff = menuOffset;
-            }
-        }
-    }
-
-
     public void mapPlot() {
         final MFrame mapf = new MFrame(this);
         mapf.setSize(400, 400);
@@ -1785,62 +1330,6 @@ public void handlePrintFile(ApplicationEvent event) {} */
         mapf.setLocation(0, 333);
 
         mapf.show();
-    }
-
-
-    public void mds() {
-
-        int[] varsT = varNames.getSelectedIndices();
-        DataSet dataT = dataSets.elementAt(dataSetCounter);
-        try {
-            RConnection c = new RConnection();
-            c.voidEval("library(MASS, pos=1)");
-            for (int i = 0; i < varsT.length; i++) {
-                c.assign("x", dataT.getRawNumbers(varsT[i]));
-                if (dataT.n > dataT.getN(varsT[i])) {                      // Check for missings in this variable
-                    boolean[] missy = dataT.getMissings(varsT[i]);
-                    int[] flag = new int[dataT.n];
-                    for (int j = 0; j < dataT.n; j++)
-                        if (missy[j])
-                            flag[j] = 1;
-                        else
-                            flag[j] = 0;
-                    c.assign("xM", flag);
-                    c.voidEval("is.na(x)[xM==1] <- T");
-                }
-                if (i == 0)
-                    c.voidEval("tempData <- x");
-                else
-                    c.voidEval("tempData <- cbind(tempData, x)");
-            }
-            c.voidEval("tempD <- dist(scale(tempData))");
-            c.voidEval("is.na(tempD)[tempD==0] <- T");
-            c.voidEval("startConf <- cmdscale(dist(scale(tempData)), k=2)");
-            c.voidEval("sMds <- sammon(tempD, y=startConf, k=2, trace=F)");
-            double[] x1 = c.eval("sMds$points[,1]").asDoubles();
-            double[] x2 = c.eval("sMds$points[,2]").asDoubles();
-
-            dataT.addVariable("mds1", false, false, x1, new boolean[dataT.n]);
-            dataT.addVariable("mds2", false, false, x2, new boolean[dataT.n]);
-
-            final MFrame scatterf = new MFrame(this);
-            scatterf.setSize(400, 400);
-            scatterf.setTitle("Scatterplot 2D");
-
-            Scatter2DPlot scat = new Scatter2DPlot(scatterf, 400, 400, dataT, new int[]{dataT.k - 2, dataT.k - 1}, varNames, false);
-            scat.addSelectionListener(this);
-            plots.addElement(scat);
-            scatterf.setLocation(300, 333);
-            scatterf.show();
-        } catch (RserveException rse) {
-            System.out.println("Rserve exception: " + rse.getMessage());
-        }
-        catch (REXPMismatchException mme) {
-            System.out.println("Mismatch exception : " + mme.getMessage());
-        }
-        catch (REngineException ren) {
-            System.out.println("REngine exception : " + ren.getMessage());
-        }
     }
 
 
@@ -1924,103 +1413,16 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
             JMenuItem menuItem = (JMenuItem) plotMenu.getMenuComponent(i);
             if (menuItem.getAction() instanceof PlotAction) {
-                ((PlotAction) menuItem.getAction()).configureForVarSelection((varNames.getSelectedIndices()).length, numCategorical);
+                PlotAction plotAction = (PlotAction) menuItem.getAction();
+
+                if (varNames.getSelectedIndices().length == 0) {
+                    plotAction.setEnabled(false);
+                } else {
+                    plotAction.configureForVarSelection((varNames.getSelectedIndices()).length, numCategorical);
+                }
             }
         }
 
-        //    System.out.println("number categorical: "+numCategorical+", weight Index "+weightIndex);
-
-        switch ((varNames.getSelectedIndices()).length) {
-            case 0:
-                mosaicPlotMenuItem.setEnabled(false);
-                weightedBarchartMenuItem.setEnabled(false);
-                weightedMosaicPlotMenuItem.setEnabled(false);
-                histogramMenuItem.setEnabled(false);
-                weightedHistogramMenuItem.setEnabled(false);
-                parCoordinatesMenuItem.setEnabled(false);
-                parallelBoxplotMenuItem.setEnabled(false);
-                //              sc.setEnabled(false);
-                twoDimMDSMenuItem.setEnabled(false);
-                missingValuePlotMenuItem.setEnabled(false);
-                break;
-            case 1:
-                if (numCategorical == (varNames.getSelectedIndices()).length) {
-//n.setEnabled(true);
-                    histogramMenuItem.setEnabled(false);
-                    weightedHistogramMenuItem.setEnabled(false);
-                    parallelBoxplotMenuItem.setEnabled(false);
-                } else {
-                    histogramMenuItem.setEnabled(true);
-                    weightedHistogramMenuItem.setEnabled(true);
-                    parallelBoxplotMenuItem.setEnabled(true);
-                }
-                missingValuePlotMenuItem.setEnabled(true);
-                mosaicPlotMenuItem.setEnabled(false);
-                weightedBarchartMenuItem.setEnabled(false);
-                weightedMosaicPlotMenuItem.setEnabled(false);
-                parCoordinatesMenuItem.setEnabled(false);
-                boxplotByXYMenuItem.setEnabled(false);
-                //              sc.setEnabled(false);
-                twoDimMDSMenuItem.setEnabled(false);
-                break;
-            case 2:
-                parCoordinatesMenuItem.setEnabled(true);
-                missingValuePlotMenuItem.setEnabled(true);
-                twoDimMDSMenuItem.setEnabled(false);
-                parallelBoxplotMenuItem.setEnabled(true);
-                boxplotByXYMenuItem.setEnabled(false);
-                if (numCategorical == (varNames.getSelectedIndices()).length) {
-                    mosaicPlotMenuItem.setEnabled(true);
-                } else {
-                    mosaicPlotMenuItem.setEnabled(false);
-                }
-                if (numCategorical == 1) {
-                    weightedBarchartMenuItem.setEnabled(true);
-                    weightedMosaicPlotMenuItem.setEnabled(true);
-                    parallelBoxplotMenuItem.setEnabled(false);
-                    boxplotByXYMenuItem.setEnabled(true);
-                } else {
-                    weightedBarchartMenuItem.setEnabled(false);
-                    weightedMosaicPlotMenuItem.setEnabled(false);
-                }
-                if (numCategorical == 0) {
-                    histogramMenuItem.setEnabled(true);
-                    weightedHistogramMenuItem.setEnabled(true);
-                } else {
-                    histogramMenuItem.setEnabled(false);
-                    weightedHistogramMenuItem.setEnabled(false);
-                }
-                break;
-            default:
-                if (numCategorical == (varNames.getSelectedIndices()).length) {
-                    mosaicPlotMenuItem.setEnabled(true);
-                } else {
-                    mosaicPlotMenuItem.setEnabled(false);
-                }
-                if (numCategorical == (varNames.getSelectedIndices()).length - 1) {
-                    weightedBarchartMenuItem.setEnabled(true);
-                    weightedMosaicPlotMenuItem.setEnabled(true);
-                } else {
-                    weightedBarchartMenuItem.setEnabled(false);
-                    weightedMosaicPlotMenuItem.setEnabled(false);
-                }
-                if (numCategorical == 0) {
-                    histogramMenuItem.setEnabled(true);
-                    weightedHistogramMenuItem.setEnabled(true);
-                } else {
-                    histogramMenuItem.setEnabled(false);
-                    weightedHistogramMenuItem.setEnabled(false);
-                }
-                if ((varNames.getSelectedIndices()).length - numCategorical > 2 && RService.hasR())
-                    twoDimMDSMenuItem.setEnabled(true);
-                parCoordinatesMenuItem.setEnabled(true);
-                parallelBoxplotMenuItem.setEnabled(true);
-                missingValuePlotMenuItem.setEnabled(true);
-                scatterplotMenuItem.setEnabled(false);
-                //        sc.setEnabled(false);
-        }
-        if (!dataSets.elementAt(dataSetCounter).hasMissings)
-            missingValuePlotMenuItem.setEnabled(false);
 
         // Now handle transform Menue
         int alphs = 0;
@@ -2138,4 +1540,8 @@ public void handlePrintFile(ApplicationEvent event) {} */
         plotMenu.add(new JMenuItem(new PlotAction(plotFactory, this)));
     }
 
+
+    public DataSet getCurrentDataSet() {
+        return dataSets.elementAt(dataSetCounter);
+    }
 }
