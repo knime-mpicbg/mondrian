@@ -1,9 +1,11 @@
 package de.mpicbg.sweng.mondrian.ui;
 
+import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.MonFrame;
 import de.mpicbg.sweng.mondrian.core.PlotFactory;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 
 
@@ -35,7 +37,25 @@ public class PlotAction extends AbstractAction {
 
 
     public void actionPerformed(ActionEvent e) {
-        plotFactory.createPlotPanel(monFrame.dataSets.elementAt(monFrame.dataSetCounter), monFrame.varNames.getSelectedIndices());
+        // this was done for each plot in the originial version; why is not clear yet
+        monFrame.checkHistoryBuffer();
+
+        final MFrame plotFrame = new MFrame(monFrame);
+        Font SF = new Font("SansSerif", Font.PLAIN, 11);
+        plotFrame.setFont(SF);
+
+        JPanel plotPanel = plotFactory.createPlotPanel(monFrame, plotFrame, monFrame.dataSets.elementAt(monFrame.dataSetCounter), monFrame.varNames.getSelectedIndices());
+
+        if (plotPanel != null) {
+            plotFrame.getContentPane().add(plotPanel);
+            
+
+            // create a new frame for it
+
+            plotFrame.setSize(plotPanel.getMinimumSize());
+            plotFrame.setTitle(plotFactory.getPlotTitle());
+            plotFrame.setVisible(true);
+        }
 
         // what is this
         monFrame.varNames = null;

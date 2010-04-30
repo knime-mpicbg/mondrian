@@ -130,11 +130,6 @@ public class Scatter2DPlot extends DragBox {
 
         roundX = (int) Math.max(0, 2 - Math.round((Math.log(xMax - xMin) / Math.log(10))));
         roundY = (int) Math.max(0, 2 - Math.round((Math.log(yMax - yMin) / Math.log(10))));
-
-        frame.getContentPane().add(this);
-
-        Font SF = new Font("SansSerif", Font.PLAIN, 11);
-        frame.setFont(SF);
     }
 
 

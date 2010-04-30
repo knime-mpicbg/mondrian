@@ -7,4 +7,7 @@ package de.mpicbg.sweng.mondrian.core;
  */
 public abstract class AbstractPlotFactory implements PlotFactory {
 
+    public String getPlotTitle() {
+        return getPlotName();
+    }
 }

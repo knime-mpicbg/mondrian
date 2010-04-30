@@ -1,7 +1,9 @@
 package de.mpicbg.sweng.mondrian.plots;
 
+import de.mpicbg.sweng.mondrian.MFrame;
+import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
-import de.mpicbg.sweng.mondrian.core.PlotFactory;
 
 import javax.swing.*;
 
@@ -11,7 +13,7 @@ import javax.swing.*;
  *
  * @author Holger Brandl
  */
-public class MosaicPlotFactory implements PlotFactory {
+public class MosaicPlotFactory extends AbstractPlotFactory {
 
     public String getPlotName() {
         return "New Mosaic";
@@ -23,7 +25,7 @@ public class MosaicPlotFactory implements PlotFactory {
     }
 
 
-    public JPanel createPlotPanel(DataSet dataSet, int[] selectedVarIndices) {
+    public JPanel createPlotPanel(MonFrame monFrame, MFrame plotFrame, DataSet dataSet, int[] selectedVarIndices) {
         return null;
     }
 

@@ -1,8 +1,14 @@
 
 
 v1.2 (not yet released)
-- restructured code-base
-- started git-repository
-- created ant-buiild.xml for deployment
+end-user changes
 - New: data-frame dialog just shows up if there were several data-frames in the RData-file
 - New: RData-files can be used as command-line arguments
+- New: Description-tooltips in the menus for all plots
+
+development changes:
+- started git-repository
+- superimposed packaging structure over existing code
+- refactored all plots out from main-class into implementaitons of generic-PlotFactory
+- created ant-build.xml for deployment
+

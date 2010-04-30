@@ -52,11 +52,11 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     protected static int num_windows = 0;
     public static Vector<DataSet> dataSets;
     protected static Vector<MonFrame> mondrians;
-    private Vector<DragBox> plots = new Vector<DragBox>(10, 0);
+    public Vector<DragBox> plots = new Vector<DragBox>();
 
     private java.util.List<PlotFactory> plotFacRegistry = new ArrayList<PlotFactory>();
 
-    public Vector<Selection> selList = new Vector<Selection>(10, 0);
+    public Vector<Selection> selList = new Vector<Selection>();
     public Query sqlConditions;
     public boolean selseq = false;
     public boolean alphaHi = false;
@@ -90,7 +90,6 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     private JMenuItem histogramMenuItem;
     private JMenuItem weightedHistogramMenuItem;
     private JMenuItem twoDimMDSMenuItem;
-    private JMenuItem pcaMenuItem;
 
     public JMenuItem closeAllMenuItem, colorsMenuItem, selectionMenuItem, me, transPlus, transMinus, transTimes, transDiv, transNeg, transInv, transLog, transExp;
     private JCheckBoxMenuItem selSeqCheckItem;
@@ -239,11 +238,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         plotMenu.add(boxplotByXYMenuItem = new JMenuItem("Boxplot y by x"));
         boxplotByXYMenuItem.setEnabled(false);
         plotMenu.addSeparator();
-        if (true || user.indexOf("theus") > -1) {
-            plotMenu.add(splotMenuItem = new JMenuItem("SPLOM"));
-            splotMenuItem.setEnabled(false);
-            plotMenu.addSeparator();                     // Put a separator in the menu
-        }
+
         plotMenu.add(mapPlotMenuItem = new JMenuItem("Map"));
         mapPlotMenuItem.setEnabled(false);
         menubar.add(plotMenu);                         // Add to menubar.
@@ -263,9 +258,6 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
         calc.add(twoDimMDSMenuItem = new JMenuItem("2-dim MDS"));
         twoDimMDSMenuItem.setEnabled(false);
-        //
-        calc.add(pcaMenuItem = new JMenuItem("PCA"));
-        pcaMenuItem.setEnabled(false);
         //
         menubar.add(calc);                         // Add to menubar.
 
@@ -453,14 +445,6 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 scatterplot2D();
             }
         });
-        if (true || user.indexOf("theus") > -1)
-            splotMenuItem.addActionListener(new ActionListener() {     // Open a new test window
-
-
-                public void actionPerformed(ActionEvent e) {
-                    SPLOM();
-                }
-            });
         o.addActionListener(new ActionListener() {     // Load a dataset
 
 
@@ -512,13 +496,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 mds();
             }
         });
-        pcaMenuItem.addActionListener(new ActionListener() {     // calculate PCA
-
-
-            public void actionPerformed(ActionEvent e) {
-                pca();
-            }
-        });
+       
         transPlus.addActionListener(new ActionListener() {     // x + y
 
 
@@ -1577,41 +1555,6 @@ public void handlePrintFile(ApplicationEvent event) {} */
     }
 
 
-    public void SPLOM() {
-        checkHistoryBuffer();
-
-        int p = (varNames.getSelectedIndices()).length;
-        final MFrame scatterMf = new MFrame(this);
-        int dims = Math.min(200 * p, (Toolkit.getDefaultToolkit().getScreenSize()).height);
-        scatterMf.setSize(dims - 20, dims);
-        scatterMf.getContentPane().setLayout(new GridLayout(p - 1, p - 1));
-
-        for (int i = 0; i < (p - 1); i++)
-            for (int j = 1; j < p; j++) {
-                if (i >= j) {
-                    JPanel Filler = new JPanel();
-                    Filler.setBackground(MFrame.backgroundColor);
-                    scatterMf.getContentPane().add(Filler);
-                    //          (Filler.getGraphics()).drawString("text",10,10);
-                } else {
-                    int[] tmpVars = new int[2];
-                    //          tmpVars[0] = varNames.getSelectedIndices()[j];
-                    //          tmpVars[1] = varNames.getSelectedIndices()[i];
-                    tmpVars[0] = selectBuffer[p - j - 1];
-                    tmpVars[1] = selectBuffer[p - i - 1];
-                    //
-                    Scatter2DPlot scat = new Scatter2DPlot(scatterMf, 200, 200, dataSets.elementAt(dataSetCounter), tmpVars, varNames, true);
-                    scat.addSelectionListener(this);
-                    scat.addDataListener(this);
-                    plots.addElement(scat);
-                }
-            }
-        scatterMf.setLocation(300, 0);
-        scatterMf.setTitle("Scatterplot Matrix");
-        scatterMf.show();
-    }
-
-
     public void pc(String mode) {
         checkHistoryBuffer();
 
@@ -2011,72 +1954,6 @@ public void handlePrintFile(ApplicationEvent event) {} */
     }
 
 
-    public void pca() {
-
-        int[] varsT = varNames.getSelectedIndices();
-        DataSet dataT = dataSets.elementAt(dataSetCounter);
-        try {
-            RConnection c = new RConnection();
-            String call = " ~ x1 ";
-            for (int i = 0; i < varsT.length; i++) {
-                c.assign("x", dataT.getRawNumbers(varsT[i]));
-                if (dataT.n > dataT.getN(varsT[i])) {                      // Check for missings in this variable
-                    boolean[] missy = dataT.getMissings(varsT[i]);
-                    int[] flag = new int[dataT.n];
-                    for (int j = 0; j < dataT.n; j++)
-                        if (missy[j])
-                            flag[j] = 1;
-                        else
-                            flag[j] = 0;
-                    c.assign("xM", flag);
-                    c.voidEval("is.na(x)[xM==1] <- T");
-                }
-                if (i == 0)
-                    c.voidEval("tempData <- x");
-                else {
-                    c.voidEval("tempData <- cbind(tempData, x)");
-                    call += " + x" + (i + 1) + "";
-                }
-            }
-            c.voidEval("tempData <- data.frame(tempData)");
-
-            for (int i = 0; i < varsT.length; i++)
-                c.voidEval("names(tempData)[" + (i + 1) + "] <- \"x" + (i + 1) + "\"");
-
-            String opt = "TRUE";
-            int answer = JOptionPane.showConfirmDialog(this, "Calculate PCA for correlation matrix", "Standardize Data?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-            if (answer == JOptionPane.NO_OPTION)
-                opt = "FALSE";
-
-            c.voidEval("pca <- predict(princomp(" + call + " , data = tempData, cor = " + opt + ", na.action = na.exclude))");
-            for (int i = 0; i < varsT.length; i++) {
-                double[] x = c.eval("pca[," + (i + 1) + "]").asDoubles();
-                boolean missy[] = new boolean[dataT.n];
-                for (int j = 0; j < x.length; j++) {
-                    if (Double.isNaN(x[j])) {
-                        missy[j] = true;
-                        x[j] = Double.MAX_VALUE;
-                    } else
-                        missy[j] = false;
-                }
-                dataT.addVariable("pca " + (i + 1) + "", false, false, x, missy);
-            }
-            varNames = null;
-            setVarList();
-        } catch (RserveException rse) {
-            JOptionPane.showMessageDialog(this, "Calculation of PCA failed");
-            System.out.println(rse);
-        }
-        catch (REXPMismatchException rse) {
-            JOptionPane.showMessageDialog(this, "Calculation of PCA failed");
-            System.out.println(rse);
-        }
-        catch (REngineException rse) {
-            JOptionPane.showMessageDialog(this, "Calculation of PCA failed");
-            System.out.println(rse);
-        }
-    }
-
 
     public void switchVariableMode() {
         for (int i = 0; i < varNames.getSelectedIndices().length; i++) {
@@ -2177,9 +2054,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
                 //              sc.setEnabled(false);
                 scatterplotMenuItem.setEnabled(false);
                 twoDimMDSMenuItem.setEnabled(false);
-                pcaMenuItem.setEnabled(false);
                 missingValuePlotMenuItem.setEnabled(false);
-                splotMenuItem.setEnabled(false);
                 break;
             case 1:
                 if (numCategorical == (varNames.getSelectedIndices()).length) {
@@ -2203,13 +2078,10 @@ public void handlePrintFile(ApplicationEvent event) {} */
                 //              sc.setEnabled(false);
                 scatterplotMenuItem.setEnabled(false);
                 twoDimMDSMenuItem.setEnabled(false);
-                pcaMenuItem.setEnabled(false);
-                splotMenuItem.setEnabled(false);
                 break;
             case 2:
                 parCoordinatesMenuItem.setEnabled(true);
                 scatterplotMenuItem.setEnabled(true);
-                splotMenuItem.setEnabled(true);
                 missingValuePlotMenuItem.setEnabled(true);
                 twoDimMDSMenuItem.setEnabled(false);
                 parallelBoxplotMenuItem.setEnabled(true);
@@ -2233,7 +2105,6 @@ public void handlePrintFile(ApplicationEvent event) {} */
                 if (numCategorical == 0) {
                     histogramMenuItem.setEnabled(true);
                     weightedHistogramMenuItem.setEnabled(true);
-                    pcaMenuItem.setEnabled(true);
                 } else {
                     histogramMenuItem.setEnabled(false);
                     weightedHistogramMenuItem.setEnabled(false);
@@ -2261,14 +2132,11 @@ public void handlePrintFile(ApplicationEvent event) {} */
                     histogramMenuItem.setEnabled(false);
                     weightedHistogramMenuItem.setEnabled(false);
                 }
-                if ((varNames.getSelectedIndices()).length - numCategorical > 1 && RService.hasR())
-                    pcaMenuItem.setEnabled(true);
                 if ((varNames.getSelectedIndices()).length - numCategorical > 2 && RService.hasR())
                     twoDimMDSMenuItem.setEnabled(true);
                 parCoordinatesMenuItem.setEnabled(true);
                 parallelBoxplotMenuItem.setEnabled(true);
                 missingValuePlotMenuItem.setEnabled(true);
-                splotMenuItem.setEnabled(true);
                 scatterplotMenuItem.setEnabled(false);
                 //        sc.setEnabled(false);
         }

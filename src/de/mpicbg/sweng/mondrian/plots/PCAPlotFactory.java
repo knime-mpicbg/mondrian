@@ -1,5 +1,7 @@
 package de.mpicbg.sweng.mondrian.plots;
 
+import de.mpicbg.sweng.mondrian.MFrame;
+import de.mpicbg.sweng.mondrian.MonFrame;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.util.r.RService;
@@ -25,7 +27,7 @@ public class PCAPlotFactory extends AbstractPlotFactory {
     }
 
 
-    public JPanel createPlotPanel(DataSet dataSet, int[] selectedVarIndices) {
+    public JPanel createPlotPanel(MonFrame monFrame, MFrame plotFrame, DataSet dataSet, int[] selectedVarIndices) {
         try {
             RConnection c = new RConnection();
             String call = " ~ x1 ";

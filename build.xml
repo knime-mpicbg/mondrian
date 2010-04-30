@@ -9,7 +9,7 @@
     <property name="classes.dir" location="${basedir}/classes"/>
     <property name="lib.dir" location="${basedir}/lib"/>
     <property name="lib.mrj" location="${basedir}/mrj"/>
-    <property name="dist.dir" location="${basedir}/dist"/>
+    <property name="dist.dir" location="${basedir}/../mondrian-deployed"/>
     <property name="bin.dir" location="${basedir}/bin"/>
 
     <property name="project.name" value="mondrian"/>
@@ -62,11 +62,12 @@
         <!--<jar basedir="${bin.dir}" includes="config/miguelmic.sxl" update="true" destfile="${project.name}.jar"/>-->
 
         <!--<move file="${jarfile}" todir="${lib.dir}"/>-->
+        <delete dir="${classes.dir}" failonerror="true"/>
     </target>
 
 
     <target name="deploy.mac" depends="create-jar" description="creates a macos app for the mondrian">
-        <property name="target.dir" value="${basedir}/../mondrian4mac"/>
+        <property name="target.dir" value="${dist.dir}"/>
         <delete file="${target.dir}" failonerror="true"/>
 
         <mkdir dir="${target.dir}"/>

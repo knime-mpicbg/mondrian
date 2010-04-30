@@ -6,6 +6,7 @@ import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.io.DataFrameConverter;
 import de.mpicbg.sweng.mondrian.plots.MosaicPlotFactory;
 import de.mpicbg.sweng.mondrian.plots.PCAPlotFactory;
+import de.mpicbg.sweng.mondrian.plots.SpomFactory;
 
 import java.io.File;
 import java.util.Vector;
@@ -29,6 +30,8 @@ public class MondrianStarter implements MRJOpenDocumentHandler {
 
         monFrame.regiserPlotFactory(new PCAPlotFactory());
         monFrame.regiserPlotFactory(new MosaicPlotFactory());
+        monFrame.regiserPlotFactory(new SpomFactory());
+
 
 //    System.out.println(" MonFrame Created / Register Handler ...");
 
