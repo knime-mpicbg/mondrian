@@ -63,17 +63,12 @@ public class MFrame extends JFrame implements WindowListener {
     }
 
 
-    public boolean hasR() {
-        return j.hasR;
-    }
-
-
     public void close() {
         System.out.println("Window Closed!!");
 
         j.windows.remove(m);
         if (j.windows.getItemCount() < 3)
-            j.ca.setEnabled(false);
+            j.closeAllMenuItem.setEnabled(false);
         if (!selString.equals(""))
             j.updateSelection();
         this.setVisible(false);
@@ -97,7 +92,7 @@ public class MFrame extends JFrame implements WindowListener {
     public void show() {
 
         m = new JMenuItem(getTitle());
-        j.ca.setEnabled(true);
+        j.closeAllMenuItem.setEnabled(true);
 
         for (int i = 2; i < j.windows.getItemCount(); i++)
             if (((j.windows.getItem(i)).getText()).substring(0, 2).equals((m.getText()).substring(0, 2)))

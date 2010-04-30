@@ -12,7 +12,15 @@ import java.io.*;
  * running if you started it after your application quits since it may pose a security risk. Inform the user if you
  * started an Rserve instance.
  */
-public class StartRserve {
+public class RService {
+
+    private static boolean hasR = false;
+
+
+    public static boolean hasR() {
+        return hasR;
+    }
+
 
     /**
      * shortcut to <code>launchRserve(cmd, "--no-save --slave", "--no-save --slave", false)</code>
@@ -142,6 +150,11 @@ public class StartRserve {
             c.shutdown();
         } catch (Exception ignored) {
         }
+    }
+
+
+    public static void init() {
+        hasR = RService.checkLocalRserve();
     }
 }
 

@@ -13,10 +13,11 @@ import de.mpicbg.sweng.mondrian.io.db.Query;
 import de.mpicbg.sweng.mondrian.plots.*;
 import de.mpicbg.sweng.mondrian.plots.basic.MyPoly;
 import de.mpicbg.sweng.mondrian.ui.AttributeCellRenderer;
+import de.mpicbg.sweng.mondrian.ui.PlotAction;
 import de.mpicbg.sweng.mondrian.ui.PreferencesFrame;
 import de.mpicbg.sweng.mondrian.util.StatUtil;
 import de.mpicbg.sweng.mondrian.util.Util;
-import de.mpicbg.sweng.mondrian.util.r.StartRserve;
+import de.mpicbg.sweng.mondrian.util.r.RService;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RConnection;
@@ -36,6 +37,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Vector;
@@ -52,11 +54,12 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     protected static Vector<MonFrame> mondrians;
     private Vector<DragBox> plots = new Vector<DragBox>(10, 0);
 
+    private java.util.List<PlotFactory> plotFacRegistry = new ArrayList<PlotFactory>();
+
     public Vector<Selection> selList = new Vector<Selection>(10, 0);
     public Query sqlConditions;
     public boolean selseq = false;
     public boolean alphaHi = false;
-    public boolean hasR = false;
     public Vector<MyPoly> polys = new Vector<MyPoly>(256, 256);
     private JList varNames = null;
     private int numCategorical = 0;
@@ -66,26 +69,30 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     private JLabel progText;
     public JMenuBar menubar;
     public JMenu windows, help, dv, sam, trans;
-    private JMenuItem n;
-    private JMenuItem nw;
+
+
+    // plot menu items // todo these should all go into the factory
+    private JMenuItem mosaicPlotMenuItem;
+    private JMenuItem weightedMosaicPlotMenuItem;
     private JMenuItem closeDataSetMenuItem;
-    private JMenuItem t;
+    private JMenuItem splotMenuItem;
     private JMenuItem mapPlotMenuItem;
     private JMenuItem saveMenuItem;
     private JMenuItem saveSelectionMenuItem;
-    private JMenuItem mv;
+    private JMenuItem missingValuePlotMenuItem;
     private JMenuItem modelNavigatorButton;
-    private JMenuItem b;
-    private JMenuItem bw;
-    private JMenuItem pc;
-    private JMenuItem pb;
-    private JMenuItem byx;
-    private JMenuItem sc2;
-    private JMenuItem hi;
-    private JMenuItem hiw;
-    private JMenuItem mds;
-    private JMenuItem pca;
-    public JMenuItem ca, fc, fs, me, transPlus, transMinus, transTimes, transDiv, transNeg, transInv, transLog, transExp;
+    private JMenuItem barchartMenuItem;
+    private JMenuItem weightedBarchartMenuItem;
+    private JMenuItem parCoordinatesMenuItem;
+    private JMenuItem parallelBoxplotMenuItem;
+    private JMenuItem boxplotByXYMenuItem;
+    private JMenuItem scatterplotMenuItem;
+    private JMenuItem histogramMenuItem;
+    private JMenuItem weightedHistogramMenuItem;
+    private JMenuItem twoDimMDSMenuItem;
+    private JMenuItem pcaMenuItem;
+
+    public JMenuItem closeAllMenuItem, colorsMenuItem, selectionMenuItem, me, transPlus, transMinus, transTimes, transDiv, transNeg, transInv, transLog, transExp;
     private JCheckBoxMenuItem se;
     private JCheckBoxMenuItem ah;
     private JCheckBoxMenuItem os;
@@ -100,6 +107,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     private String searchText = "";
     private long startT = 0;
     private Vector<Integer> setIndices = new Vector<Integer>(10, 0);
+    public JMenu plotMenu;
 
 
     public MonFrame(Vector<MonFrame> mondrians, Vector<DataSet> dataSets, boolean load, boolean loadDB, File loadFile) {
@@ -126,11 +134,10 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
             MFrame.lineColor = Util.hrgb2color(prefs.get("color.line", ""));
             DragBox.hiliteColor = Util.hrgb2color(prefs.get("color.select", ""));
         }
+
         // Start Rserve
-
-        hasR = StartRserve.checkLocalRserve();
-
-        System.out.println("Starting RServe ... " + hasR);
+        System.out.println("Starting RServe ... ");
+        RService.init();
 
         user = System.getProperty("user.name");
         System.out.println(user + " on " + System.getProperty("os.name"));
@@ -202,43 +209,43 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         }
         menubar.add(file);                         // Add to menubar.
         //
-        JMenu plot = new JMenu("Plot");            // Create a Plot menu.
-        plot.add(mv = new JMenuItem("Missing Value Plot"));
-        mv.setEnabled(false);
-        plot.addSeparator();
-        plot.add(b = new JMenuItem("Barchart"));
-        b.setEnabled(false);
-        plot.add(bw = new JMenuItem("Weighted Barchart"));
-        bw.setEnabled(false);
-        plot.addSeparator();
-        plot.add(hi = new JMenuItem("Histogram"));
-        hi.setEnabled(false);
-        plot.add(hiw = new JMenuItem("Weighted Histogram"));
-        hiw.setEnabled(false);
-        plot.addSeparator();
-        plot.add(sc2 = new JMenuItem("Scatterplot"));
-        sc2.setEnabled(false);
-        plot.addSeparator();
-        plot.add(n = new JMenuItem("Mosaic Plot"));
-        n.setEnabled(false);
-        plot.add(nw = new JMenuItem("Weighted Mosaic Plot"));
-        nw.setEnabled(false);
-        plot.addSeparator();
-        plot.add(pc = new JMenuItem("Parallel Coordinates"));
-        pc.setEnabled(false);
-        plot.add(pb = new JMenuItem("Parallel Boxplot"));
-        pb.setEnabled(false);
-        plot.add(byx = new JMenuItem("Boxplot y by x"));
-        byx.setEnabled(false);
-        plot.addSeparator();
+        plotMenu = new JMenu("Plot");
+        plotMenu.add(missingValuePlotMenuItem = new JMenuItem("Missing Value Plot"));
+        missingValuePlotMenuItem.setEnabled(false);
+        plotMenu.addSeparator();
+        plotMenu.add(barchartMenuItem = new JMenuItem("Barchart"));
+        barchartMenuItem.setEnabled(false);
+        plotMenu.add(weightedBarchartMenuItem = new JMenuItem("Weighted Barchart"));
+        weightedBarchartMenuItem.setEnabled(false);
+        plotMenu.addSeparator();
+        plotMenu.add(histogramMenuItem = new JMenuItem("Histogram"));
+        histogramMenuItem.setEnabled(false);
+        plotMenu.add(weightedHistogramMenuItem = new JMenuItem("Weighted Histogram"));
+        weightedHistogramMenuItem.setEnabled(false);
+        plotMenu.addSeparator();
+        plotMenu.add(scatterplotMenuItem = new JMenuItem("Scatterplot"));
+        scatterplotMenuItem.setEnabled(false);
+        plotMenu.addSeparator();
+        plotMenu.add(mosaicPlotMenuItem = new JMenuItem("Mosaic Plot"));
+        mosaicPlotMenuItem.setEnabled(false);
+        plotMenu.add(weightedMosaicPlotMenuItem = new JMenuItem("Weighted Mosaic Plot"));
+        weightedMosaicPlotMenuItem.setEnabled(false);
+        plotMenu.addSeparator();
+        plotMenu.add(parCoordinatesMenuItem = new JMenuItem("Parallel Coordinates"));
+        parCoordinatesMenuItem.setEnabled(false);
+        plotMenu.add(parallelBoxplotMenuItem = new JMenuItem("Parallel Boxplot"));
+        parallelBoxplotMenuItem.setEnabled(false);
+        plotMenu.add(boxplotByXYMenuItem = new JMenuItem("Boxplot y by x"));
+        boxplotByXYMenuItem.setEnabled(false);
+        plotMenu.addSeparator();
         if (true || user.indexOf("theus") > -1) {
-            plot.add(t = new JMenuItem("SPLOM"));
-            t.setEnabled(false);
-            plot.addSeparator();                     // Put a separator in the menu
+            plotMenu.add(splotMenuItem = new JMenuItem("SPLOM"));
+            splotMenuItem.setEnabled(false);
+            plotMenu.addSeparator();                     // Put a separator in the menu
         }
-        plot.add(mapPlotMenuItem = new JMenuItem("Map"));
+        plotMenu.add(mapPlotMenuItem = new JMenuItem("Map"));
         mapPlotMenuItem.setEnabled(false);
-        menubar.add(plot);                         // Add to menubar.
+        menubar.add(plotMenu);                         // Add to menubar.
         //
         JMenu calc = new JMenu("Calc");            // Create a Calc menu.
         calc.add(trans = new JMenu("transform"));
@@ -253,11 +260,11 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         trans.add(transLog = new JMenuItem("log(x)"));
         trans.add(transExp = new JMenuItem("exp(x)"));
 
-        calc.add(mds = new JMenuItem("2-dim MDS"));
-        mds.setEnabled(false);
+        calc.add(twoDimMDSMenuItem = new JMenuItem("2-dim MDS"));
+        twoDimMDSMenuItem.setEnabled(false);
         //
-        calc.add(pca = new JMenuItem("PCA"));
-        pca.setEnabled(false);
+        calc.add(pcaMenuItem = new JMenuItem("PCA"));
+        pcaMenuItem.setEnabled(false);
         //
         menubar.add(calc);                         // Add to menubar.
 
@@ -298,10 +305,10 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         vm.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
         options.add(dv = new JMenu("Derive Variable from"));
-        dv.add(fs = new JMenuItem("Selection"));
-        fs.setEnabled(false);
-        dv.add(fc = new JMenuItem("Colors"));
-        fc.setEnabled(false);
+        dv.add(selectionMenuItem = new JMenuItem("Selection"));
+        selectionMenuItem.setEnabled(false);
+        dv.add(colorsMenuItem = new JMenuItem("Colors"));
+        colorsMenuItem.setEnabled(false);
 
         options.addSeparator();                     // Put a separator in the menu
         options.add(modelNavigatorButton = new JMenuItem("Model Navigator", KeyEvent.VK_J));
@@ -316,9 +323,9 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
         windows = menubar.add(new JMenu("Window"));
 
-        windows.add(ca = new JMenuItem("Close All"));
-        ca.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        ca.setEnabled(false);
+        windows.add(closeAllMenuItem = new JMenuItem("Close All"));
+        closeAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        closeAllMenuItem.setEnabled(false);
 
         windows.addSeparator();
 
@@ -367,14 +374,14 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         getContentPane().add("South", progPanel);
 
         // Create and register action listener objects for the menu items.
-        mv.addActionListener(new ActionListener() {     // Open a new missing value plot window
+        missingValuePlotMenuItem.addActionListener(new ActionListener() {     // Open a new missing value plot window
 
 
             public void actionPerformed(ActionEvent e) {
                 missPlot();
             }
         });
-        n.addActionListener(new ActionListener() {     // Open a new mosaic plot window
+        mosaicPlotMenuItem.addActionListener(new ActionListener() {     // Open a new mosaic plot window
 
 
             public void actionPerformed(ActionEvent e) {
@@ -382,63 +389,63 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 mosaicPlot();
             }
         });
-        nw.addActionListener(new ActionListener() {     // Open a new weighted mosaic plot window
+        weightedMosaicPlotMenuItem.addActionListener(new ActionListener() {     // Open a new weighted mosaic plot window
 
 
             public void actionPerformed(ActionEvent e) {
                 weightedMosaicPlot();
             }
         });
-        b.addActionListener(new ActionListener() {     // Open a new mosaic plot window
+        barchartMenuItem.addActionListener(new ActionListener() {     // Open a new mosaic plot window
 
 
             public void actionPerformed(ActionEvent e) {
                 barChart();
             }
         });
-        bw.addActionListener(new ActionListener() {     // Open a new mosaic plot window
+        weightedBarchartMenuItem.addActionListener(new ActionListener() {     // Open a new mosaic plot window
 
 
             public void actionPerformed(ActionEvent e) {
                 weightedbarChart();
             }
         });
-        hi.addActionListener(new ActionListener() {     // Open a histogram window
+        histogramMenuItem.addActionListener(new ActionListener() {     // Open a histogram window
 
 
             public void actionPerformed(ActionEvent e) {
                 histogram();
             }
         });
-        hiw.addActionListener(new ActionListener() {     // Open a weighted histogram window
+        weightedHistogramMenuItem.addActionListener(new ActionListener() {     // Open a weighted histogram window
 
 
             public void actionPerformed(ActionEvent e) {
                 weightedHistogram();
             }
         });
-        pc.addActionListener(new ActionListener() {     // Open a parallel coordinate plot window
+        parCoordinatesMenuItem.addActionListener(new ActionListener() {     // Open a parallel coordinate plot window
 
 
             public void actionPerformed(ActionEvent e) {
                 pc("Poly");
             }
         });
-        pb.addActionListener(new ActionListener() {     // Open a parallel boxplot plot window
+        parallelBoxplotMenuItem.addActionListener(new ActionListener() {     // Open a parallel boxplot plot window
 
 
             public void actionPerformed(ActionEvent e) {
                 pc("Box");
             }
         });
-        byx.addActionListener(new ActionListener() {     // Open a boxplot plot y by x window
+        boxplotByXYMenuItem.addActionListener(new ActionListener() {     // Open a boxplot plot y by x window
 
 
             public void actionPerformed(ActionEvent e) {
                 pc("Box");
             }
         });
-        sc2.addActionListener(new ActionListener() {     // Open a scatterplot window
+        scatterplotMenuItem.addActionListener(new ActionListener() {     // Open a scatterplot window
 
 
             public void actionPerformed(ActionEvent e) {
@@ -446,7 +453,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
             }
         });
         if (true || user.indexOf("theus") > -1)
-            t.addActionListener(new ActionListener() {     // Open a new test window
+            splotMenuItem.addActionListener(new ActionListener() {     // Open a new test window
 
 
                 public void actionPerformed(ActionEvent e) {
@@ -497,14 +504,14 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 mapPlot();
             }
         });
-        mds.addActionListener(new ActionListener() {     // Open a new window for a 2-dim MDS
+        twoDimMDSMenuItem.addActionListener(new ActionListener() {     // Open a new window for a 2-dim MDS
 
 
             public void actionPerformed(ActionEvent e) {
                 mds();
             }
         });
-        pca.addActionListener(new ActionListener() {     // calculate PCA
+        pcaMenuItem.addActionListener(new ActionListener() {     // calculate PCA
 
 
             public void actionPerformed(ActionEvent e) {
@@ -574,14 +581,14 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 switchSelection();
             }
         });
-        fs.addActionListener(new ActionListener() {     // Derive variable from selection (false) or color (true)
+        selectionMenuItem.addActionListener(new ActionListener() {     // Derive variable from selection (false) or color (true)
 
 
             public void actionPerformed(ActionEvent e) {
                 deriveVariable(false);
             }
         });
-        fc.addActionListener(new ActionListener() {     // Derive variable from selection (false) or color (true)
+        colorsMenuItem.addActionListener(new ActionListener() {     // Derive variable from selection (false) or color (true)
 
 
             public void actionPerformed(ActionEvent e) {
@@ -658,7 +665,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 switchVariableMode();
             }
         });
-        ca.addActionListener(new ActionListener() {     // Close all Windows
+        closeAllMenuItem.addActionListener(new ActionListener() {     // Close all Windows
 
 
             public void actionPerformed(ActionEvent e) {
@@ -733,7 +740,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
         mondrianRunning = true;
 
-        if (!hasR) {
+        if (!RService.hasR()) {
             //      JOptionPane.showMessageDialog(this, "Connection to R failed:\nSome functions might be missing!\n\nPlease check installation of R and  Rserve\nor try starting Rserve manually ...","Rserve Error",JOptionPane.WARNING_MESSAGE);
             g.setColor(Color.white);
             g.fillRect(9, 275, 220, 14);
@@ -2138,120 +2145,135 @@ public void handlePrintFile(ApplicationEvent event) {} */
                 dataSetCounter = dataSets.size() - 1;
             else return; // invalid state, don't bother
         }
+
+        // this updates the counter of the categorical variables
         getSelectedTypes();
+
+
+        // match the available plot-options to the abilities of the registered plot-factories
+        for (int i = 0; i < plotMenu.getMenuComponentCount(); i++) {
+            if (!(plotMenu.getMenuComponent(i) instanceof JMenuItem)) {
+                continue;
+            }
+
+            JMenuItem menuItem = (JMenuItem) plotMenu.getMenuComponent(i);
+            if (menuItem.getAction() instanceof PlotAction) {
+                ((PlotAction) menuItem.getAction()).configureForVarSelection((varNames.getSelectedIndices()).length, numCategorical);
+            }
+        }
 
         //    System.out.println("number categorical: "+numCategorical+", weight Index "+weightIndex);
 
         switch ((varNames.getSelectedIndices()).length) {
             case 0:
-                n.setEnabled(false);
-                b.setEnabled(false);
-                bw.setEnabled(false);
-                nw.setEnabled(false);
-                hi.setEnabled(false);
-                hiw.setEnabled(false);
-                pc.setEnabled(false);
-                pb.setEnabled(false);
+                mosaicPlotMenuItem.setEnabled(false);
+                barchartMenuItem.setEnabled(false);
+                weightedBarchartMenuItem.setEnabled(false);
+                weightedMosaicPlotMenuItem.setEnabled(false);
+                histogramMenuItem.setEnabled(false);
+                weightedHistogramMenuItem.setEnabled(false);
+                parCoordinatesMenuItem.setEnabled(false);
+                parallelBoxplotMenuItem.setEnabled(false);
                 //              sc.setEnabled(false);
-                sc2.setEnabled(false);
-                mds.setEnabled(false);
-                pca.setEnabled(false);
-                mv.setEnabled(false);
-                t.setEnabled(false);
+                scatterplotMenuItem.setEnabled(false);
+                twoDimMDSMenuItem.setEnabled(false);
+                pcaMenuItem.setEnabled(false);
+                missingValuePlotMenuItem.setEnabled(false);
+                splotMenuItem.setEnabled(false);
                 break;
             case 1:
                 if (numCategorical == (varNames.getSelectedIndices()).length) {
-                    b.setEnabled(true);
+                    barchartMenuItem.setEnabled(true);
 //n.setEnabled(true);
-                    hi.setEnabled(false);
-                    hiw.setEnabled(false);
-                    pb.setEnabled(false);
+                    histogramMenuItem.setEnabled(false);
+                    weightedHistogramMenuItem.setEnabled(false);
+                    parallelBoxplotMenuItem.setEnabled(false);
                 } else {
-                    b.setEnabled(false);
-                    hi.setEnabled(true);
-                    hiw.setEnabled(true);
-                    pb.setEnabled(true);
+                    barchartMenuItem.setEnabled(false);
+                    histogramMenuItem.setEnabled(true);
+                    weightedHistogramMenuItem.setEnabled(true);
+                    parallelBoxplotMenuItem.setEnabled(true);
                 }
-                mv.setEnabled(true);
-                n.setEnabled(false);
-                bw.setEnabled(false);
-                nw.setEnabled(false);
-                pc.setEnabled(false);
-                byx.setEnabled(false);
+                missingValuePlotMenuItem.setEnabled(true);
+                mosaicPlotMenuItem.setEnabled(false);
+                weightedBarchartMenuItem.setEnabled(false);
+                weightedMosaicPlotMenuItem.setEnabled(false);
+                parCoordinatesMenuItem.setEnabled(false);
+                boxplotByXYMenuItem.setEnabled(false);
                 //              sc.setEnabled(false);
-                sc2.setEnabled(false);
-                mds.setEnabled(false);
-                pca.setEnabled(false);
-                t.setEnabled(false);
+                scatterplotMenuItem.setEnabled(false);
+                twoDimMDSMenuItem.setEnabled(false);
+                pcaMenuItem.setEnabled(false);
+                splotMenuItem.setEnabled(false);
                 break;
             case 2:
-                pc.setEnabled(true);
-                sc2.setEnabled(true);
-                t.setEnabled(true);
-                mv.setEnabled(true);
-                mds.setEnabled(false);
-                pb.setEnabled(true);
-                byx.setEnabled(false);
+                parCoordinatesMenuItem.setEnabled(true);
+                scatterplotMenuItem.setEnabled(true);
+                splotMenuItem.setEnabled(true);
+                missingValuePlotMenuItem.setEnabled(true);
+                twoDimMDSMenuItem.setEnabled(false);
+                parallelBoxplotMenuItem.setEnabled(true);
+                boxplotByXYMenuItem.setEnabled(false);
                 if (numCategorical == (varNames.getSelectedIndices()).length) {
-                    b.setEnabled(true);
-                    n.setEnabled(true);
+                    barchartMenuItem.setEnabled(true);
+                    mosaicPlotMenuItem.setEnabled(true);
                 } else {
-                    b.setEnabled(false);
-                    n.setEnabled(false);
+                    barchartMenuItem.setEnabled(false);
+                    mosaicPlotMenuItem.setEnabled(false);
                 }
                 if (numCategorical == 1) {
-                    bw.setEnabled(true);
-                    nw.setEnabled(true);
-                    pb.setEnabled(false);
-                    byx.setEnabled(true);
+                    weightedBarchartMenuItem.setEnabled(true);
+                    weightedMosaicPlotMenuItem.setEnabled(true);
+                    parallelBoxplotMenuItem.setEnabled(false);
+                    boxplotByXYMenuItem.setEnabled(true);
                 } else {
-                    bw.setEnabled(false);
-                    nw.setEnabled(false);
+                    weightedBarchartMenuItem.setEnabled(false);
+                    weightedMosaicPlotMenuItem.setEnabled(false);
                 }
                 if (numCategorical == 0) {
-                    hi.setEnabled(true);
-                    hiw.setEnabled(true);
-                    pca.setEnabled(true);
+                    histogramMenuItem.setEnabled(true);
+                    weightedHistogramMenuItem.setEnabled(true);
+                    pcaMenuItem.setEnabled(true);
                 } else {
-                    hi.setEnabled(false);
-                    hiw.setEnabled(false);
+                    histogramMenuItem.setEnabled(false);
+                    weightedHistogramMenuItem.setEnabled(false);
                 }
                 break;
             default:
                 if (numCategorical == (varNames.getSelectedIndices()).length) {
-                    b.setEnabled(true);
-                    n.setEnabled(true);
+                    barchartMenuItem.setEnabled(true);
+                    mosaicPlotMenuItem.setEnabled(true);
                 } else {
-                    b.setEnabled(false);
-                    n.setEnabled(false);
+                    barchartMenuItem.setEnabled(false);
+                    mosaicPlotMenuItem.setEnabled(false);
                 }
                 if (numCategorical == (varNames.getSelectedIndices()).length - 1) {
-                    bw.setEnabled(true);
-                    nw.setEnabled(true);
+                    weightedBarchartMenuItem.setEnabled(true);
+                    weightedMosaicPlotMenuItem.setEnabled(true);
                 } else {
-                    bw.setEnabled(false);
-                    nw.setEnabled(false);
+                    weightedBarchartMenuItem.setEnabled(false);
+                    weightedMosaicPlotMenuItem.setEnabled(false);
                 }
                 if (numCategorical == 0) {
-                    hi.setEnabled(true);
-                    hiw.setEnabled(true);
+                    histogramMenuItem.setEnabled(true);
+                    weightedHistogramMenuItem.setEnabled(true);
                 } else {
-                    hi.setEnabled(false);
-                    hiw.setEnabled(false);
+                    histogramMenuItem.setEnabled(false);
+                    weightedHistogramMenuItem.setEnabled(false);
                 }
-                if ((varNames.getSelectedIndices()).length - numCategorical > 1 && hasR)
-                    pca.setEnabled(true);
-                if ((varNames.getSelectedIndices()).length - numCategorical > 2 && hasR)
-                    mds.setEnabled(true);
-                pc.setEnabled(true);
-                pb.setEnabled(true);
-                mv.setEnabled(true);
-                t.setEnabled(true);
-                sc2.setEnabled(false);
+                if ((varNames.getSelectedIndices()).length - numCategorical > 1 && RService.hasR())
+                    pcaMenuItem.setEnabled(true);
+                if ((varNames.getSelectedIndices()).length - numCategorical > 2 && RService.hasR())
+                    twoDimMDSMenuItem.setEnabled(true);
+                parCoordinatesMenuItem.setEnabled(true);
+                parallelBoxplotMenuItem.setEnabled(true);
+                missingValuePlotMenuItem.setEnabled(true);
+                splotMenuItem.setEnabled(true);
+                scatterplotMenuItem.setEnabled(false);
                 //        sc.setEnabled(false);
         }
         if (!dataSets.elementAt(dataSetCounter).hasMissings)
-            mv.setEnabled(false);
+            missingValuePlotMenuItem.setEnabled(false);
 
         // Now handle transform Menue
         int alphs = 0;
@@ -2312,14 +2334,14 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
         // Selection
         if (data.countSelection() == 0)
-            fs.setEnabled(false);
+            selectionMenuItem.setEnabled(false);
         else
-            fs.setEnabled(true);
+            selectionMenuItem.setEnabled(true);
         // Colors
         if (data.colorBrush)
-            fc.setEnabled(true);
+            colorsMenuItem.setEnabled(true);
         else
-            fc.setEnabled(false);
+            colorsMenuItem.setEnabled(false);
 
         boolean mode = DragBox.extSelMode;
         os.setSelected(mode);
@@ -2360,4 +2382,13 @@ public void handlePrintFile(ApplicationEvent event) {} */
         se.setSelected(true);
         se.setEnabled(false);
     }
+
+
+    public void regiserPlotFactory(PlotFactory plotFactory) {
+        plotFacRegistry.add(plotFactory);
+
+        // add the new factory to the main-menu
+        plotMenu.add(new JMenuItem(new PlotAction(plotFactory, this)));
+    }
+
 }

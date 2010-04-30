@@ -7,6 +7,7 @@ import de.mpicbg.sweng.mondrian.core.Selection;
 import de.mpicbg.sweng.mondrian.plots.basic.MyPoly;
 import de.mpicbg.sweng.mondrian.util.StatUtil;
 import de.mpicbg.sweng.mondrian.util.Util;
+import de.mpicbg.sweng.mondrian.util.r.RService;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
@@ -107,7 +108,7 @@ public class MapPlot extends DragBox {
         });
         p.add(Varlist);
 
-        if (frame.hasR()) {
+        if (RService.hasR()) {
             try {
                 RConnection c = new RConnection();
 
@@ -151,7 +152,7 @@ public class MapPlot extends DragBox {
         Collist.addItem("blue");
         Collist.addItem("blue2red");
         Collist.addItem("blueWred");
-        if (frame.hasR()) {
+        if (RService.hasR()) {
             Collist.addItem("heat");
             Collist.addItem("terrain");
             Collist.addItem("topo");

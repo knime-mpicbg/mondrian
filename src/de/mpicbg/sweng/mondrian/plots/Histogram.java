@@ -7,6 +7,7 @@ import de.mpicbg.sweng.mondrian.plots.basic.Axis;
 import de.mpicbg.sweng.mondrian.plots.basic.MyRect;
 import de.mpicbg.sweng.mondrian.util.StatUtil;
 import de.mpicbg.sweng.mondrian.util.Util;
+import de.mpicbg.sweng.mondrian.util.r.RService;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.RList;
@@ -521,7 +522,7 @@ public class Histogram extends DragBox implements ActionListener {
                 Selection S = (Selection) Selections.elementAt(i);
                 maintainSelection(S);
             }
-            if (!frame.hasR()) {
+            if (!RService.hasR()) {
                 densityMode = false;
                 CDPlot = false;
             }
@@ -674,7 +675,7 @@ public class Histogram extends DragBox implements ActionListener {
                         Density.setSelected(false);
                     mode.add(Density);
 
-                    if (!frame.hasR()) {
+                    if (!RService.hasR()) {
                         CDPlotM.setEnabled(false);
                         Density.setEnabled(false);
                     }
@@ -863,7 +864,7 @@ public class Histogram extends DragBox implements ActionListener {
             home();
             Update();
         } else if (command.equals("Density")) {
-            if (frame.hasR()) {
+            if (RService.hasR()) {
                 densityMode = !densityMode;
                 if (densityMode)
                     scaleSelD = true;
@@ -871,7 +872,7 @@ public class Histogram extends DragBox implements ActionListener {
             } else
                 return;
         } else if (command.equals("CDPlot")) {
-            if (frame.hasR()) {
+            if (RService.hasR()) {
                 CDPlot = !CDPlot;
                 densityMode = true;
                 Update();

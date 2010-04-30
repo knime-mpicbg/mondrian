@@ -8,6 +8,7 @@ import de.mpicbg.sweng.mondrian.core.Table;
 import de.mpicbg.sweng.mondrian.plots.basic.MyRect;
 import de.mpicbg.sweng.mondrian.util.StatUtil;
 import de.mpicbg.sweng.mondrian.util.Util;
+import de.mpicbg.sweng.mondrian.util.r.RService;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.RList;
@@ -489,7 +490,7 @@ public class Scatter2DPlot extends DragBox {
                             rougher.setEnabled(false);
                         }
 
-                        if (!frame.hasR()) {
+                        if (!RService.hasR()) {
                             loess.setEnabled(false);
                             splines.setEnabled(false);
                             locfit.setEnabled(false);

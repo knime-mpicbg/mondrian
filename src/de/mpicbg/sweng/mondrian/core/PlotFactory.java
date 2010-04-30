@@ -1,5 +1,8 @@
 package de.mpicbg.sweng.mondrian.core;
 
+import javax.swing.*;
+
+
 /**
  * Document me!
  *
@@ -7,4 +10,15 @@ package de.mpicbg.sweng.mondrian.core;
  */
 public interface PlotFactory {
 
+    String getPlotName();
+
+    String getShortDescription();
+
+    JPanel createPlotPanel();
+
+    /**
+     * Is called whenever the variable-selection changes in order to determine the enabled-state of the different plots
+     * in the menu.
+     */
+    boolean isCompliant(int numVariables, int numCategoricalVariables);
 }
