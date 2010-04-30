@@ -68,7 +68,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     private JProgressBar progBar;
     private JLabel progText;
     public JMenuBar menubar;
-    public JMenu windows, help, dv, sam, trans;
+    public JMenu windows, help, dv, sam, transformMenu;
 
     private JMenuItem saveMenuItem;
     private JMenuItem saveSelectionMenuItem;
@@ -203,21 +203,21 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         mapPlotMenuItem.setEnabled(false);
         menubar.add(plotMenu);                         // Add to menubar.
         //
-        JMenu calc = new JMenu("Calc");            // Create a Calc menu.
-        calc.add(trans = new JMenu("transform"));
-        trans.setEnabled(false);
-        trans.add(transPlus = new JMenuItem(new TransformAction("x + y", 1, this, 2)));
-        trans.add(transMinus = new JMenuItem(new TransformAction("x - y", 2, this, 2)));
-        trans.add(transTimes = new JMenuItem(new TransformAction("x * y", 3, this, 2)));
-        trans.add(transDiv = new JMenuItem(new TransformAction("x / y", 4, this, 2)));
-        trans.addSeparator();                     // Put a separator in the menu
-        trans.add(transNeg = new JMenuItem(new TransformAction("- x", 5, this, 2)));
-        trans.add(transInv = new JMenuItem(new TransformAction("1/x", 6, this, 2)));
-        trans.add(transLog = new JMenuItem(new TransformAction("log(x)", 7, this, 2)));
-        trans.add(transExp = new JMenuItem(new TransformAction("exp(x)", 8, this, 2)));
 
-        //
-        menubar.add(calc);                         // Add to menubar.
+        transformMenu = new JMenu("Transform");
+
+        transformMenu.setEnabled(false);
+        transformMenu.add(transPlus = new JMenuItem(new TransformAction("x + y", 1, this, 2)));
+        transformMenu.add(transMinus = new JMenuItem(new TransformAction("x - y", 2, this, 2)));
+        transformMenu.add(transTimes = new JMenuItem(new TransformAction("x * y", 3, this, 2)));
+        transformMenu.add(transDiv = new JMenuItem(new TransformAction("x / y", 4, this, 2)));
+        transformMenu.addSeparator();
+        transformMenu.add(transNeg = new JMenuItem(new TransformAction("- x", 5, this, 1)));
+        transformMenu.add(transInv = new JMenuItem(new TransformAction("1/x", 6, this, 1)));
+        transformMenu.add(transLog = new JMenuItem(new TransformAction("log(x)", 7, this, 1)));
+        transformMenu.add(transExp = new JMenuItem(new TransformAction("exp(x)", 8, this, 1)));
+
+        menubar.add(transformMenu);
 
         JMenu options = new JMenu("Options");      // Create an Option menu.
         JMenuItem sa;
@@ -1424,57 +1424,35 @@ public void handlePrintFile(ApplicationEvent event) {} */
         }
 
 
-        // Now handle transform Menue
+        // Now handle transform menu
+        updateTrafoMenuToVarSelection();
+    }
+
+
+    private void updateTrafoMenuToVarSelection() {
         int alphs = 0;
         DataSet data = dataSets.elementAt(dataSetCounter);
-        for (int i = 0; i < varNames.getSelectedIndices().length; i++)
+        for (int i = 0; i < varNames.getSelectedIndices().length; i++) {
             if (data.alpha(varNames.getSelectedIndices()[i]))
                 alphs++;
+        }
+
         if (alphs == 0 && (varNames.getSelectedIndices().length == 2 || varNames.getSelectedIndices().length == 1)) {
-            trans.setEnabled(true);
-            if (varNames.getSelectedIndices().length == 2) {
-                transPlus.setText(data.getName(selectBuffer[1]) + " + " + data.getName(selectBuffer[0]));
-                transMinus.setText(data.getName(selectBuffer[1]) + " - " + data.getName(selectBuffer[0]));
-                transTimes.setText(data.getName(selectBuffer[1]) + " * " + data.getName(selectBuffer[0]));
-                transDiv.setText(data.getName(selectBuffer[1]) + " / " + data.getName(selectBuffer[0]));
-                transNeg.setText("-x");
-                transInv.setText("1/x");
-                transLog.setText("log(x)");
-                transExp.setText("exp(x)");
-                transPlus.setEnabled(true);
-                transMinus.setEnabled(true);
-                transTimes.setEnabled(true);
-                transDiv.setEnabled(true);
-                transNeg.setEnabled(false);
-                transInv.setEnabled(false);
-                transLog.setEnabled(false);
-                transExp.setEnabled(false);
-            } else {
-                if (data.getName(selectBuffer[0]).indexOf("-") > 0 || data.getName(selectBuffer[0]).indexOf("+") > 0)
-                    transNeg.setText("-(" + data.getName(selectBuffer[0]) + ")");
-                else
-                    transNeg.setText("-" + data.getName(selectBuffer[0]));
-                if (data.getName(selectBuffer[0]).indexOf("-") > 0 || data.getName(selectBuffer[0]).indexOf("+") > 0)
-                    transInv.setText("1/(" + data.getName(selectBuffer[0]) + ")");
-                else
-                    transInv.setText("1/" + data.getName(selectBuffer[0]));
-                transLog.setText("log(" + data.getName(selectBuffer[0]) + ")");
-                transExp.setText("exp(" + data.getName(selectBuffer[0]) + ")");
-                transPlus.setText("x + y");
-                transMinus.setText("x - y");
-                transTimes.setText("x * y");
-                transDiv.setText("x / y");
-                transPlus.setEnabled(false);
-                transMinus.setEnabled(false);
-                transTimes.setEnabled(false);
-                transDiv.setEnabled(false);
-                transNeg.setEnabled(true);
-                transInv.setEnabled(true);
-                transLog.setEnabled(true);
-                transExp.setEnabled(true);
+            transformMenu.setEnabled(true);
+
+            for (int i = 0; i < transformMenu.getComponentCount(); i++) {
+                Component menuComponent = transformMenu.getMenuComponent(i);
+                if (!(menuComponent instanceof JMenuItem)) {
+                    continue;
+                }
+
+                TransformAction action = (TransformAction) ((JMenuItem) menuComponent).getAction();
+                action.setEnabled(action.isCompliant(varNames.getSelectedIndices().length));
             }
-        } else
-            trans.setEnabled(false);
+
+        } else {
+            transformMenu.setEnabled(false);
+        }
     }
 
 
