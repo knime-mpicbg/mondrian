@@ -14,7 +14,7 @@ public interface PlotFactory {
 
     String getShortDescription();
 
-    JPanel createPlotPanel();
+    JPanel createPlotPanel(DataSet dataSet, int[] selectedVarIndices);
 
     /**
      * Is called whenever the variable-selection changes in order to determine the enabled-state of the different plots

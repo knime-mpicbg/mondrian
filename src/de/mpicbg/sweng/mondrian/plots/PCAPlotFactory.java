@@ -1,13 +1,15 @@
 package de.mpicbg.sweng.mondrian.plots;
 
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
+import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.util.r.RService;
+import org.rosuda.REngine.Rserve.RConnection;
 
 import javax.swing.*;
 
 
 /**
- * Document me!
+ * Does not actually create a new panel but cacluates a pca of the data and adds the coefficients as variables
  *
  * @author Holger Brandl
  */
@@ -23,7 +25,57 @@ public class PCAPlotFactory extends AbstractPlotFactory {
     }
 
 
-    public JPanel createPlotPanel() {
+    public JPanel createPlotPanel(DataSet dataSet, int[] selectedVarIndices) {
+        try {
+            RConnection c = new RConnection();
+            String call = " ~ x1 ";
+            for (int i = 0; i < selectedVarIndices.length; i++) {
+                c.assign("x", dataSet.getRawNumbers(selectedVarIndices[i]));
+                if (dataSet.n > dataSet.getN(selectedVarIndices[i])) {                      // Check for missings in this variable
+                    boolean[] missy = dataSet.getMissings(selectedVarIndices[i]);
+                    int[] flag = new int[dataSet.n];
+                    for (int j = 0; j < dataSet.n; j++)
+                        if (missy[j])
+                            flag[j] = 1;
+                        else
+                            flag[j] = 0;
+                    c.assign("xM", flag);
+                    c.voidEval("is.na(x)[xM==1] <- T");
+                }
+                if (i == 0)
+                    c.voidEval("tempData <- x");
+                else {
+                    c.voidEval("tempData <- cbind(tempData, x)");
+                    call += " + x" + (i + 1) + "";
+                }
+            }
+            c.voidEval("tempData <- data.frame(tempData)");
+
+            for (int i = 0; i < selectedVarIndices.length; i++)
+                c.voidEval("names(tempData)[" + (i + 1) + "] <- \"x" + (i + 1) + "\"");
+
+            String opt = "TRUE";
+            int answer = JOptionPane.showConfirmDialog(null, "Calculate PCA for correlation matrix", "Standardize Data?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if (answer == JOptionPane.NO_OPTION)
+                opt = "FALSE";
+
+            c.voidEval("pca <- predict(princomp(" + call + " , data = tempData, cor = " + opt + ", na.action = na.exclude))");
+            for (int i = 0; i < selectedVarIndices.length; i++) {
+                double[] x = c.eval("pca[," + (i + 1) + "]").asDoubles();
+                boolean missy[] = new boolean[dataSet.n];
+                for (int j = 0; j < x.length; j++) {
+                    if (Double.isNaN(x[j])) {
+                        missy[j] = true;
+                        x[j] = Double.MAX_VALUE;
+                    } else
+                        missy[j] = false;
+                }
+                dataSet.addVariable("pca " + (i + 1) + "", false, false, x, missy);
+            }
+        } catch (Throwable e) {
+            throw new RuntimeException("Calculation of PCA failed", e);
+        }
+
         return null;
     }
 

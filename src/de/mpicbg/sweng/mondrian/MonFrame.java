@@ -61,7 +61,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     public boolean selseq = false;
     public boolean alphaHi = false;
     public Vector<MyPoly> polys = new Vector<MyPoly>(256, 256);
-    private JList varNames = null;
+    public JList varNames = null;
     private int numCategorical = 0;
     private int weightIndex = 0;
     private JScrollPane scrollPane;
@@ -93,10 +93,11 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     private JMenuItem pcaMenuItem;
 
     public JMenuItem closeAllMenuItem, colorsMenuItem, selectionMenuItem, me, transPlus, transMinus, transTimes, transDiv, transNeg, transInv, transLog, transExp;
-    private JCheckBoxMenuItem se;
-    private JCheckBoxMenuItem ah;
-    private JCheckBoxMenuItem os;
-    private JCheckBoxMenuItem as;
+    private JCheckBoxMenuItem selSeqCheckItem;
+    private JCheckBoxMenuItem alphaOnHighlightCheckMenuItem;
+    private JCheckBoxMenuItem orSelectionCheckMenuItem;
+    private JCheckBoxMenuItem andSelectionCheckMenuItem;
+
     private ModelNavigator modelNavigator;
     public int dataSetCounter = -1;
     private int dCol = 1, dSel = 1;
@@ -278,9 +279,9 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         ts.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
         options.add(sam = new JMenu("<SHIFT><ALT> is"));
-        sam.add(os = new JCheckBoxMenuItem("OR Selection"));
-        sam.add(as = new JCheckBoxMenuItem("AND Selection"));
-        as.setSelected(true);
+        sam.add(orSelectionCheckMenuItem = new JCheckBoxMenuItem("OR Selection"));
+        sam.add(andSelectionCheckMenuItem = new JCheckBoxMenuItem("AND Selection"));
+        andSelectionCheckMenuItem.setSelected(true);
 
         options.addSeparator();                     // Put a separator in the menu
         JMenuItem cc;
@@ -288,16 +289,16 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         cc.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, Event.ALT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
         options.addSeparator();                     // Put a separator in the menu
-        options.add(se = new JCheckBoxMenuItem("Selection Sequences", selseq));
-        se.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        options.add(selSeqCheckItem = new JCheckBoxMenuItem("Selection Sequences", selseq));
+        selSeqCheckItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
         JMenuItem cs;
         options.add(cs = new JMenuItem("Clear Sequences"));
         cs.setAccelerator(KeyStroke.getKeyStroke(Event.BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
         options.addSeparator();                     // Put a separator in the menu
-        options.add(ah = new JCheckBoxMenuItem("Alpha on Highlight", alphaHi));
-        ah.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        options.add(alphaOnHighlightCheckMenuItem = new JCheckBoxMenuItem("Alpha on Highlight", alphaHi));
+        alphaOnHighlightCheckMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
         options.addSeparator();                     // Put a separator in the menu
         JMenuItem vm;
@@ -574,7 +575,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 transform(8);
             }
         });
-        se.addActionListener(new ActionListener() {     // Change the selection mode
+        selSeqCheckItem.addActionListener(new ActionListener() {     // Change the selection mode
 
 
             public void actionPerformed(ActionEvent e) {
@@ -595,14 +596,14 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 deriveVariable(true);
             }
         });
-        os.addActionListener(new ActionListener() {     // Set extended selection mode AND (false) or OR (true)
+        orSelectionCheckMenuItem.addActionListener(new ActionListener() {     // Set extended selection mode AND (false) or OR (true)
 
 
             public void actionPerformed(ActionEvent e) {
                 setExtSelMode(true);
             }
         });
-        as.addActionListener(new ActionListener() {     // Set extended selection mode AND (false) or OR (true)
+        andSelectionCheckMenuItem.addActionListener(new ActionListener() {     // Set extended selection mode AND (false) or OR (true)
 
 
             public void actionPerformed(ActionEvent e) {
@@ -630,7 +631,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 clearColors();
             }
         });
-        ah.addActionListener(new ActionListener() {     // Change the alpha mode for highlighted cases
+        alphaOnHighlightCheckMenuItem.addActionListener(new ActionListener() {     // Change the alpha mode for highlighted cases
 
 
             public void actionPerformed(ActionEvent e) {
@@ -972,7 +973,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         if (dataSetCounter > -1 && dataSets.elementAt(dataSetCounter).isDB)
             selseq = true;
         else {
-            selseq = se.isSelected();
+            selseq = selSeqCheckItem.isSelected();
             //System.out.println("Selection Sequences : "+selseq);
             if (!selseq)
                 deleteSelection();
@@ -981,7 +982,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
 
     public void switchAlpha() {
-        alphaHi = ah.isSelected();
+        alphaHi = alphaOnHighlightCheckMenuItem.isSelected();
         updateSelection();
     }
 
@@ -1012,8 +1013,8 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
     public void setExtSelMode(boolean mode) {
         DragBox.extSelMode = mode;
-        os.setSelected(mode);
-        as.setSelected(!mode);
+        orSelectionCheckMenuItem.setSelected(mode);
+        andSelectionCheckMenuItem.setSelected(!mode);
     }
 
 
@@ -1080,13 +1081,13 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
             }
             if (plots.elementAt(i).switchSel) {    // This window has caused the switch event
                 plots.elementAt(i).switchSel = false;
-                se.setSelected(!se.isSelected());                // perform the tick mark change manually ...
+                selSeqCheckItem.setSelected(!selSeqCheckItem.isSelected());                // perform the tick mark change manually ...
                 switchSelection();
                 return;
             }
             if (plots.elementAt(i).switchAlpha) {    // This window has caused the switch alpha event
                 plots.elementAt(i).switchAlpha = false;
-                ah.setSelected(!ah.isSelected());
+                alphaOnHighlightCheckMenuItem.setSelected(!alphaOnHighlightCheckMenuItem.isSelected());
                 switchAlpha();
                 plots.elementAt(i).updateSelection();
                 return;
@@ -2149,8 +2150,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
         // this updates the counter of the categorical variables
         getSelectedTypes();
 
-
-        // match the available plot-options to the abilities of the registered plot-factories
+        // update the enabled states of all registered plot-factories
         for (int i = 0; i < plotMenu.getMenuComponentCount(); i++) {
             if (!(plotMenu.getMenuComponent(i) instanceof JMenuItem)) {
                 continue;
@@ -2344,8 +2344,8 @@ public void handlePrintFile(ApplicationEvent event) {} */
             colorsMenuItem.setEnabled(false);
 
         boolean mode = DragBox.extSelMode;
-        os.setSelected(mode);
-        as.setSelected(!mode);
+        orSelectionCheckMenuItem.setSelected(mode);
+        andSelectionCheckMenuItem.setSelected(!mode);
     }
 
 
@@ -2379,8 +2379,8 @@ public void handlePrintFile(ApplicationEvent event) {} */
         dataSets.addElement(data);
         setVarList();
         selseq = true;
-        se.setSelected(true);
-        se.setEnabled(false);
+        selSeqCheckItem.setSelected(true);
+        selSeqCheckItem.setEnabled(false);
     }
 
 

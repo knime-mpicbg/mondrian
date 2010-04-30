@@ -35,7 +35,11 @@ public class PlotAction extends AbstractAction {
 
 
     public void actionPerformed(ActionEvent e) {
-        plotFactory.createPlotPanel();
+        plotFactory.createPlotPanel(monFrame.dataSets.elementAt(monFrame.dataSetCounter), monFrame.varNames.getSelectedIndices());
+
+        // what is this
+        monFrame.varNames = null;
+        monFrame.setVarList();
 
     }
 

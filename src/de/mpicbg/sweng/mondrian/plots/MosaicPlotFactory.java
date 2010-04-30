@@ -1,5 +1,6 @@
 package de.mpicbg.sweng.mondrian.plots;
 
+import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.core.PlotFactory;
 
 import javax.swing.*;
@@ -22,7 +23,7 @@ public class MosaicPlotFactory implements PlotFactory {
     }
 
 
-    public JPanel createPlotPanel() {
+    public JPanel createPlotPanel(DataSet dataSet, int[] selectedVarIndices) {
         return null;
     }
 
