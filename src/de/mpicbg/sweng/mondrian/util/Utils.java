@@ -19,9 +19,10 @@ import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+import java.util.prefs.Preferences;
 
 
-public class Util {
+public class Utils {
 
     private static final HashMap LABELToURLTemplate = new HashMap();
 
@@ -64,7 +65,7 @@ public class Util {
 
         byte[] arrayLogo;
         try {
-            InputStream inputLogo = Util.class.getResourceAsStream(name);
+            InputStream inputLogo = Utils.class.getResourceAsStream(name);
 
             arrayLogo = streamToBytes(inputLogo);
             inputLogo.close();
@@ -158,7 +159,7 @@ public class Util {
 
     public static Color hrgb2color(String s) {
         if (s != null && s.length() > 0 && s.charAt(0) == '#') {
-            int c = Util.parseHexInt(s.substring(1));
+            int c = Utils.parseHexInt(s.substring(1));
             return new Color((c >> 16) & 255, (c >> 8) & 255, c & 255);
         }
         return null;
@@ -302,6 +303,11 @@ public class Util {
                     refCardf.dispose();
             }
         });
+    }
+
+
+    public static Preferences getPrefs() {
+        return Preferences.userNodeForPackage(Utils.class);
     }
 }
 

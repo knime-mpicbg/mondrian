@@ -2,7 +2,7 @@ package de.mpicbg.sweng.mondrian.core;
 
 import de.mpicbg.sweng.mondrian.util.BufferTokenizer;
 import de.mpicbg.sweng.mondrian.util.Qsort;
-import de.mpicbg.sweng.mondrian.util.Util;
+import de.mpicbg.sweng.mondrian.util.Utils;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -193,8 +193,8 @@ public class Variable {
     public void shrink() {
         if (!isCategorical)
             levelP = 10;
-        levelA = (String[]) Util.resizeArray(levelA, levelP);
-        grpSize = (int[]) Util.resizeArray(grpSize, levelP);
+        levelA = (String[]) Utils.resizeArray(levelA, levelP);
+        grpSize = (int[]) Utils.resizeArray(grpSize, levelP);
         if (!isCategorical) {
             levelP = 0;
             dimThres = 10;
@@ -205,8 +205,8 @@ public class Variable {
     void expand() {
         dimThres = (int) (1.5 * dimThres);
         System.out.println("-- Expand to: " + dimThres);
-        levelA = (String[]) Util.resizeArray(levelA, dimThres);
-        grpSize = (int[]) Util.resizeArray(grpSize, dimThres);
+        levelA = (String[]) Utils.resizeArray(levelA, dimThres);
+        grpSize = (int[]) Utils.resizeArray(grpSize, dimThres);
     }
 
 
@@ -257,7 +257,7 @@ public class Variable {
                     ResultSet rs = stmt.executeQuery(query);
 
                     if (rs.next())
-                        this.min = Util.atod(rs.getString(1));
+                        this.min = Utils.atod(rs.getString(1));
                     rs.close();
                     stmt.close();
                     System.out.println("query: " + query + " ---> " + this.min);
@@ -290,7 +290,7 @@ public class Variable {
                     ResultSet rs = stmt.executeQuery(query);
 
                     if (rs.next())
-                        this.max = Util.atod(rs.getString(1));
+                        this.max = Utils.atod(rs.getString(1));
                     rs.close();
                     stmt.close();
                     System.out.println("query: " + query + " ---> " + this.max);

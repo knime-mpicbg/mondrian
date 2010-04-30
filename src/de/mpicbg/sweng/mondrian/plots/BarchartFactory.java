@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MFrame;
+import de.mpicbg.sweng.mondrian.MDialog;
 import de.mpicbg.sweng.mondrian.MonFrame;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
@@ -28,11 +28,11 @@ public class BarchartFactory extends AbstractPlotFactory {
     }
 
 
-    public PlotPanel createPlotPanel(MonFrame monFrame, MFrame plotFrame, DataSet dataSet, JList varNames) {
+    public PlotPanel createPlotPanel(MonFrame monFrame, MDialog plotDialog, DataSet dataSet, JList varNames) {
         int[] indices = varNames.getSelectedIndices();
 
         PlotPanel barChartsContainer = new PlotPanel();
-        plotFrame.setLayout(new GridLayout(1, indices.length));
+        plotDialog.setLayout(new GridLayout(1, indices.length));
 
 
         int weight = -1;
@@ -47,7 +47,7 @@ public class BarchartFactory extends AbstractPlotFactory {
             int totHeight = (Toolkit.getDefaultToolkit().getScreenSize()).height;
             int tmpHeight = Math.min(totHeight - 30, 60 + breakdown.levels[0] * 30);
 
-            Barchart barchart = new Barchart(plotFrame, 300, tmpHeight, breakdown);
+            Barchart barchart = new Barchart(plotDialog, 300, tmpHeight, breakdown);
 
             barChartsContainer.add(barchart);
         }
@@ -56,7 +56,7 @@ public class BarchartFactory extends AbstractPlotFactory {
     }
 
 
-    public boolean isCompliant(int numVariables, int numCategoricalVariables) {
+    public boolean isCompliant(DataSet dataSet, int numVariables, int numCategoricalVariables) {
         return numVariables == numCategoricalVariables;
     }
 }

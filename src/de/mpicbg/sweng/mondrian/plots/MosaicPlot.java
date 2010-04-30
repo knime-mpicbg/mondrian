@@ -1,12 +1,13 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MFrame;
+import de.mpicbg.sweng.mondrian.MDialog;
 import de.mpicbg.sweng.mondrian.core.*;
 import de.mpicbg.sweng.mondrian.io.db.Query;
 import de.mpicbg.sweng.mondrian.plots.basic.MyRect;
 import de.mpicbg.sweng.mondrian.plots.basic.MyText;
+import de.mpicbg.sweng.mondrian.ui.ColorManager;
 import de.mpicbg.sweng.mondrian.util.ModelEvent;
-import de.mpicbg.sweng.mondrian.util.Util;
+import de.mpicbg.sweng.mondrian.util.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,7 +41,7 @@ public class MosaicPlot extends DragBox implements ActionListener {
     /**
      * This constructor requires a Frame and a desired size
      */
-    public MosaicPlot(MFrame frame, int width, int height, Table tablep) {
+    public MosaicPlot(MDialog frame, int width, int height, Table tablep) {
         super(frame);
         this.tablep = tablep;
         this.width = width;
@@ -169,7 +170,7 @@ public class MosaicPlot extends DragBox implements ActionListener {
 
     public void paint(Graphics2D g) {
 
-        frame.setBackground(MFrame.backgroundColor);
+        frame.setBackground(ColorManager.backgroundColor);
 
         tablep.getSelection();
 
@@ -230,7 +231,7 @@ public class MosaicPlot extends DragBox implements ActionListener {
             bg.setColor(Color.black);
         }
 
-        bg.setColor(MFrame.lineColor);
+        bg.setColor(ColorManager.lineColor);
 
         if (displayMode.equals("Same Bin Size") || displayMode.equals("Multiple Barcharts") || displayMode.equals("Fluctuation") || printing || showLabels)
             for (int i = 0; i < Labels.size(); i++) {
@@ -273,7 +274,7 @@ public class MosaicPlot extends DragBox implements ActionListener {
             for (int i = 0; i < rects.size(); i++) {
                 MyRect r = (MyRect) rects.elementAt(i);
                 if (r.contains(e.getX(), e.getY())) {
-                    return Util.info2Html(r.getLabel());
+                    return Utils.info2Html(r.getLabel());
                 }
             }
             // end FOR
@@ -355,7 +356,7 @@ public class MosaicPlot extends DragBox implements ActionListener {
                         brush.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, Event.ALT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
                         brush.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
-                                frame.j.clearColors();
+                                frame.parentFrame.clearColors();
                             }
 
 
@@ -609,7 +610,7 @@ public class MosaicPlot extends DragBox implements ActionListener {
                 if (e.getKeyCode() == KeyEvent.VK_SUBTRACT)
                     if (!tablep.deleteInteraction(interact))
                         Toolkit.getDefaultToolkit().beep();
-                frame.setCursor(Frame.DEFAULT_CURSOR);
+                frame.setCursor(Cursor.getDefaultCursor());
             }
             create(border, border, width - border, height - border, "");
             Graphics g = this.getGraphics();

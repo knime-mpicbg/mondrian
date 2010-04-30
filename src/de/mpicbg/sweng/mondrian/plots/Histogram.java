@@ -1,12 +1,13 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MFrame;
+import de.mpicbg.sweng.mondrian.MDialog;
 import de.mpicbg.sweng.mondrian.core.*;
 import de.mpicbg.sweng.mondrian.io.db.Query;
 import de.mpicbg.sweng.mondrian.plots.basic.Axis;
 import de.mpicbg.sweng.mondrian.plots.basic.MyRect;
+import de.mpicbg.sweng.mondrian.ui.ColorManager;
 import de.mpicbg.sweng.mondrian.util.StatUtil;
-import de.mpicbg.sweng.mondrian.util.Util;
+import de.mpicbg.sweng.mondrian.util.Utils;
 import de.mpicbg.sweng.mondrian.util.r.RService;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
@@ -53,7 +54,7 @@ public class Histogram extends DragBox implements ActionListener {
     private int eventID;
 
 
-    public Histogram(MFrame frame, int width, int height, Table tablep, double bStart, double bWidth, int weight) {
+    public Histogram(MDialog frame, int width, int height, Table tablep, double bStart, double bWidth, int weight) {
         super(frame);
         this.tablep = tablep;
         this.name = tablep.name;
@@ -174,7 +175,7 @@ public class Histogram extends DragBox implements ActionListener {
 
     public void paint(Graphics2D g) {
 
-        frame.setBackground(MFrame.backgroundColor);
+        frame.setBackground(ColorManager.backgroundColor);
 
         tablep.getSelection();
 
@@ -225,7 +226,7 @@ public class Histogram extends DragBox implements ActionListener {
         }
         tick = outside;
 
-        bg.setColor(MFrame.lineColor);
+        bg.setColor(ColorManager.lineColor);
 
         // x-axis
         bg.drawLine((int) userToWorldX(xMin), (int) userToWorldY(0) + outside,
@@ -548,7 +549,7 @@ public class Histogram extends DragBox implements ActionListener {
                 frame.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 
                 info = true;
-                tbg.setColor(MFrame.backgroundColor);
+                tbg.setColor(ColorManager.backgroundColor);
 
                 // Draw x-Label for CRTL_DOWN event
                 int egetX = e.getX();
@@ -575,7 +576,7 @@ public class Histogram extends DragBox implements ActionListener {
                     tbg.fillRect((int) userToWorldX(xMax) - maxWidth - 4, (int) userToWorldY(getLly()) + outside + tick + 1,
                             maxWidth + 4, fm.getMaxAscent() + fm.getMaxDescent());
 
-                tbg.setColor(MFrame.lineColor);
+                tbg.setColor(ColorManager.lineColor);
                 tbg.drawLine(egetX, (int) userToWorldY(getLly()) + outside,
                         egetX, (int) userToWorldY(getLly()) + outside + tick);
                 tbg.drawString(print,
@@ -610,7 +611,7 @@ public class Histogram extends DragBox implements ActionListener {
             for (int i = 0; i < rects.size(); i++) {
                 MyRect r = (MyRect) rects.elementAt(i);
                 if (r.contains(e.getX(), e.getY())) {
-                    return Util.info2Html(r.getLabel());
+                    return Utils.info2Html(r.getLabel());
                 }
             }
             // end FOR
@@ -724,11 +725,11 @@ public class Histogram extends DragBox implements ActionListener {
                             wdt[i][3] = new JCheckBoxMenuItem("" + axisW.tickMMMM * Math.pow(10, (double) i), false);
 
                         for (int j = 0; j < 4; j++) {
-                            if (xMax - xMin > Util.atod(wdt[i][j].getText())) {
+                            if (xMax - xMin > Utils.atod(wdt[i][j].getText())) {
                                 menuWidth.add(wdt[i][j]);
                                 wdt[i][j].addItemListener(new ItemListener() {
                                     public void itemStateChanged(ItemEvent e) {
-                                        bWidth = Util.atod(((JCheckBoxMenuItem) e.getItem()).getText());
+                                        bWidth = Utils.atod(((JCheckBoxMenuItem) e.getItem()).getText());
                                         tablep.updateBins(bStart, bWidth);
                                         Update();
                                     }
@@ -751,21 +752,21 @@ public class Histogram extends DragBox implements ActionListener {
                         for (int j = 0; j < 4; j++) {
                             int k = 0;
                             int insert = 0;
-                            double ticker = Util.atod(wdt[i][j].getText());
+                            double ticker = Utils.atod(wdt[i][j].getText());
                             if (xMax - xMin > ticker) {
                                 starter = StatUtil.round((Math.floor(xMin / ticker)) * ticker, 8);
 
                                 while (k < menuStart.getItemCount()) {
-                                    if (starter > Util.atod(menuStart.getItem(k).getText()))
+                                    if (starter > Utils.atod(menuStart.getItem(k).getText()))
                                         insert = k + 1;
                                     k++;
                                 }
 
                                 if (insert == menuStart.getItemCount() && insert > 0 &&
-                                        starter == Util.atod(menuStart.getItem(insert - 1).getText()))
+                                        starter == Utils.atod(menuStart.getItem(insert - 1).getText()))
                                     insert = -1;
                                 else if (insert < menuStart.getItemCount() &&
-                                        starter == Util.atod(menuStart.getItem(insert).getText()))
+                                        starter == Utils.atod(menuStart.getItem(insert).getText()))
                                     insert = -1;
 
                                 if (insert != -1) {
@@ -780,7 +781,7 @@ public class Histogram extends DragBox implements ActionListener {
                                         menuStart.add(fst[i][j]);
                                     fst[i][j].addItemListener(new ItemListener() {
                                         public void itemStateChanged(ItemEvent e) {
-                                            bStart = Util.atod(((JCheckBoxMenuItem) e.getItem()).getText());
+                                            bStart = Utils.atod(((JCheckBoxMenuItem) e.getItem()).getText());
                                             tablep.updateBins(bStart, bWidth);
                                             Update();
                                         }
@@ -798,7 +799,7 @@ public class Histogram extends DragBox implements ActionListener {
                         menuStart.add(tmp);
                         tmp.addItemListener(new ItemListener() {
                             public void itemStateChanged(ItemEvent e) {
-                                bStart = Util.atod(((JCheckBoxMenuItem) e.getItem()).getText());
+                                bStart = Utils.atod(((JCheckBoxMenuItem) e.getItem()).getText());
                                 tablep.updateBins(bStart, bWidth);
                                 Update();
                             }
@@ -830,7 +831,7 @@ public class Histogram extends DragBox implements ActionListener {
                         brush.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, Event.ALT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
                         brush.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
-                                frame.j.clearColors();
+                                frame.parentFrame.clearColors();
                             }
 
 
@@ -855,9 +856,9 @@ public class Histogram extends DragBox implements ActionListener {
             Update();
         } else if (command.equals("bwidth") || command.equals("bstart")) {
             if (command.equals("bwidth"))
-                bWidth = Util.atod(JOptionPane.showInputDialog(this, "Set bin width to:"));
+                bWidth = Utils.atod(JOptionPane.showInputDialog(this, "Set bin width to:"));
             if (command.equals("bstart"))
-                bStart = Util.atod(JOptionPane.showInputDialog(this, "Set anchor point to:"));
+                bStart = Utils.atod(JOptionPane.showInputDialog(this, "Set anchor point to:"));
             tablep.updateBins(bStart, bWidth);
             Update();
         } else if (command.equals("home")) {

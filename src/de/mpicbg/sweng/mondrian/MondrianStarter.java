@@ -26,34 +26,34 @@ public class MondrianStarter implements MRJOpenDocumentHandler {
 
         MonFrame monFrame = new MonFrame(new Vector<MonFrame>(), new Vector<DataSet>(), false, false, null);
 
-        monFrame.regiserPlotFactory(new MissPlotFactory());
+        monFrame.registerPlotFactory(new MissPlotFactory());
         monFrame.plotMenu.add(new JSeparator());
 
-        monFrame.regiserPlotFactory(new BarchartFactory());
-        monFrame.regiserPlotFactory(new WeightedBarCharFactory());
+        monFrame.registerPlotFactory(new BarchartFactory());
+        monFrame.registerPlotFactory(new WeightedBarCharFactory());
         monFrame.plotMenu.add(new JSeparator());
 
-        monFrame.regiserPlotFactory(new HistogramFactory());
-        monFrame.regiserPlotFactory(new WeightedHistogramFactory());
+        monFrame.registerPlotFactory(new HistogramFactory());
+        monFrame.registerPlotFactory(new WeightedHistogramFactory());
         monFrame.plotMenu.add(new JSeparator());
 
-        monFrame.regiserPlotFactory(new ScatterplotFactory());
-        monFrame.regiserPlotFactory(new SplomFactory());
+        monFrame.registerPlotFactory(new ScatterplotFactory());
+        monFrame.registerPlotFactory(new SplomFactory());
         monFrame.plotMenu.add(new JSeparator());
 
 
-        monFrame.regiserPlotFactory(new MosaicPlotFactory());
-        monFrame.regiserPlotFactory(new WeightedMosaicPlotFactory());
+        monFrame.registerPlotFactory(new MosaicPlotFactory());
+        monFrame.registerPlotFactory(new WeightedMosaicPlotFactory());
         monFrame.plotMenu.add(new JSeparator());
 
-        monFrame.regiserPlotFactory(new BoxplotByXYFactory());
-        monFrame.regiserPlotFactory(new ParallelBoxplotFactory());
-        monFrame.regiserPlotFactory(new ParallelPlotFactory());
+        monFrame.registerPlotFactory(new BoxplotByXYFactory());
+        monFrame.registerPlotFactory(new ParallelBoxplotFactory());
+        monFrame.registerPlotFactory(new ParallelPlotFactory());
         monFrame.plotMenu.add(new JSeparator());
 
-        monFrame.regiserPlotFactory(new TwoDimMDSFactory());
-        monFrame.regiserPlotFactory(new MapPlotFactory());
-        monFrame.regiserPlotFactory(new PCAPlotFactory());
+        monFrame.registerPlotFactory(new TwoDimMDSFactory());
+        monFrame.registerPlotFactory(new MapPlotFactory());
+        monFrame.registerPlotFactory(new PCAPlotFactory());
 
 
         MRJApplicationUtils.registerOpenDocumentHandler(this);

@@ -2,7 +2,7 @@ package de.mpicbg.sweng.mondrian.io.db;
 
 import de.mpicbg.sweng.mondrian.MonFrame;
 import de.mpicbg.sweng.mondrian.core.DataSet;
-import de.mpicbg.sweng.mondrian.util.Util;
+import de.mpicbg.sweng.mondrian.util.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -47,12 +47,12 @@ public class DBDatasetLoader {
             gbc.fill = GridBagConstraints.NONE;
             gbc.anchor = GridBagConstraints.EAST;
 
-            Util.add(dbLoadDialog, new JLabel(" Driver: "), gbc, 0, 0, 1, 1);
-            Util.add(dbLoadDialog, new JLabel(" URL: "), gbc, 0, 1, 1, 1);
-            Util.add(dbLoadDialog, new JLabel(" User: "), gbc, 0, 2, 1, 1);
-            Util.add(dbLoadDialog, new JLabel(" Pwd: "), gbc, 2, 2, 1, 1);
-            Util.add(dbLoadDialog, new JLabel(" DB: "), gbc, 0, 3, 1, 1);
-            Util.add(dbLoadDialog, new JLabel(" Table: "), gbc, 0, 4, 1, 1);
+            Utils.add(dbLoadDialog, new JLabel(" Driver: "), gbc, 0, 0, 1, 1);
+            Utils.add(dbLoadDialog, new JLabel(" URL: "), gbc, 0, 1, 1, 1);
+            Utils.add(dbLoadDialog, new JLabel(" User: "), gbc, 0, 2, 1, 1);
+            Utils.add(dbLoadDialog, new JLabel(" Pwd: "), gbc, 2, 2, 1, 1);
+            Utils.add(dbLoadDialog, new JLabel(" DB: "), gbc, 0, 3, 1, 1);
+            Utils.add(dbLoadDialog, new JLabel(" Table: "), gbc, 0, 4, 1, 1);
 
             final JTextField DriverName = new JTextField("org.gjt.mm.mysql.Driver", 35);
             final JTextField URL = new JTextField("jdbc:mysql://137.250.124.51:3306/datasets", 35);
@@ -69,15 +69,15 @@ public class DBDatasetLoader {
             final JButton Cancel = new JButton("Cancel");
             gbc.fill = GridBagConstraints.BOTH;
             gbc.anchor = GridBagConstraints.CENTER;
-            Util.add(dbLoadDialog, DriverName, gbc, 1, 0, 3, 1);
-            Util.add(dbLoadDialog, URL, gbc, 1, 1, 3, 1);
-            Util.add(dbLoadDialog, Username, gbc, 1, 2, 1, 1);
-            Util.add(dbLoadDialog, Passwd, gbc, 3, 2, 1, 1);
-            Util.add(dbLoadDialog, DBList, gbc, 1, 3, 3, 1);
-            Util.add(dbLoadDialog, tableList, gbc, 1, 4, 3, 1);
+            Utils.add(dbLoadDialog, DriverName, gbc, 1, 0, 3, 1);
+            Utils.add(dbLoadDialog, URL, gbc, 1, 1, 3, 1);
+            Utils.add(dbLoadDialog, Username, gbc, 1, 2, 1, 1);
+            Utils.add(dbLoadDialog, Passwd, gbc, 3, 2, 1, 1);
+            Utils.add(dbLoadDialog, DBList, gbc, 1, 3, 3, 1);
+            Utils.add(dbLoadDialog, tableList, gbc, 1, 4, 3, 1);
             gbc.fill = GridBagConstraints.NONE;
-            Util.add(dbLoadDialog, Select, gbc, 1, 5, 1, 1);
-            Util.add(dbLoadDialog, Cancel, gbc, 3, 5, 1, 1);
+            Utils.add(dbLoadDialog, Select, gbc, 1, 5, 1, 1);
+            Utils.add(dbLoadDialog, Cancel, gbc, 3, 5, 1, 1);
 
             final JButton Load = new JButton("Load");
             dbLoadDialog.getRootPane().setDefaultButton(Load);
@@ -85,8 +85,8 @@ public class DBDatasetLoader {
             Connect.setEnabled(false);
             gbc.fill = GridBagConstraints.BOTH;
             gbc.anchor = GridBagConstraints.CENTER;
-            Util.add(dbLoadDialog, Load, gbc, 4, 0, 1, 1);
-            Util.add(dbLoadDialog, Connect, gbc, 4, 2, 1, 1);
+            Utils.add(dbLoadDialog, Load, gbc, 4, 0, 1, 1);
+            Utils.add(dbLoadDialog, Connect, gbc, 4, 2, 1, 1);
 
             dbLoadDialog.pack();
             dbLoadDialog.show();

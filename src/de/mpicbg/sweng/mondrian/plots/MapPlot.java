@@ -1,12 +1,13 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MFrame;
+import de.mpicbg.sweng.mondrian.MDialog;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.core.DragBox;
 import de.mpicbg.sweng.mondrian.core.Selection;
 import de.mpicbg.sweng.mondrian.plots.basic.MyPoly;
+import de.mpicbg.sweng.mondrian.ui.ColorManager;
 import de.mpicbg.sweng.mondrian.util.StatUtil;
-import de.mpicbg.sweng.mondrian.util.Util;
+import de.mpicbg.sweng.mondrian.util.Utils;
 import de.mpicbg.sweng.mondrian.util.r.RService;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RConnection;
@@ -58,12 +59,10 @@ public class MapPlot extends DragBox {
     /**
      * This constructor requires a Frame and a desired size
      */
-    public MapPlot(MFrame frame, int width, int height, DataSet data, Vector polys, JList varList) {
+    public MapPlot(MDialog frame, int width, int height, DataSet data, Vector polys, JList varList) {
         super(frame);
         this.polys = polys;
         this.data = data;
-        int width1 = width;
-        int height1 = height;
 
         border = 20;
         if (varList.getSelectedIndices().length > 0)
@@ -520,8 +519,8 @@ public class MapPlot extends DragBox {
         if (printing) {
             bg = g;
         }
-        if (oldWidth != size.width || oldHeight != size.height || scaleChanged || colorChanged || frame.getBackground() != MFrame.backgroundColor) {
-            frame.setBackground(MFrame.backgroundColor);
+        if (oldWidth != size.width || oldHeight != size.height || scaleChanged || colorChanged || frame.getBackground() != ColorManager.backgroundColor) {
+            frame.setBackground(ColorManager.backgroundColor);
             p.setPreferredSize(new Dimension(frame.getWidth(), 2 + maxField.getY() + maxField.getHeight()));
             colorChanged = false;
             create();
@@ -618,11 +617,11 @@ public class MapPlot extends DragBox {
                 if (((minField.getText()).trim()).equals(""))
                     min = data.getMin(displayVar);
                 else
-                    min = Util.atod(minField.getText());
+                    min = Utils.atod(minField.getText());
                 if (((maxField.getText()).trim()).equals(""))
                     max = data.getMax(displayVar);
                 else
-                    max = Util.atod(maxField.getText());
+                    max = Utils.atod(maxField.getText());
             } else {
                 shadeI = data.getRank(displayVar);
                 min = 0;
@@ -644,9 +643,9 @@ public class MapPlot extends DragBox {
                     if (data.colorBrush)
                         p.setColor(data.getColor(match[i]));
                     else
-                        p.setColor(MFrame.objectColor);
+                        p.setColor(ColorManager.objectColor);
                 } else
-                    p.setColor(MFrame.backgroundColor);
+                    p.setColor(ColorManager.backgroundColor);
             else {
                 float intensity = 0;
                 if (match[i] > -1) {
@@ -675,7 +674,7 @@ public class MapPlot extends DragBox {
                 }
 //System.out.println("Intensity: "+intensity);
                 if (p.Id == -1)
-                    p.setColor(MFrame.backgroundColor);
+                    p.setColor(ColorManager.backgroundColor);
                 else if (miss[match[i]])
                     p.setColor(Color.white);
                 else if (scheme.equals("gray"))

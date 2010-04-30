@@ -44,7 +44,7 @@ public class TransformAction extends AbstractAction {
 
         System.out.println("Transform: " + mode);
         String name = "";
-        DataSet data = monFrame.getCurrentDataSet();
+        DataSet data = monFrame.getController().getCurrentDataSet();
 
         double[] tData = new double[data.n];
         boolean[] tMiss = new boolean[data.n];

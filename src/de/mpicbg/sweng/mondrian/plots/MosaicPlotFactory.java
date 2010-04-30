@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MFrame;
+import de.mpicbg.sweng.mondrian.MDialog;
 import de.mpicbg.sweng.mondrian.MonFrame;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
@@ -27,7 +27,7 @@ public class MosaicPlotFactory extends AbstractPlotFactory {
     }
 
 
-    public PlotPanel createPlotPanel(MonFrame monFrame, MFrame plotFrame, DataSet dataSet, JList varNames) {
+    public PlotPanel createPlotPanel(MonFrame monFrame, MDialog plotDialog, DataSet dataSet, JList varNames) {
 
         int k = (varNames.getSelectedIndices()).length;
         int[] passBuffer = new int[k];
@@ -55,11 +55,11 @@ public class MosaicPlotFactory extends AbstractPlotFactory {
 //        plotw.addModelListener(modelNavigator);
 //        modelNavigatorButton.setEnabled(true);
 
-        return new MosaicPlot(plotFrame, 400, 400, breakdown);
+        return new MosaicPlot(plotDialog, 400, 400, breakdown);
     }
 
 
-    public boolean isCompliant(int numVariables, int numCategoricalVariables) {
+    public boolean isCompliant(DataSet dataSet, int numVariables, int numCategoricalVariables) {
         return numVariables > 2 && (numVariables - 1) == numCategoricalVariables;
     }
 }

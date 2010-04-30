@@ -1,5 +1,8 @@
 package de.mpicbg.sweng.mondrian.plots;
 
+import de.mpicbg.sweng.mondrian.core.DataSet;
+
+
 /**
  * Document me!
  *
@@ -20,7 +23,7 @@ public class ParallelBoxplotFactory extends ParallelPlotFactory {
 
 
     @Override
-    public boolean isCompliant(int numVariables, int numCategoricalVariables) {
+    public boolean isCompliant(DataSet dataSet, int numVariables, int numCategoricalVariables) {
 
         switch (numVariables) {
             case 1:

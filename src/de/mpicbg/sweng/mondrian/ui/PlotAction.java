@@ -1,7 +1,9 @@
 package de.mpicbg.sweng.mondrian.ui;
 
-import de.mpicbg.sweng.mondrian.MFrame;
+import de.mpicbg.sweng.mondrian.MDialog;
+import de.mpicbg.sweng.mondrian.MonController;
 import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.core.DragBox;
 import de.mpicbg.sweng.mondrian.core.PlotFactory;
 
@@ -41,11 +43,11 @@ public class PlotAction extends AbstractAction {
         // this was done for each plot in the originial version; why is not clear yet
         monFrame.checkHistoryBuffer();
 
-        final MFrame plotFrame = new MFrame(monFrame);
+        MDialog plotFrame = new MDialog(monFrame);
         Font SF = new Font("SansSerif", Font.PLAIN, 11);
         plotFrame.setFont(SF);
 
-        PlotPanel plotPanel = plotFactory.createPlotPanel(monFrame, plotFrame, monFrame.dataSets.elementAt(monFrame.dataSetCounter), monFrame.varNames);
+        PlotPanel plotPanel = plotFactory.createPlotPanel(monFrame, plotFrame, MonController.dataSets.elementAt(monFrame.dataSetCounter), monFrame.varNames);
 
 
         if (plotPanel != null) {
@@ -71,7 +73,7 @@ public class PlotAction extends AbstractAction {
     /**
      * Invoked to match the menu-options to the current variable selection.
      */
-    public void configureForVarSelection(int numVariables, int numCategoricalVariables) {
-        setEnabled(plotFactory.isCompliant(numVariables, numCategoricalVariables));
+    public void configureForVarSelection(DataSet dataSet, int numVariables, int numCategoricalVariables) {
+        setEnabled(plotFactory.isCompliant(dataSet, numVariables, numCategoricalVariables));
     }
 }

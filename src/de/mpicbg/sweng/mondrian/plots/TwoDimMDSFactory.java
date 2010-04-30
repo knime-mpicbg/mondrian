@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MFrame;
+import de.mpicbg.sweng.mondrian.MDialog;
 import de.mpicbg.sweng.mondrian.MonFrame;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
@@ -31,7 +31,7 @@ public class TwoDimMDSFactory extends AbstractPlotFactory {
     }
 
 
-    public PlotPanel createPlotPanel(MonFrame monFrame, MFrame plotFrame, DataSet dataSet, JList varNames) {
+    public PlotPanel createPlotPanel(MonFrame monFrame, MDialog plotDialog, DataSet dataSet, JList varNames) {
         int[] varsT = varNames.getSelectedIndices();
 
         try {
@@ -65,7 +65,7 @@ public class TwoDimMDSFactory extends AbstractPlotFactory {
             dataSet.addVariable("mds1", false, false, x1, new boolean[dataSet.n]);
             dataSet.addVariable("mds2", false, false, x2, new boolean[dataSet.n]);
 
-            Scatter2DPlot scatterPlot = new Scatter2DPlot(plotFrame, 400, 400, dataSet, new int[]{dataSet.k - 2, dataSet.k - 1}, varNames, false);
+            Scatter2DPlot scatterPlot = new Scatter2DPlot(plotDialog, 400, 400, dataSet, new int[]{dataSet.k - 2, dataSet.k - 1}, varNames, false);
             scatterPlot.setName(getPlotName());
         } catch (RserveException rse) {
             System.out.println("Rserve exception: " + rse.getMessage());
@@ -81,7 +81,7 @@ public class TwoDimMDSFactory extends AbstractPlotFactory {
     }
 
 
-    public boolean isCompliant(int numVariables, int numCategoricalVariables) {
+    public boolean isCompliant(DataSet dataSet, int numVariables, int numCategoricalVariables) {
         return numVariables > 2 && numVariables - numCategoricalVariables > 2 && RService.hasR();
     }
 }

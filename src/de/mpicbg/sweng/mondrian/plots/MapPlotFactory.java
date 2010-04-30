@@ -1,9 +1,10 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MFrame;
+import de.mpicbg.sweng.mondrian.MDialog;
 import de.mpicbg.sweng.mondrian.MonFrame;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
+import de.mpicbg.sweng.mondrian.core.MapCache;
 import de.mpicbg.sweng.mondrian.ui.PlotPanel;
 
 import javax.swing.*;
@@ -26,8 +27,8 @@ public class MapPlotFactory extends AbstractPlotFactory {
     }
 
 
-    public PlotPanel createPlotPanel(MonFrame monFrame, MFrame plotFrame, DataSet dataSet, JList varNames) {
-        MapPlot mapPlot = new MapPlot(plotFrame, 400, 400, dataSet, monFrame.polys, varNames);
+    public PlotPanel createPlotPanel(MonFrame monFrame, MDialog plotDialog, DataSet dataSet, JList varNames) {
+        MapPlot mapPlot = new MapPlot(plotDialog, 400, 400, dataSet, monFrame.polys, varNames);
 
         if (mapPlot.ratio > 1)
             mapPlot.setSize((int) (350 * mapPlot.ratio), 350 + 56);
@@ -38,7 +39,7 @@ public class MapPlotFactory extends AbstractPlotFactory {
     }
 
 
-    public boolean isCompliant(int numVariables, int numCategoricalVariables) {
-        return true;
+    public boolean isCompliant(DataSet dataSet, int numVariables, int numCategoricalVariables) {
+        return MapCache.getInstance().getPolys(dataSet).size() > 0;
     }
 }

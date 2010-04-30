@@ -2,13 +2,13 @@ package de.mpicbg.sweng.mondrian;//
 //	File:		AboutBox.java
 //
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 
-public class AboutBox extends Frame
-        implements ActionListener {
+public class AboutBox extends JDialog implements ActionListener {
 
 
     public AboutBox() {

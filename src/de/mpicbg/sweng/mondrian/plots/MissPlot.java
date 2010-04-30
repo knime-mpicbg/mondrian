@@ -1,11 +1,12 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MFrame;
+import de.mpicbg.sweng.mondrian.MDialog;
 import de.mpicbg.sweng.mondrian.core.*;
 import de.mpicbg.sweng.mondrian.plots.basic.MyRect;
 import de.mpicbg.sweng.mondrian.plots.basic.MyText;
+import de.mpicbg.sweng.mondrian.ui.ColorManager;
 import de.mpicbg.sweng.mondrian.util.Qsort;
-import de.mpicbg.sweng.mondrian.util.Util;
+import de.mpicbg.sweng.mondrian.util.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -39,7 +40,7 @@ public class MissPlot extends DragBox implements ActionListener {
     private int k;
 
 
-    public MissPlot(MFrame frame, DataSet data, int[] vars) {
+    public MissPlot(MDialog frame, DataSet data, int[] vars) {
         super(frame);
 
         this.vars = vars;
@@ -176,7 +177,7 @@ public class MissPlot extends DragBox implements ActionListener {
 
     public void paint(Graphics2D g) {
 
-        frame.setBackground(MFrame.backgroundColor);
+        frame.setBackground(ColorManager.backgroundColor);
 
         Dimension size;
         if (!printing)
@@ -214,7 +215,7 @@ public class MissPlot extends DragBox implements ActionListener {
 
         int start = -1, stop = k - 1;
 
-        bg.setColor(MFrame.lineColor);
+        bg.setColor(ColorManager.lineColor);
 
         if (!printing) {
             for (int i = 0; i < labels.size(); i++) {
@@ -292,7 +293,7 @@ public class MissPlot extends DragBox implements ActionListener {
             for (int i = 0; i < rects.size(); i++) {
                 MyRect r = (MyRect) rects.elementAt(i);
                 if (r.contains(e.getX(), e.getY() + sb.getValue())) {
-                    return Util.info2Html(r.getLabel());
+                    return Utils.info2Html(r.getLabel());
                 }
             }
             // end FOR
@@ -422,7 +423,7 @@ public class MissPlot extends DragBox implements ActionListener {
                 moving = false;
                 movingRectO.moveTo(-1, oldY);
                 movingRectM.moveTo(-1, oldY);
-                frame.setCursor(Frame.DEFAULT_CURSOR);
+                frame.setCursor(Cursor.getDefaultCursor());
                 out:
                 {
                     for (int i = 0; i < rects.size(); i += 2) {

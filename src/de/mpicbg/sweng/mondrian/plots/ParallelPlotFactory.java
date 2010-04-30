@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MFrame;
+import de.mpicbg.sweng.mondrian.MDialog;
 import de.mpicbg.sweng.mondrian.MonFrame;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
@@ -26,7 +26,7 @@ public class ParallelPlotFactory extends AbstractPlotFactory {
     }
 
 
-    public PlotPanel createPlotPanel(MonFrame monFrame, MFrame plotFrame, DataSet dataSet, JList varNames) {
+    public PlotPanel createPlotPanel(MonFrame monFrame, MDialog plotDialog, DataSet dataSet, JList varNames) {
         int k = (varNames.getSelectedIndices()).length;
         int[] passTmpBuffer = new int[k];
         int count = 0;
@@ -38,11 +38,11 @@ public class ParallelPlotFactory extends AbstractPlotFactory {
         int[] passBuffer = new int[count];
         System.arraycopy(passTmpBuffer, 0, passBuffer, 0, count);
 
-        return new ParallelPlot(plotFrame, dataSet, passBuffer, getMode(), varNames);
+        return new ParallelPlot(plotDialog, dataSet, passBuffer, getMode(), varNames);
     }
 
 
-    public boolean isCompliant(int numVariables, int numCategoricalVariables) {
+    public boolean isCompliant(DataSet dataSet, int numVariables, int numCategoricalVariables) {
         return numVariables > 1;
     }
 

@@ -2,7 +2,6 @@ package de.mpicbg.sweng.mondrian;
 
 
 import com.apple.mrj.MRJApplicationUtils;
-import com.apple.mrj.MRJOpenDocumentHandler;
 import com.apple.mrj.MRJQuitHandler;
 import de.mpicbg.sweng.mondrian.core.*;
 import de.mpicbg.sweng.mondrian.io.AsciiFileLoader;
@@ -14,9 +13,10 @@ import de.mpicbg.sweng.mondrian.plots.basic.MyPoly;
 import de.mpicbg.sweng.mondrian.ui.AttributeCellRenderer;
 import de.mpicbg.sweng.mondrian.ui.PlotAction;
 import de.mpicbg.sweng.mondrian.ui.PreferencesFrame;
+import de.mpicbg.sweng.mondrian.ui.SaveDataSetAction;
 import de.mpicbg.sweng.mondrian.ui.transform.TransformAction;
 import de.mpicbg.sweng.mondrian.util.StatUtil;
-import de.mpicbg.sweng.mondrian.util.Util;
+import de.mpicbg.sweng.mondrian.util.Utils;
 import de.mpicbg.sweng.mondrian.util.r.RService;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
@@ -29,26 +29,22 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Vector;
-import java.util.prefs.Preferences;
 
 
-public class MonFrame extends JFrame implements ProgressIndicator, SelectionListener, DataListener, MRJQuitHandler, MRJOpenDocumentHandler {
+public class MonFrame extends JFrame implements ProgressIndicator, SelectionListener, DataListener, MRJQuitHandler {
+
+    MonController controller;
 
     /**
      * Remember # of open windows so we can quit when last one is closed
      */
     protected static int num_windows = 0;
-    public static Vector<DataSet> dataSets;
 
     private java.util.List<Mondrian> mondrians = new ArrayList<Mondrian>();
     protected static Vector<MonFrame> monFrames;
@@ -77,9 +73,6 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     private JMenuItem closeDataSetMenuItem;
 
 
-    // plot menu items // todo these should all go into the factory
-    private JMenuItem mapPlotMenuItem;
-
     public JMenuItem closeAllMenuItem, colorsMenuItem, selectionMenuItem, me, transPlus, transMinus, transTimes, transDiv, transNeg, transInv, transLog, transExp;
     private JCheckBoxMenuItem selSeqCheckItem;
     private JCheckBoxMenuItem alphaOnHighlightCheckMenuItem;
@@ -89,8 +82,6 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     private ModelNavigator modelNavigator;
     public int dataSetCounter = -1;
     private int dCol = 1, dSel = 1;
-    private int graphicsPerf;
-    static String user;
     public boolean mondrianRunning = false;
     public int[] selectBuffer;
     private String searchText = "";
@@ -103,34 +94,15 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
         monFrames.addElement(this);
 
-        MRJApplicationUtils.registerOpenDocumentHandler(this);
-
-        //    System.out.println("........... Creating new Instance of MonFrame .........");
-
-
         Toolkit.getDefaultToolkit().setDynamicLayout(false);
-
         MRJApplicationUtils.registerQuitHandler(this);
 
-        PreferencesFrame.setScheme(2);
-
-        // Read Preferences
-        Preferences prefs = Preferences.userNodeForPackage(this.getClass());
-
-        if (!prefs.get("color.background", "").equals("")) {
-            MFrame.backgroundColor = Util.hrgb2color(prefs.get("color.background", ""));
-            MFrame.objectColor = Util.hrgb2color(prefs.get("color.objects", ""));
-            MFrame.lineColor = Util.hrgb2color(prefs.get("color.line", ""));
-            DragBox.hiliteColor = Util.hrgb2color(prefs.get("color.select", ""));
-        }
-
         // Start Rserve
-        System.out.println("Starting RServe ... ");
         RService.init();
 
         Font SF = new Font("SansSerif", Font.BOLD, 12);
         this.setFont(SF);
-        MonFrame.dataSets = dataSets;
+        MonController.dataSets = dataSets;
         MonFrame.monFrames = monFrames;
         this.setTitle("Mondrian");               // Create the window.
         num_windows++;                           // Count it.
@@ -154,11 +126,8 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         openDataBaseMenuItem.setEnabled(true);
 
 
-        file.add(saveMenuItem = new JMenuItem("Save"));
-        saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        saveMenuItem.setEnabled(false);
-
-        file.add(saveSelectionMenuItem = new JMenuItem("Save Selection"));
+        file.add(saveMenuItem = new JMenuItem(new SaveDataSetAction("Save", false, controller)));
+        file.add(saveSelectionMenuItem = new JMenuItem(new SaveDataSetAction("Save Selection", true, controller)));
 
         saveSelectionMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         saveSelectionMenuItem.setEnabled(false);
@@ -278,7 +247,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
         this.setJMenuBar(menubar);                 // Add it to the frame.
 
-        Icon MondrianIcon = new ImageIcon(Util.readGif("/Logo.gif"));
+        Icon MondrianIcon = new ImageIcon(Utils.readGif("/Logo.gif"));
 
         JLabel MondrianLabel = new JLabel(MondrianIcon);
         scrollPane = new JScrollPane(MondrianLabel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -319,20 +288,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 new DataFrameConverter(MonFrame.this).loadDataFrame();
             }
         });
-        saveMenuItem.addActionListener(new ActionListener() {     // Save the current dataset
 
-
-            public void actionPerformed(ActionEvent e) {
-                Save(false);
-            }
-        });
-        saveSelectionMenuItem.addActionListener(new ActionListener() {     // Save the current selection
-
-
-            public void actionPerformed(ActionEvent e) {
-                Save(true);
-            }
-        });
         openDataBaseMenuItem.addActionListener(new ActionListener() {     // Load a database
 
 
@@ -458,7 +414,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
 
             public void actionPerformed(ActionEvent e) {
-                Util.showRefCard(MonFrame.this);
+                Utils.showRefCard(MonFrame.this);
             }
         });
         oh.addActionListener(new ActionListener() {     // Show Mondrian Webpage.
@@ -486,7 +442,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
         this.addWindowListener(new WindowAdapter() {
             public void windowActivated(WindowEvent e) {
-                topWindow();
+//                topWindow();
             }
         });
 
@@ -494,13 +450,6 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         this.setResizable(false);
         this.setSize(295, 320);
         this.show();
-
-        if (dataSets.isEmpty())
-            graphicsPerf = setGraphicsPerformance();
-        else if (dataSets.firstElement().graphicsPerf != 0)
-            graphicsPerf = dataSets.firstElement().graphicsPerf;
-        else
-            graphicsPerf = 25000;
 
         Graphics g = this.getGraphics();
         g.setFont(new Font("SansSerif", 0, 11));
@@ -538,7 +487,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
      * @param data dataset to open
      */
     public MonFrame(DataSet data) {
-        this((monFrames == null) ? new Vector<MonFrame>(5, 5) : monFrames, (dataSets == null) ? new Vector<DataSet>(5, 5) : dataSets, false, false, null);
+        this((monFrames == null) ? new Vector<MonFrame>(5, 5) : monFrames, (MonController.dataSets == null) ? new Vector<DataSet>(5, 5) : MonController.dataSets, false, false, null);
 
         initWithData(data);
     }
@@ -550,17 +499,17 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
      * @param data dataset to use
      */
     public void initWithData(DataSet data) {
-        dataSets.addElement(data);
-        dataSetCounter = dataSets.size() - 1;
+        MonController.dataSets.addElement(data);
+        dataSetCounter = MonController.dataSets.size() - 1;
         selectBuffer = new int[data.k + 15];
         setVarList();
-        this.setTitle("Mondrian(" + dataSets.elementAt(dataSetCounter).setName + ")");               //
+        this.setTitle("Mondrian(" + controller.getCurrentDataSet().setName + ")");               //
         me.setText(this.getTitle());
         closeDataSetMenuItem.setEnabled(true);
         saveMenuItem.setEnabled(true);
 
-        int nom = dataSets.elementAt(dataSetCounter).countSelection();
-        int denom = dataSets.elementAt(dataSetCounter).n;
+        int nom = controller.getCurrentDataSet().countSelection();
+        int denom = controller.getCurrentDataSet().n;
         String Display = nom + "/" + denom + " (" + StatUtil.roundToString(100 * nom / denom, 2) + "%)";
         progText.setText(Display);
         progBar.setValue(nom);
@@ -584,23 +533,6 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     }
 
 
-    int setGraphicsPerformance() {
-
-        int graphicsPerf = 0;
-        Image testI = createImage(200, 200);        //
-        Graphics2D gI = (Graphics2D) testI.getGraphics();
-        gI.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, ((float) 0.05)));
-        long start = new java.util.Date().getTime();
-        while (new java.util.Date().getTime() - start < 1000) {
-            graphicsPerf++;
-            gI.fillOval(10, 10, 3, 3);
-        }
-        System.out.println("Graphics Performance: " + graphicsPerf);
-
-        return graphicsPerf;
-    }
-
-
     /**
      * Close a window.  If this is the last open window, just quit.
      */
@@ -614,17 +546,17 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
             return;
         }
 
-        String message = "Close dataset \"" + dataSets.elementAt(dataSetCounter).setName + "\" and\n all corresponding plots?";
+        String message = "Close dataset \"" + controller.getCurrentDataSet().setName + "\" and\n all corresponding plots?";
 
         int answer = JOptionPane.showConfirmDialog(this, message);
         if (answer == JOptionPane.YES_OPTION) {
             num_windows--;
             for (int i = plots.size() - 1; i >= 0; i--)
                 plots.elementAt(i).frame.close();
-            dataSets.setElementAt(new DataSet("nullinger"), dataSetCounter);
+            MonController.dataSets.setElementAt(new DataSet("nullinger"), dataSetCounter);
             this.dispose();
             if (num_windows == 0) {
-                new MonFrame(monFrames, dataSets, false, false, null);
+                new MonFrame(monFrames, MonController.dataSets, false, false, null);
                 //        System.out.println(" -----------------------> disposing MonFrame !!!!!!!!!!!!!!!!");
                 this.dispose();
             }
@@ -641,7 +573,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
 
     public void switchSelection() {
-        if (dataSetCounter > -1 && dataSets.elementAt(dataSetCounter).isDB)
+        if (dataSetCounter > -1 && controller.getCurrentDataSet().isDB)
             selseq = true;
         else {
             selseq = selSeqCheckItem.isSelected();
@@ -660,7 +592,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
     public void selectAll() {
         if (dataSetCounter > -1) {
-            dataSets.elementAt(dataSetCounter).selectAll();
+            controller.getCurrentDataSet().selectAll();
             updateSelection();
         }
     }
@@ -668,7 +600,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
     public void toggleSelection() {
         if (dataSetCounter > -1) {
-            dataSets.elementAt(dataSetCounter).toggleSelection();
+            controller.getCurrentDataSet().toggleSelection();
             updateSelection();
         }
     }
@@ -676,7 +608,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
     public void clearColors() {
         if (dataSetCounter > -1) {
-            dataSets.elementAt(dataSetCounter).colorsOff();
+            controller.getCurrentDataSet().colorsOff();
             dataChanged(-1);
         }
     }
@@ -692,7 +624,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     public void deriveVariable(boolean color) {
 
         String name;
-        DataSet data = dataSets.elementAt(dataSetCounter);
+        DataSet data = controller.getCurrentDataSet();
         if (color)
             name = "Colors " + dCol++;
         else
@@ -823,7 +755,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 }
             }
             sqlConditions = new Query();                // Replace ???
-            if (dataSets.elementAt(dataSetCounter).isDB)
+            if (controller.getCurrentDataSet().isDB)
                 for (int i = 0; i < selList.size(); i++) {
                     Selection S = selList.elementAt(i);
                     if (S.mode == Selection.MODE_STANDARD)
@@ -832,22 +764,22 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                     if (!condStr.equals(""))
                         sqlConditions.addCondition(Selection.getSQLModeString(S.mode), "(" + condStr + ")");
                 }
-            dataSets.elementAt(dataSetCounter).sqlConditions = sqlConditions;
+            controller.getCurrentDataSet().sqlConditions = sqlConditions;
 
             //      System.out.println("Main Update: "+sqlConditions.makeQuery());
 
         } else {
             if (toggleSelection) {
                 System.out.println(" TOGGLE SELECTION ... ");
-                dataSets.elementAt(dataSetCounter).toggleSelection();
+                controller.getCurrentDataSet().toggleSelection();
             } else if (unSelect) {
                 System.out.println(" UNSELECT ... ");
-                dataSets.elementAt(dataSetCounter).clearSelection();
+                controller.getCurrentDataSet().clearSelection();
             } else {
                 System.out.println(" SELECT ALL ... ");
-                dataSets.elementAt(dataSetCounter).selectAll();
+                controller.getCurrentDataSet().selectAll();
             }
-            if (dataSets.elementAt(dataSetCounter).isDB)
+            if (controller.getCurrentDataSet().isDB)
                 sqlConditions.clearConditions();
         }
 
@@ -859,9 +791,9 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
             plots.elementAt(i).updateSelection();
         }
 
-        dataSets.elementAt(dataSetCounter).selChanged = true;
-        int nom = dataSets.elementAt(dataSetCounter).countSelection();
-        int denom = dataSets.elementAt(dataSetCounter).n;
+        controller.getCurrentDataSet().selChanged = true;
+        int nom = controller.getCurrentDataSet().countSelection();
+        int denom = controller.getCurrentDataSet().n;
         String Display = nom + "/" + denom + " (" + StatUtil.roundToString(100F * nom / denom, 2) + "%)";
         progText.setText(Display);
         progBar.setValue(nom);
@@ -888,7 +820,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
             int col = plots.elementAt(i).colorSet;
             if (col > -1) {
                 plots.elementAt(i).colorSet = -1;
-                DataSet data = dataSets.elementAt(dataSetCounter);
+                DataSet data = controller.getCurrentDataSet();
                 id = -1;
                 if (col < 999) {
                     System.out.println("Setting Colors !!!!");
@@ -913,79 +845,6 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     }
 
 
-    public void Save(boolean selection) {
-        checkHistoryBuffer();
-
-        FileDialog f;
-        if (selection)
-            f = new FileDialog(this, "Save Selection", FileDialog.SAVE);
-        else
-            f = new FileDialog(this, "Save Data", FileDialog.SAVE);
-        f.show();
-        if (f.getFile() != null)
-            saveDataSet(f.getDirectory() + f.getFile(), selection);
-    }
-
-
-    public boolean saveDataSet(String file, boolean selection) {
-        try {
-            int k = dataSets.elementAt(dataSetCounter).k;
-            int n = dataSets.elementAt(dataSetCounter).n;
-
-            FileWriter fw = new FileWriter(file);
-
-            double[][] dataCopy = new double[k][n];
-            boolean[][] missing = new boolean[k][n];
-            DataSet data = dataSets.elementAt(dataSetCounter);
-            double[] selected = data.getSelection();
-            for (int j = 0; j < k; j++) {
-                missing[j] = data.getMissings(j);
-                if (data.categorical(j) && !data.alpha(j))
-                    dataCopy[j] = data.getRawNumbers(j);
-                else
-                    dataCopy[j] = data.getNumbers(j);
-            }
-
-            String line = "";
-            NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "US"));
-            DecimalFormat df = (DecimalFormat) nf;
-            df.applyPattern("#.#################");
-
-            boolean first = true;
-            for (int j = 0; j < k; j++)
-                if ((varNames.getSelectedIndices().length == 0) || varNames.isSelectedIndex(j)) {
-                    line += (first ? "" : "\t") + data.getName(j);
-                    first = false;
-                }
-            fw.write(line + "\r");
-
-            for (int i = 0; i < n; i++) {
-                if (!selection || (selection && selected[i] > 0)) {
-                    line = "";
-                    first = true;
-                    for (int j = 0; j < k; j++)
-                        if ((varNames.getSelectedIndices().length == 0) || varNames.isSelectedIndex(j)) {
-                            if (missing[j][i])
-                                line += (first ? "" : "\t") + "NA";
-                            else if (data.categorical(j))
-                                line += (first ? "" : "\t") + data.getLevelName(j, dataCopy[j][i]);
-                            else
-                                line += (first ? "" : "\t") + df.format(dataCopy[j][i]);
-                            first = false;
-                        }
-                    fw.write(line + (i == (n - 1) ? "" : "\r"));
-                }
-            }
-            fw.close();
-
-        } catch (Exception ex) {
-            System.out.println("Error writing to file: " + ex);
-            return false;
-        }
-        return true;
-    }
-
-
     public void loadDataSet(boolean isDB, File file, String title) {
 
         //    System.out.println(".......... IN loadDataSet("+thisDataSet+") IN .........");
@@ -996,15 +855,15 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
             if (new AsciiFileLoader(this).loadAsciiFile(file)) {
                 setVarList();
                 if (title.equals(""))
-                    this.setTitle("Mondrian(" + dataSets.elementAt(dataSetCounter).setName + ")");               //
+                    this.setTitle("Mondrian(" + controller.getCurrentDataSet().setName + ")");               //
                 else
                     this.setTitle("Mondrian(" + title + ")");
                 me.setText(this.getTitle());
                 closeDataSetMenuItem.setEnabled(true);
                 saveMenuItem.setEnabled(true);
 
-                int nom = dataSets.elementAt(dataSetCounter).countSelection();
-                int denom = dataSets.elementAt(dataSetCounter).n;
+                int nom = controller.getCurrentDataSet().countSelection();
+                int denom = controller.getCurrentDataSet().n;
                 String Display = nom + "/" + denom + " (" + StatUtil.roundToString(100 * nom / denom, 2) + "%)";
                 progText.setText(Display);
                 progBar.setValue(nom);
@@ -1012,10 +871,8 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 maintainOptionMenu();
             }
         } else {
-            new MonFrame(monFrames, dataSets, true, isDB, file);
+            new MonFrame(monFrames, MonController.dataSets, true, isDB, file);
         }
-        if (dataSetCounter != -1)
-            dataSets.elementAt(dataSetCounter).graphicsPerf = graphicsPerf;
     }
 
 
@@ -1025,8 +882,8 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
             return;
         }
         if (dataSetCounter == -1)
-            dataSetCounter = dataSets.size() - 1;
-        final DataSet data = dataSets.elementAt(dataSetCounter);
+            dataSetCounter = MonController.dataSets.size() - 1;
+        final DataSet data = controller.getCurrentDataSet();
         String listNames[] = new String[data.k];
         for (int j = 0; j < data.k; j++) {
             listNames[j] = " " + data.getName(j);
@@ -1129,9 +986,6 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
         RepaintManager currentManager = RepaintManager.currentManager(varNames);
         currentManager.setDoubleBufferingEnabled(true);
-
-        if (polys.size() > 0)
-            mapPlotMenuItem.setEnabled(true);
 
         this.setResizable(true);
 
@@ -1251,7 +1105,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
     public void switchVariableMode() {
         for (int i = 0; i < varNames.getSelectedIndices().length; i++) {
             int index = (varNames.getSelectedIndices())[i];
-            DataSet data = dataSets.elementAt(dataSetCounter);
+            DataSet data = controller.getCurrentDataSet();
             if (!data.alpha(index)) {
                 if (data.categorical(index))
                     data.catToNum(index);
@@ -1267,7 +1121,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
     public void getSelectedTypes() {
         numCategorical = 0;
         for (int i = 0; i < varNames.getSelectedIndices().length; i++) {
-            if (dataSets.elementAt(dataSetCounter).categorical(varNames.getSelectedIndices()[i]))
+            if (controller.getCurrentDataSet().categorical(varNames.getSelectedIndices()[i]))
                 numCategorical++;
             else
                 weightIndex = varNames.getSelectedIndices()[i];
@@ -1312,8 +1166,8 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
     public void maintainPlotMenu() {
         if (dataSetCounter == -1) {
-            if (dataSets.size() > 0)
-                dataSetCounter = dataSets.size() - 1;
+            if (MonController.dataSets.size() > 0)
+                dataSetCounter = MonController.dataSets.size() - 1;
             else return; // invalid state, don't bother
         }
 
@@ -1333,7 +1187,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
                 if (varNames.getSelectedIndices().length == 0) {
                     plotAction.setEnabled(false);
                 } else {
-                    plotAction.configureForVarSelection((varNames.getSelectedIndices()).length, numCategorical);
+                    plotAction.configureForVarSelection(controller.getCurrentDataSet(), (varNames.getSelectedIndices()).length, numCategorical);
                 }
             }
         }
@@ -1346,7 +1200,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
     private void updateTrafoMenuToVarSelection() {
         int alphs = 0;
-        DataSet data = dataSets.elementAt(dataSetCounter);
+        DataSet data = controller.getCurrentDataSet();
         for (int i = 0; i < varNames.getSelectedIndices().length; i++) {
             if (data.alpha(varNames.getSelectedIndices()[i]))
                 alphs++;
@@ -1372,7 +1226,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
 
     public void maintainOptionMenu() {
-        DataSet data = dataSets.elementAt(dataSetCounter);
+        DataSet data = controller.getCurrentDataSet();
 
         // Selection
         if (data.countSelection() == 0)
@@ -1403,22 +1257,8 @@ public void handlePrintFile(ApplicationEvent event) {} */
     }
 
 
-    public void handleOpenFile(File inFile) {
-        //  handleOpenFile does not get an Event if a file is dropped on a non-running Mondrian.app, so we need to get it here, but only in this singular situation!
-        //
-        //    System.out.println(".......... CALL loadDataSet("+inFile+") FROM handleOpenFile IN MonFrame .........");
-        if (mondrianRunning)
-            return;
-        while (!mondrianRunning)
-            System.out.println(" wait for Mondrian to initialize ...");   // Wait until Mondrian initialized
-        if (!dataSets.isEmpty())
-            return;
-        loadDataSet(false, inFile, "");
-    }
-
-
     public void setDataSet(DataSet data) {
-        dataSets.addElement(data);
+        MonController.dataSets.addElement(data);
         setVarList();
         selseq = true;
         selSeqCheckItem.setSelected(true);
@@ -1426,7 +1266,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
     }
 
 
-    public void regiserPlotFactory(PlotFactory plotFactory) {
+    public void registerPlotFactory(PlotFactory plotFactory) {
         plotFacRegistry.add(plotFactory);
 
         // add the new factory to the main-menu
@@ -1434,7 +1274,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
     }
 
 
-    public DataSet getCurrentDataSet() {
-        return dataSets.elementAt(dataSetCounter);
+    public MonController getController() {
+        return controller;
     }
 }

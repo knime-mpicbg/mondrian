@@ -1,13 +1,14 @@
 package de.mpicbg.sweng.mondrian.plots;
 
 
-import de.mpicbg.sweng.mondrian.MFrame;
+import de.mpicbg.sweng.mondrian.MDialog;
 import de.mpicbg.sweng.mondrian.core.*;
 import de.mpicbg.sweng.mondrian.plots.basic.MyRect;
 import de.mpicbg.sweng.mondrian.plots.basic.MyText;
+import de.mpicbg.sweng.mondrian.ui.ColorManager;
 import de.mpicbg.sweng.mondrian.util.Qsort;
 import de.mpicbg.sweng.mondrian.util.StatUtil;
-import de.mpicbg.sweng.mondrian.util.Util;
+import de.mpicbg.sweng.mondrian.util.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -69,7 +70,7 @@ public class ParallelPlot extends DragBox implements ActionListener {
     private static EventQueue evtq;
 
 
-    public ParallelPlot(MFrame frame, DataSet data, int[] vars, String mode, JList varList) {
+    public ParallelPlot(MDialog frame, DataSet data, int[] vars, String mode, JList varList) {
         super(frame);
         Dimension size = frame.getSize();
         this.width = size.width;
@@ -184,7 +185,7 @@ public class ParallelPlot extends DragBox implements ActionListener {
             if (minXDist < slotWidth / 4) {
                 String x = "";
                 if (data.phoneNumber(vars[permA[popXId]])) {
-                    x = " " + data.getName(vars[permA[popXId]]) + '\n' + " Number\t " + Util.toPhoneNumber(dataCopy[permA[popXId]][popYId]);
+                    x = " " + data.getName(vars[permA[popXId]]) + '\n' + " Number\t " + Utils.toPhoneNumber(dataCopy[permA[popXId]][popYId]);
                 } else if (data.categorical(vars[permA[popXId]]))
                     if (paintMode.equals("Poly")) {
                         x = " " + data.getName(vars[permA[popXId]]);
@@ -193,7 +194,7 @@ public class ParallelPlot extends DragBox implements ActionListener {
                         for (int i = 0; i < rects.size(); i++) {
                             MyRect r = (MyRect) rects.elementAt(i);
                             if (r.contains(e.getX(), e.getY() + sb.getValue())) {
-                                return Util.info2Html(r.getLabel());
+                                return Utils.info2Html(r.getLabel());
                             }
                         }
                 else {
@@ -237,7 +238,7 @@ public class ParallelPlot extends DragBox implements ActionListener {
                             x = x + " \n Value\t " + dataCopy[permA[popXId]][popYId];
                     }
                 }
-                return Util.info2Html(x);
+                return Utils.info2Html(x);
             }
             return null;
         } else
@@ -855,7 +856,7 @@ public class ParallelPlot extends DragBox implements ActionListener {
             create(width, height);
             update(this.getGraphics());
         } else if (command.equals("1.0") || command.equals("0.5") || command.equals("0.1") || command.equals("0.05") || command.equals("0.01") || command.equals("0.005")) {
-            alpha = (float) Util.atod(command);
+            alpha = (float) Utils.atod(command);
 //System.out.println("alpha: "+alpha);
 
             create(width, height);
@@ -961,7 +962,7 @@ public class ParallelPlot extends DragBox implements ActionListener {
         } else if (command.equals("center") || command.equals("cmean") || command.equals("cmedian") || command.equals("ccase") || command.equals("cvalue")) {
             alignMode = command;
             if (alignMode.equals("cvalue"))
-                centerAt = Util.atod(JOptionPane.showInputDialog(this, "Align values at:"));
+                centerAt = Utils.atod(JOptionPane.showInputDialog(this, "Align values at:"));
 
             create(width, height);
             update(this.getGraphics());
@@ -1019,8 +1020,8 @@ public class ParallelPlot extends DragBox implements ActionListener {
         else
             slotMax = 40;
 
-        if (scaleChanged || oldWidth != size.width || oldHeight != size.height || hotSelection || frame.getBackground() != MFrame.backgroundColor) {
-            frame.setBackground(MFrame.backgroundColor);
+        if (scaleChanged || oldWidth != size.width || oldHeight != size.height || hotSelection || frame.getBackground() != ColorManager.backgroundColor) {
+            frame.setBackground(ColorManager.backgroundColor);
 
             this.width = size.width;
             this.height = size.height;
@@ -1064,7 +1065,7 @@ public class ParallelPlot extends DragBox implements ActionListener {
 
             if (((alignMode.equals("center") || alignMode.equals("cvalue")) && Scale.equals("Individual")) || paintMode.equals("XbyY")) { // draw y-axis if the scaling options allow
                 //
-                bg.setColor(MFrame.lineColor);
+                bg.setColor(ColorManager.lineColor);
                 Font SF = new Font("SansSerif", Font.PLAIN, 11);
                 bg.setFont(SF);
                 FontMetrics fm = bg.getFontMetrics();
@@ -1107,7 +1108,7 @@ public class ParallelPlot extends DragBox implements ActionListener {
                     if (data.colorArray[i] > 0)
                         bg.setColor(cols[data.colorArray[i]]);
                     else
-                        bg.setColor(MFrame.lineColor);
+                        bg.setColor(ColorManager.lineColor);
                     if (!data.hasMissings)
                         bg.drawPolyline(poly[i].xpoints, poly[i].ypoints, k);
                     else
@@ -1260,7 +1261,7 @@ public class ParallelPlot extends DragBox implements ActionListener {
                 ttbg.setFont(SF);
                 ttbg.setColor(DragBox.hiliteColor);
             } else
-                ttbg.setColor(MFrame.lineColor);
+                ttbg.setColor(ColorManager.lineColor);
             // Set Y position of Text AFTER we set the font size
             if ((j % 2) == 1)
                 mt.moveYTo(border - 6);
@@ -1893,26 +1894,26 @@ S.o = new floatRect((double)((S.r.x - border) % slotWidth)/slotWidth,
                 // Base Boxes
                 g.setColor(Color.lightGray);
                 g.fillRect(mid - width / 2, uWP, width, uHP - uWP);
-                g.setColor(MFrame.lineColor);
+                g.setColor(ColorManager.lineColor);
                 g.drawRect(mid - width / 2, uWP, width, uHP - uWP);
                 g.setColor(Color.gray);
                 g.fillRect(mid - width / 2, uHP, width, medP - uHP);
-                g.setColor(MFrame.lineColor);
+                g.setColor(ColorManager.lineColor);
                 g.drawRect(mid - width / 2, uHP, width, medP - uHP);
                 g.setColor(Color.gray);
                 g.fillRect(mid - width / 2, medP, width, lHP - medP);
-                g.setColor(MFrame.lineColor);
+                g.setColor(ColorManager.lineColor);
                 g.drawRect(mid - width / 2, medP, width, lHP - medP);
                 g.setColor(Color.lightGray);
                 g.fillRect(mid - width / 2, lHP, width, lWP - lHP);
-                g.setColor(MFrame.lineColor);
+                g.setColor(ColorManager.lineColor);
                 g.drawRect(mid - width / 2, lHP, width, lWP - lHP);
                 // bold median line
                 ((Graphics2D) g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5F));
                 g.drawRect(mid - width / 2 - 1, medP - 1, width + 2, 2);
                 ((Graphics2D) g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0F));
 
-                g.setColor(MFrame.lineColor);
+                g.setColor(ColorManager.lineColor);
 
                 int dia = 3;
                 if (printing)

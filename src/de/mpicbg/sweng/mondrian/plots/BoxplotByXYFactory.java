@@ -1,5 +1,8 @@
 package de.mpicbg.sweng.mondrian.plots;
 
+import de.mpicbg.sweng.mondrian.core.DataSet;
+
+
 /**
  * Document me!
  *
@@ -17,7 +20,7 @@ public class BoxplotByXYFactory extends ParallelBoxplotFactory {
     }
 
 
-    public boolean isCompliant(int numVariables, int numCategoricalVariables) {
+    public boolean isCompliant(DataSet dataSet, int numVariables, int numCategoricalVariables) {
         return numVariables == 2 && numCategoricalVariables == 1;
     }
 }

@@ -154,6 +154,7 @@ public class RService {
 
 
     public static void init() {
+        System.out.println("Starting RServe ... ");
         hasR = RService.checkLocalRserve();
     }
 }

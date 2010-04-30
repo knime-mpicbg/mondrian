@@ -5,7 +5,7 @@ import de.mpicbg.sweng.mondrian.core.SelectionEvent;
 import de.mpicbg.sweng.mondrian.core.Table;
 import de.mpicbg.sweng.mondrian.plots.MosaicPlot;
 import de.mpicbg.sweng.mondrian.util.StatUtil;
-import de.mpicbg.sweng.mondrian.util.Util;
+import de.mpicbg.sweng.mondrian.util.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -69,48 +69,48 @@ public class ModelNavigator extends JFrame implements ActionListener, ModelListe
 
         //mosaic = NULL;
 
-        Util.add(this, new Label("Drop Int.:", Label.RIGHT), gbc, 1, 0, 1, 1);
-        Util.add(this, new Label("Model:", Label.RIGHT), gbc, 2, 0, 1, 1);
-        Util.add(this, new Label("Add Int.:", Label.RIGHT), gbc, 3, 0, 1, 1);
-        Util.add(this, new Label("G2=", Label.RIGHT), gbc, 0, 1, 1, 1);
-        Util.add(this, new Label("chi2=", Label.RIGHT), gbc, 0, 2, 1, 1);
-        Util.add(this, new Label("df=", Label.RIGHT), gbc, 0, 3, 1, 1);
-        Util.add(this, new Label("p=", Label.RIGHT), gbc, 0, 4, 1, 1);
+        Utils.add(this, new Label("Drop Int.:", Label.RIGHT), gbc, 1, 0, 1, 1);
+        Utils.add(this, new Label("Model:", Label.RIGHT), gbc, 2, 0, 1, 1);
+        Utils.add(this, new Label("Add Int.:", Label.RIGHT), gbc, 3, 0, 1, 1);
+        Utils.add(this, new Label("G2=", Label.RIGHT), gbc, 0, 1, 1, 1);
+        Utils.add(this, new Label("chi2=", Label.RIGHT), gbc, 0, 2, 1, 1);
+        Utils.add(this, new Label("df=", Label.RIGHT), gbc, 0, 3, 1, 1);
+        Utils.add(this, new Label("p=", Label.RIGHT), gbc, 0, 4, 1, 1);
 
         modelP = new Label(" -.----", Label.RIGHT);
-        Util.add(this, modelP, gbc, 2, 4, 1, 1);
+        Utils.add(this, modelP, gbc, 2, 4, 1, 1);
         currentP = new Label(" -.----", Label.RIGHT);
-        Util.add(this, currentP, gbc, 3, 4, 1, 1);
+        Utils.add(this, currentP, gbc, 3, 4, 1, 1);
         interP = new Label(" -.----", Label.RIGHT);
-        Util.add(this, interP, gbc, 1, 4, 1, 1);
+        Utils.add(this, interP, gbc, 1, 4, 1, 1);
 
         modelG2 = new Label("----.-", Label.RIGHT);
-        Util.add(this, modelG2, gbc, 2, 1, 1, 1);
+        Utils.add(this, modelG2, gbc, 2, 1, 1, 1);
         currentG2 = new Label("----.-", Label.RIGHT);
-        Util.add(this, currentG2, gbc, 3, 1, 1, 1);
+        Utils.add(this, currentG2, gbc, 3, 1, 1, 1);
         interG2 = new Label("----.-", Label.RIGHT);
-        Util.add(this, interG2, gbc, 1, 1, 1, 1);
+        Utils.add(this, interG2, gbc, 1, 1, 1, 1);
 
         modelX2 = new Label("----.-", Label.RIGHT);
-        Util.add(this, modelX2, gbc, 2, 2, 1, 1);
+        Utils.add(this, modelX2, gbc, 2, 2, 1, 1);
         currentX2 = new Label("----.-", Label.RIGHT);
-        Util.add(this, currentX2, gbc, 3, 2, 1, 1);
+        Utils.add(this, currentX2, gbc, 3, 2, 1, 1);
         interX2 = new Label("----.-", Label.RIGHT);
-        Util.add(this, interX2, gbc, 1, 2, 1, 1);
+        Utils.add(this, interX2, gbc, 1, 2, 1, 1);
 
         modelDf = new Label("----", Label.RIGHT);
-        Util.add(this, modelDf, gbc, 2, 3, 1, 1);
+        Utils.add(this, modelDf, gbc, 2, 3, 1, 1);
         currentDf = new Label("----", Label.RIGHT);
-        Util.add(this, currentDf, gbc, 3, 3, 1, 1);
+        Utils.add(this, currentDf, gbc, 3, 3, 1, 1);
         interDf = new Label("----", Label.RIGHT);
-        Util.add(this, interDf, gbc, 1, 3, 1, 1);
+        Utils.add(this, interDf, gbc, 1, 3, 1, 1);
 
-        Util.add(this, new Label("... in Plot:"), gbc, 3, 5, 1, 1);
+        Utils.add(this, new Label("... in Plot:"), gbc, 3, 5, 1, 1);
 
         for (int i = 0; i < 4; i++) {
             inter[i] = new Label("", Label.RIGHT);
             gbc.fill = GridBagConstraints.HORIZONTAL;
-            Util.add(this, inter[i], gbc, 2, 6 + i, 2, 1);
+            Utils.add(this, inter[i], gbc, 2, 6 + i, 2, 1);
         }
 
         interList = new List(5);
@@ -125,7 +125,7 @@ public class ModelNavigator extends JFrame implements ActionListener, ModelListe
 //    gbc.fill = GridBagConstraints.WEST;
         Panel P = new Panel();
         P.add(interList);
-        Util.add(this, interList, gbc, 0, 5, 2, 5);
+        Utils.add(this, interList, gbc, 0, 5, 2, 5);
 
         gbc.fill = GridBagConstraints.NONE;
         Button Remove = new Button("Remove");
@@ -142,9 +142,9 @@ public class ModelNavigator extends JFrame implements ActionListener, ModelListe
 
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.CENTER;
-        Util.add(this, Remove, gbc, 1, 10, 1, 1);
-        Util.add(this, Reset, gbc, 2, 10, 1, 1);
-        Util.add(this, Add, gbc, 3, 10, 1, 1);
+        Utils.add(this, Remove, gbc, 1, 10, 1, 1);
+        Utils.add(this, Reset, gbc, 2, 10, 1, 1);
+        Utils.add(this, Add, gbc, 3, 10, 1, 1);
 
         this.pack();
     }

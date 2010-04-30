@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MFrame;
+import de.mpicbg.sweng.mondrian.MDialog;
 import de.mpicbg.sweng.mondrian.MonFrame;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
@@ -28,16 +28,16 @@ public class HistogramFactory extends AbstractPlotFactory {
     }
 
 
-    public PlotPanel createPlotPanel(MonFrame monFrame, MFrame plotFrame, DataSet dataSet, JList varNames) {
+    public PlotPanel createPlotPanel(MonFrame monFrame, MDialog plotDialog, DataSet dataSet, JList varNames) {
 
         int[] indices = varNames.getSelectedIndices();
         int weight = 0;
 
-        return createHistogram(plotFrame, dataSet, indices, weight);
+        return createHistogram(plotDialog, dataSet, indices, weight);
     }
 
 
-    protected PlotPanel createHistogram(MFrame plotFrame, DataSet dataSet, int[] indices, int weight) {
+    protected PlotPanel createHistogram(MDialog plotFrame, DataSet dataSet, int[] indices, int weight) {
         PlotPanel plotPanel = new PlotPanel();
         plotPanel.setLayout(new GridLayout(1, indices.length));
 
@@ -58,7 +58,7 @@ public class HistogramFactory extends AbstractPlotFactory {
     }
 
 
-    public boolean isCompliant(int numVariables, int numCategoricalVariables) {
+    public boolean isCompliant(DataSet dataSet, int numVariables, int numCategoricalVariables) {
         return numCategoricalVariables == 0;
     }
 }

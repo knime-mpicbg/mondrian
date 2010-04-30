@@ -1,12 +1,13 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MFrame;
+import de.mpicbg.sweng.mondrian.MDialog;
 import de.mpicbg.sweng.mondrian.core.*;
 import de.mpicbg.sweng.mondrian.io.db.Query;
 import de.mpicbg.sweng.mondrian.plots.basic.MyRect;
 import de.mpicbg.sweng.mondrian.plots.basic.MyText;
+import de.mpicbg.sweng.mondrian.ui.ColorManager;
 import de.mpicbg.sweng.mondrian.util.Qsort;
-import de.mpicbg.sweng.mondrian.util.Util;
+import de.mpicbg.sweng.mondrian.util.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,7 +41,7 @@ public class Barchart extends DragBox implements ActionListener {
     private int globalStart = -1;
 
 
-    public Barchart(MFrame frame, int width, int height, Table tablep) {
+    public Barchart(MDialog frame, int width, int height, Table tablep) {
         super(frame);
         this.tablep = tablep;
         this.name = tablep.name;
@@ -184,7 +185,7 @@ public class Barchart extends DragBox implements ActionListener {
 
         tablep.getSelection();
 
-        frame.setBackground(MFrame.backgroundColor);
+        frame.setBackground(ColorManager.backgroundColor);
 
         Dimension size;
         if (!printing)
@@ -238,7 +239,7 @@ public class Barchart extends DragBox implements ActionListener {
 
         int start = -1, stop = k - 1;
 
-        bg.setColor(MFrame.lineColor);
+        bg.setColor(ColorManager.lineColor);
         if (!printing) {
             int sbVal = sb.getValue();
             for (int i = 0; i < labels.size(); i++) {
@@ -316,7 +317,7 @@ public class Barchart extends DragBox implements ActionListener {
             for (int i = 0; i < rects.size(); i++) {
                 MyRect r = (MyRect) rects.elementAt(i);
                 if (r.contains(e.getX(), e.getY() + sb.getValue())) {
-                    return Util.info2Html(r.getLabel());
+                    return Utils.info2Html(r.getLabel());
                 }
             }
             // end FOR
@@ -442,7 +443,7 @@ public class Barchart extends DragBox implements ActionListener {
                         brush.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, Event.ALT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
                         brush.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
-                                frame.j.clearColors();
+                                frame.parentFrame.clearColors();
                             }
 
 
@@ -759,7 +760,7 @@ public class Barchart extends DragBox implements ActionListener {
         int x = 0;
         for (int i = 0; i < k; i++)
             if (tablep.data.phoneNumber(tablep.initialVars[0]))
-                x = Math.max(x, FM.stringWidth(Util.toPhoneNumber(Util.atod(lnames[0][i]))));
+                x = Math.max(x, FM.stringWidth(Utils.toPhoneNumber(Utils.atod(lnames[0][i]))));
             else
                 x = Math.max(x, FM.stringWidth(lnames[0][i]));
 
@@ -778,7 +779,7 @@ public class Barchart extends DragBox implements ActionListener {
             h = (Math.max(y2 - y1, k * 22) + 10 * pF) / k - 10 * pF;
             w = (x2 - x1 - x);
             if (tablep.data.phoneNumber(tablep.initialVars[0]))
-                labels.addElement(new MyText(Util.toPhoneNumber(Util.atod(lnames[0][i])), x1 + x - 10 * pF, y1 + y + (int) (h / 2) + fh / 2));
+                labels.addElement(new MyText(Utils.toPhoneNumber(Utils.atod(lnames[0][i])), x1 + x - 10 * pF, y1 + y + (int) (h / 2) + fh / 2));
             else {
                 String shorty = lnames[0][i];
                 String addOn = "";
@@ -806,7 +807,7 @@ public class Barchart extends DragBox implements ActionListener {
             if (tablep.data.phoneNumber(tablep.initialVars[0]))
                 rects.addElement(new MyRect(true, 'x', "Observed", x1 + x, y1 + y, w, (int) h,
                         tablep.table[i], tablep.table[i], 1, 0,
-                        Util.toPhoneNumber(Util.atod(lnames[0][i])) + '\n', tileIds[i], tablep));
+                        Utils.toPhoneNumber(Utils.atod(lnames[0][i])) + '\n', tileIds[i], tablep));
             else
                 rects.addElement(new MyRect(true, 'x', "Observed", x1 + x, y1 + y, w, (int) h,
                         tablep.table[i], tablep.table[i], 1, 0, lnames[0][i] + '\n', tileIds[i], tablep));

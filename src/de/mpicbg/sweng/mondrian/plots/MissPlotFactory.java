@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MFrame;
+import de.mpicbg.sweng.mondrian.MDialog;
 import de.mpicbg.sweng.mondrian.MonFrame;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
@@ -26,7 +26,7 @@ public class MissPlotFactory extends AbstractPlotFactory {
     }
 
 
-    public PlotPanel createPlotPanel(MonFrame monFrame, MFrame plotFrame, DataSet dataSet, JList varNames) {
+    public PlotPanel createPlotPanel(MonFrame monFrame, MDialog plotDialog, DataSet dataSet, JList varNames) {
         int k = 0;
         for (int i = 0; i < (varNames.getSelectedIndices()).length; i++)
             if (dataSet.n > dataSet.getN((varNames.getSelectedIndices())[i]))
@@ -48,17 +48,17 @@ public class MissPlotFactory extends AbstractPlotFactory {
 //                    tmpHeight = 20 * (1 + k);
 
 
-            return new MissPlot(plotFrame, dataSet, passVars);
+            return new MissPlot(plotDialog, dataSet, passVars);
 
 
         } else
-            JOptionPane.showMessageDialog(plotFrame, "Non of the selected variables\ninclude any missing values");
+            JOptionPane.showMessageDialog(plotDialog, "Non of the selected variables\ninclude any missing values");
 
         return null;
     }
 
 
-    public boolean isCompliant(int numVariables, int numCategoricalVariables) {
+    public boolean isCompliant(DataSet dataSet, int numVariables, int numCategoricalVariables) {
         // todo addtionally we should check that
 //        if (!dataSet.hasMissings)
 //            missingValuePlotMenuItem.setEnabled(false);

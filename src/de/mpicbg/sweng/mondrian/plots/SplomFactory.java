@@ -1,9 +1,10 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MFrame;
+import de.mpicbg.sweng.mondrian.MDialog;
 import de.mpicbg.sweng.mondrian.MonFrame;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
+import de.mpicbg.sweng.mondrian.ui.ColorManager;
 import de.mpicbg.sweng.mondrian.ui.PlotPanel;
 
 import javax.swing.*;
@@ -27,7 +28,7 @@ public class SplomFactory extends AbstractPlotFactory {
     }
 
 
-    public PlotPanel createPlotPanel(MonFrame monFrame, MFrame plotFrame, DataSet dataSet, JList varNames) {
+    public PlotPanel createPlotPanel(MonFrame monFrame, MDialog plotDialog, DataSet dataSet, JList varNames) {
         int numVars = (varNames.getSelectedIndices()).length;
 
         PlotPanel splomPanel = new PlotPanel();
@@ -38,7 +39,7 @@ public class SplomFactory extends AbstractPlotFactory {
             for (int j = 1; j < numVars; j++) {
                 if (i >= j) {
                     JPanel Filler = new JPanel();
-                    Filler.setBackground(MFrame.backgroundColor);
+                    Filler.setBackground(ColorManager.backgroundColor);
                     splomPanel.add(Filler);
                     //          (Filler.getGraphics()).drawString("text",10,10);
                 } else {
@@ -48,7 +49,7 @@ public class SplomFactory extends AbstractPlotFactory {
                     tmpVars[0] = monFrame.selectBuffer[numVars - j - 1];
                     tmpVars[1] = monFrame.selectBuffer[numVars - i - 1];
                     //
-                    Scatter2DPlot scat = new Scatter2DPlot(plotFrame, 200, 200, dataSet, tmpVars, varNames, true);
+                    Scatter2DPlot scat = new Scatter2DPlot(plotDialog, 200, 200, dataSet, tmpVars, varNames, true);
                     splomPanel.add(scat);
                 }
             }
@@ -57,7 +58,7 @@ public class SplomFactory extends AbstractPlotFactory {
     }
 
 
-    public boolean isCompliant(int numVariables, int numCategoricalVariables) {
+    public boolean isCompliant(DataSet dataSet, int numVariables, int numCategoricalVariables) {
         return numVariables > 0;
     }
 }

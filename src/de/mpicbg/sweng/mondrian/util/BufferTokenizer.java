@@ -1011,7 +1011,7 @@ public class BufferTokenizer {
                             temp = m.group(2).getBytes();
                             String template = "<image src='"
                                     + m.group(1) + "$val" + m.group(3) + "'>";
-                            Util.registerHTMLTemplate(m.group(2), template);
+                            Utils.registerHTMLTemplate(m.group(2), template);
                         } else {
                             System.err.println("Unknown Url for column: " + label);
                         }

@@ -1,13 +1,13 @@
 package de.mpicbg.sweng.mondrian.core;
 
-import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.MonFrame;
 import de.mpicbg.sweng.mondrian.io.ScanException;
 import de.mpicbg.sweng.mondrian.io.UnacceptableFormatException;
 import de.mpicbg.sweng.mondrian.io.db.Query;
+import de.mpicbg.sweng.mondrian.ui.ColorManager;
 import de.mpicbg.sweng.mondrian.util.BufferTokenizer;
 import de.mpicbg.sweng.mondrian.util.StatUtil;
-import de.mpicbg.sweng.mondrian.util.Util;
+import de.mpicbg.sweng.mondrian.util.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -50,7 +50,6 @@ public class DataSet {
     public Connection con;
     public String Table;
     public Query sqlConditions = new Query();
-    public int graphicsPerf = 0;
     int counter;
     public boolean selChanged;
     private int[][] RGBs;
@@ -112,7 +111,7 @@ public class DataSet {
             ResultSet rs = stmt.executeQuery(query);
 
             if (rs.next()) {
-                this.n = (int) Util.atod(rs.getString(1));
+                this.n = (int) Utils.atod(rs.getString(1));
 //            selectionArray = new double[this.n];
             }
             rs.close();
@@ -172,8 +171,8 @@ public class DataSet {
             }
         Var.forceCategorical = false;
         Var.isCategorical = categorical;
-        this.alpha = (boolean[]) Util.resizeArray(this.alpha, ++this.k);
-        this.NAcount = (int[]) Util.resizeArray(this.NAcount, this.k);
+        this.alpha = (boolean[]) Utils.resizeArray(this.alpha, ++this.k);
+        this.NAcount = (int[]) Utils.resizeArray(this.NAcount, this.k);
         NAcount[NAcount.length - 1] = Var.numMiss;
         this.alpha[k - 1] = alpha;
         if (Var.isCategorical) {
@@ -274,7 +273,7 @@ public class DataSet {
                         if (m.matches()) {
                             Var.forceCategorical = true;
                             Var.name = m.group(2);
-                            Util.registerHTMLTemplate(Var.name, m.group(1) + "$var" + m.group(3));
+                            Utils.registerHTMLTemplate(Var.name, m.group(1) + "$var" + m.group(3));
                         } else {
                             System.err.println("Unknown Url for column: " + varName);
                             Var.forceCategorical = true;
@@ -933,7 +932,7 @@ public class DataSet {
             colorBrush = true;
             brushColors = new Color[k + 1];
 //      System.out.println("Setting "+k+" Colors");
-            brushColors[0] = MFrame.objectColor;
+            brushColors[0] = ColorManager.objectColor;
         } else
             return;
 
@@ -977,13 +976,13 @@ public class DataSet {
         if (!colorBrush) {
             colorBrush = true;
             brushColors = new Color[2];
-            brushColors[0] = MFrame.objectColor;
+            brushColors[0] = ColorManager.objectColor;
             brushColors[1] = newColor;
         } else {
             for (int i = 0; i < brushColors.length; i++)
                 if (brushColors[i].equals(newColor))
                     return i;
-            brushColors = (Color[]) Util.resizeArray(brushColors, brushColors.length + 1);
+            brushColors = (Color[]) Utils.resizeArray(brushColors, brushColors.length + 1);
             brushColors[brushColors.length - 1] = newColor;
         }
         return brushColors.length - 1;
@@ -1051,16 +1050,16 @@ public class DataSet {
 //System.out.println(" filterVar: "+filterVar+" Grp: "+grp+ " <-- "+ filterGrp +" --> "+filterVal); 
         filterON = true;
 //    if( Util.isNumber(grp) )           // Make sure that numeric values get the representation of a Java numeric (123 -> 123.0)!!
-        if (!alpha(filterVar) && Util.isNumber(grp))           // Make sure that numeric values get the representation of a Java numeric (123 -> 123.0)!!
+        if (!alpha(filterVar) && Utils.isNumber(grp))           // Make sure that numeric values get the representation of a Java numeric (123 -> 123.0)!!
             filterGrp = (int) (((Variable) data.elementAt(filterVar)).Level(Double.toString(Double.valueOf(grp).doubleValue())));
         else
             filterGrp = (int) (((Variable) data.elementAt(filterVar)).Level(grp));
         if ((data.elementAt(filterVar).alpha))
             filterVal = filterGrp;
         else if (!grp.equals("NA"))
-            filterVal = Util.atod(grp);
+            filterVal = Utils.atod(grp);
         else {
-            filterVal = Util.atod(Double.MAX_VALUE + "");
+            filterVal = Utils.atod(Double.MAX_VALUE + "");
             filterGrp = (int) (((Variable) data.elementAt(filterVar)).Level(Double.MAX_VALUE + ""));
         }
     }

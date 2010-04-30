@@ -4,13 +4,13 @@ package de.mpicbg.sweng.mondrian.core;
 //
 
 
-import de.mpicbg.sweng.mondrian.MFrame;
+import de.mpicbg.sweng.mondrian.MDialog;
 import de.mpicbg.sweng.mondrian.plots.Barchart;
 import de.mpicbg.sweng.mondrian.plots.Histogram;
 import de.mpicbg.sweng.mondrian.plots.ParallelPlot;
 import de.mpicbg.sweng.mondrian.ui.PlotPanel;
 import de.mpicbg.sweng.mondrian.util.StatUtil;
-import de.mpicbg.sweng.mondrian.util.Util;
+import de.mpicbg.sweng.mondrian.util.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -46,7 +46,7 @@ abstract class DragBox
     public Color dragboxcolor = Color.red;
     public Graphics dragboxgraphics = null;
 
-    public MFrame frame;                               // The frame we are within.
+    public MDialog frame;                               // The frame we are within.
     public JScrollBar sb;                             // We might need a scroll bar
 
     public int colorSet = -1;                         // The color which as assigned with meta-n
@@ -346,7 +346,7 @@ abstract class DragBox
     ///////////////////////////////////////////////////////////////////////////
 
 
-    public DragBox(MFrame frame) {
+    public DragBox(MDialog frame) {
 
         this.frame = frame;
 
@@ -1275,12 +1275,12 @@ abstract class DragBox
 
         if (command.equals("Apply") || command.equals("OK") || command.equals("Home") || command.equals("Cancel")) {
             if (command.equals("Apply") || command.equals("OK")) {
-                double xMin = Util.atod(LD.tfXMinI.getText());
-                double yMin = Util.atod(LD.tfYMinI.getText());
-                double xMax = Util.atod(LD.tfXMaxI.getText());
-                double yMax = Util.atod(LD.tfYMaxI.getText());
-                double width = Math.max(150, Util.atod(LD.tfWidthI.getText()));
-                double height = Math.max(100, Util.atod(LD.tfHeightI.getText()));
+                double xMin = Utils.atod(LD.tfXMinI.getText());
+                double yMin = Utils.atod(LD.tfYMinI.getText());
+                double xMax = Utils.atod(LD.tfXMaxI.getText());
+                double yMax = Utils.atod(LD.tfYMaxI.getText());
+                double width = Math.max(150, Utils.atod(LD.tfWidthI.getText()));
+                double height = Math.max(100, Utils.atod(LD.tfHeightI.getText()));
 
                 frame.setSize((int) width, (int) height);
                 if (xMax > xMin && yMax > yMin) {

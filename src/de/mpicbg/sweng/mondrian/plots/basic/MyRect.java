@@ -1,11 +1,11 @@
 package de.mpicbg.sweng.mondrian.plots.basic;
 
 
-import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.core.DragBox;
 import de.mpicbg.sweng.mondrian.core.Table;
+import de.mpicbg.sweng.mondrian.ui.ColorManager;
 import de.mpicbg.sweng.mondrian.util.StatUtil;
-import de.mpicbg.sweng.mondrian.util.Util;
+import de.mpicbg.sweng.mondrian.util.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -167,12 +167,12 @@ public class MyRect extends Rectangle implements ActionListener {
                 if (info.indexOf("¥") == -1 && info.indexOf(": NA\n") == -1 && !(info.length() > 2 ? (info.substring(0, 3)).equals("NA\n") : false))
                     missCell = false;
                 if (!missCell)
-                    g.setColor(MFrame.objectColor);
+                    g.setColor(ColorManager.objectColor);
                 else
                     g.setColor(Color.white);
                 if (tablep != null && tablep.data.colorBrush) {
                     if (dir == 'x') {
-                        int[] ws = Util.roundProportions(Colors, obs, Math.min(w, width));
+                        int[] ws = Utils.roundProportions(Colors, obs, Math.min(w, width));
                         int altp;
                         if (!flip)
                             altp = x;
@@ -181,7 +181,7 @@ public class MyRect extends Rectangle implements ActionListener {
                         for (int i = 0; i < Colors.length; i++) {
                             if (i == Colors.length - 1)
                                 if (!missCell)
-                                    g.setColor(MFrame.objectColor);
+                                    g.setColor(ColorManager.objectColor);
                                 else
                                     g.setColor(Color.white);
                             else if (i == 0)
@@ -197,12 +197,12 @@ public class MyRect extends Rectangle implements ActionListener {
                             }
                         }
                     } else if (dir == 'y') {
-                        int[] hs = Util.roundProportions(Colors, obs, Math.min(h, height));
+                        int[] hs = Utils.roundProportions(Colors, obs, Math.min(h, height));
                         int altp = 0;
                         for (int i = 0; i < Colors.length; i++) {
                             if (i == Colors.length - 1)
                                 if (!missCell)
-                                    g.setColor(MFrame.objectColor);
+                                    g.setColor(ColorManager.objectColor);
                                 else
                                     g.setColor(Color.white);
                             else if (i == 0)
@@ -277,7 +277,7 @@ public class MyRect extends Rectangle implements ActionListener {
         if (obs == 0 || censored)
             g.setColor(Color.red);
         else
-            g.setColor(MFrame.lineColor);
+            g.setColor(ColorManager.lineColor);
         if (dir != 'f' && Math.min(w, width) > 2 && Math.min(h, height) > 2 || obs == 0 || censored)
             g.drawRect(x, y + Math.max(0, h - height), Math.min(w, width), Math.min(h, height));
     }

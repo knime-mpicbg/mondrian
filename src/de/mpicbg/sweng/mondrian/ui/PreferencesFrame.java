@@ -8,10 +8,9 @@ package de.mpicbg.sweng.mondrian.ui;
 //  Copyright (c) 2003 __MyCompanyName__. All rights reserved.
 //
 
-import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.MonFrame;
 import de.mpicbg.sweng.mondrian.core.DragBox;
-import de.mpicbg.sweng.mondrian.util.Util;
+import de.mpicbg.sweng.mondrian.util.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,14 +23,6 @@ public class PreferencesFrame extends Frame implements WindowListener, MouseList
     private PrefCanvas pc;
     private MonFrame frame;
     private Choice cs;
-    private static String[] schemes = {
-            "RoSuDa classic", "#ffff99", "#c0c0c0", "#000000", "#00ff00",
-            "Terra di Siena", "#dfb860", "#c0c0c0", "#000000", "#b46087",
-            "Xtra red", "#ffff99", "#c0c0c0", "#000000", "#ff0000",
-            "DataDesk", "#000000", "#000000", "#ffffff", "#ff0000",
-            "Daltonian", "#009999", "#c0c0c0", "#000000", "#ff7400",
-            null
-    };
 
     private static PreferencesFrame last = null;
 
@@ -61,13 +52,13 @@ public class PreferencesFrame extends Frame implements WindowListener, MouseList
         ppp.add(cs = new Choice());
         cs.add("Custom ...");
         int i = 0;
-        while (schemes[i] != null) {
-            cs.add(schemes[i]);
-            if (schemes[i + 1].compareTo(Util.color2hrgb(pc.c[0])) == 0 &&
-                    schemes[i + 2].compareTo(Util.color2hrgb(pc.c[1])) == 0 &&
-                    schemes[i + 3].compareTo(Util.color2hrgb(pc.c[2])) == 0 &&
-                    schemes[i + 4].compareTo(Util.color2hrgb(pc.c[3])) == 0)
-                cs.select(schemes[i]);
+        while (ColorManager.defaultColSchemes[i] != null) {
+            cs.add(ColorManager.defaultColSchemes[i]);
+            if (ColorManager.defaultColSchemes[i + 1].compareTo(Utils.color2hrgb(pc.c[0])) == 0 &&
+                    ColorManager.defaultColSchemes[i + 2].compareTo(Utils.color2hrgb(pc.c[1])) == 0 &&
+                    ColorManager.defaultColSchemes[i + 3].compareTo(Utils.color2hrgb(pc.c[2])) == 0 &&
+                    ColorManager.defaultColSchemes[i + 4].compareTo(Utils.color2hrgb(pc.c[3])) == 0)
+                cs.select(ColorManager.defaultColSchemes[i]);
             i += 5;
         }
         cs.addItemListener(this);
@@ -93,9 +84,9 @@ public class PreferencesFrame extends Frame implements WindowListener, MouseList
         PrefCanvas() {
             setSize(250, 160);
             c = new Color[4];
-            c[0] = MFrame.backgroundColor;
-            c[1] = MFrame.objectColor;
-            c[2] = MFrame.lineColor;
+            c[0] = ColorManager.backgroundColor;
+            c[1] = ColorManager.objectColor;
+            c[2] = ColorManager.lineColor;
             c[3] = DragBox.hiliteColor;
         }
 
@@ -157,38 +148,21 @@ public class PreferencesFrame extends Frame implements WindowListener, MouseList
     public void itemStateChanged(ItemEvent e) {
         String s = cs.getSelectedItem();
         int i = 0;
-        while (schemes[i] != null) {
-            if (schemes[i].equals(s)) {
-                Color cl = Util.hrgb2color(schemes[++i]);
+        while (ColorManager.defaultColSchemes[i] != null) {
+            if (ColorManager.defaultColSchemes[i].equals(s)) {
+                Color cl = Utils.hrgb2color(ColorManager.defaultColSchemes[++i]);
                 if (cl != null) pc.c[0] = cl;
-                cl = Util.hrgb2color(schemes[++i]);
+                cl = Utils.hrgb2color(ColorManager.defaultColSchemes[++i]);
                 if (cl != null) pc.c[1] = cl;
-                cl = Util.hrgb2color(schemes[++i]);
+                cl = Utils.hrgb2color(ColorManager.defaultColSchemes[++i]);
                 if (cl != null) pc.c[2] = cl;
-                cl = Util.hrgb2color(schemes[++i]);
+                cl = Utils.hrgb2color(ColorManager.defaultColSchemes[++i]);
                 if (cl != null) pc.c[3] = cl;
                 pc.repaint();
                 return;
             }
             i += 5;
         }
-    }
-
-
-    public static void setScheme(int dragan) {
-        int i = dragan * 5;
-        Color cl = Util.hrgb2color(schemes[++i]);
-        if (cl != null)
-            MFrame.backgroundColor = cl;
-        cl = Util.hrgb2color(schemes[++i]);
-        if (cl != null)
-            MFrame.objectColor = cl;
-        cl = Util.hrgb2color(schemes[++i]);
-        if (cl != null)
-            MFrame.lineColor = cl;
-        cl = Util.hrgb2color(schemes[++i]);
-        if (cl != null)
-            DragBox.hiliteColor = cl;
     }
 
 
@@ -237,18 +211,18 @@ public class PreferencesFrame extends Frame implements WindowListener, MouseList
             setVisible(false);
         }
         if (cmd.equals("Apply") || cmd.equals("Save")) {
-            MFrame.backgroundColor = pc.c[0];
-            MFrame.objectColor = pc.c[1];
-            MFrame.lineColor = pc.c[2];
+            ColorManager.backgroundColor = pc.c[0];
+            ColorManager.objectColor = pc.c[1];
+            ColorManager.lineColor = pc.c[2];
             DragBox.hiliteColor = pc.c[3];
             frame.updateSelection();
         }
         if (cmd.equals("Save")) {
             Preferences prefs = Preferences.userNodeForPackage(this.getClass());
-            prefs.put("color.background", Util.color2hrgb(MFrame.backgroundColor));
-            prefs.put("color.objects", Util.color2hrgb(MFrame.objectColor));
-            prefs.put("color.line", Util.color2hrgb(MFrame.lineColor));
-            prefs.put("color.select", Util.color2hrgb(DragBox.hiliteColor));
+            prefs.put("color.background", Utils.color2hrgb(ColorManager.backgroundColor));
+            prefs.put("color.objects", Utils.color2hrgb(ColorManager.objectColor));
+            prefs.put("color.line", Utils.color2hrgb(ColorManager.lineColor));
+            prefs.put("color.select", Utils.color2hrgb(DragBox.hiliteColor));
             setVisible(false);
         }
     }

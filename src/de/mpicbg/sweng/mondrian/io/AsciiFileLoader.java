@@ -1,5 +1,6 @@
 package de.mpicbg.sweng.mondrian.io;
 
+import de.mpicbg.sweng.mondrian.MonController;
 import de.mpicbg.sweng.mondrian.MonFrame;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.plots.basic.MyPoly;
@@ -64,7 +65,7 @@ public class AsciiFileLoader {
         monFrame.getProgBar().setMinimum(0);
         monFrame.getProgBar().setMaximum(100);
         data = new DataSet(justFile);
-        monFrame.dataSets.addElement(data);
+        MonController.dataSets.addElement(data);
         monFrame.getProgText().setText("Loading ...");
 
         String mapFile = data.turboRead(filename, monFrame);
@@ -76,6 +77,7 @@ public class AsciiFileLoader {
             monFrame.setProgress(0.0);
             return false;
         }
+
         monFrame.getProgText().setText("");
         monFrame.getProgBar().setValue(0);
         monFrame.getProgBar().setMaximum(data.n);

@@ -1,8 +1,9 @@
 package de.mpicbg.sweng.mondrian.ui;
 
+import de.mpicbg.sweng.mondrian.MonController;
 import de.mpicbg.sweng.mondrian.MonFrame;
 import de.mpicbg.sweng.mondrian.core.DataSet;
-import de.mpicbg.sweng.mondrian.util.Util;
+import de.mpicbg.sweng.mondrian.util.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,16 +18,16 @@ public class AttributeCellRenderer extends JLabel implements ListCellRenderer {
 
     final DataSet data;
 
-    final ImageIcon alphaIcon = new ImageIcon(Util.readGif("/alpha.gif"));
-    final ImageIcon alphaMissIcon = new ImageIcon(Util.readGif("/alpha-miss.gif"));
-    final ImageIcon catIcon = new ImageIcon(Util.readGif("/cat.gif"));
-    final ImageIcon catMissIcon = new ImageIcon(Util.readGif("/cat-miss.gif"));
-    final ImageIcon numIcon = new ImageIcon(Util.readGif("/num.gif"));
-    final ImageIcon numMissIcon = new ImageIcon(Util.readGif("/num-miss.gif"));
+    final ImageIcon alphaIcon = new ImageIcon(Utils.readGif("/alpha.gif"));
+    final ImageIcon alphaMissIcon = new ImageIcon(Utils.readGif("/alpha-miss.gif"));
+    final ImageIcon catIcon = new ImageIcon(Utils.readGif("/cat.gif"));
+    final ImageIcon catMissIcon = new ImageIcon(Utils.readGif("/cat-miss.gif"));
+    final ImageIcon numIcon = new ImageIcon(Utils.readGif("/num.gif"));
+    final ImageIcon numMissIcon = new ImageIcon(Utils.readGif("/num-miss.gif"));
 
 
     public AttributeCellRenderer(MonFrame monFrame) {
-        data = MonFrame.dataSets.elementAt(monFrame.dataSetCounter);
+        data = MonController.dataSets.elementAt(monFrame.dataSetCounter);
     }
 
 

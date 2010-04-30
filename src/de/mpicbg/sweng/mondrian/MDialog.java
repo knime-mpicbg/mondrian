@@ -16,9 +16,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class MFrame extends JFrame implements WindowListener {
+public class MDialog extends JDialog implements WindowListener {
 
-    public MonFrame j;
+    public MonFrame parentFrame;
     private JMenuItem m;
     private String selString = "";
     private int counter = 0;
@@ -28,11 +28,13 @@ public class MFrame extends JFrame implements WindowListener {
     private TimerTask resizePlotTask;
     private boolean firstTime = true;
 
+    //  static Color backgroundColor = new Color(223, 184, 96);
 
-    public MFrame(MonFrame j) {
+
+    public MDialog(MonFrame parentFrame) {
         if (((System.getProperty("os.name")).toLowerCase()).indexOf("mac") > -1)
-            this.setJMenuBar(j.menubar);
-        this.j = j;
+            this.setJMenuBar(parentFrame.menubar);
+        this.parentFrame = parentFrame;
         this.setBackground(ColorManager.backgroundColor);
         addWindowListener(this);
     }
@@ -54,18 +56,18 @@ public class MFrame extends JFrame implements WindowListener {
 
 
     public boolean getAlphaHi() {
-        return j.alphaHi;
+        return parentFrame.alphaHi;
     }
 
 
     public void close() {
         System.out.println("Window Closed!!");
 
-        j.windows.remove(m);
-        if (j.windows.getItemCount() < 3)
-            j.closeAllMenuItem.setEnabled(false);
+        parentFrame.windows.remove(m);
+        if (parentFrame.windows.getItemCount() < 3)
+            parentFrame.closeAllMenuItem.setEnabled(false);
         if (!selString.equals(""))
-            j.updateSelection();
+            parentFrame.updateSelection();
         this.setVisible(false);
         this.dispose();
     }
@@ -87,19 +89,19 @@ public class MFrame extends JFrame implements WindowListener {
     public void show() {
 
         m = new JMenuItem(getTitle());
-        j.closeAllMenuItem.setEnabled(true);
+        parentFrame.closeAllMenuItem.setEnabled(true);
 
-        for (int i = 2; i < j.windows.getItemCount(); i++)
-            if (((j.windows.getItem(i)).getText()).substring(0, 2).equals((m.getText()).substring(0, 2)))
+        for (int i = 2; i < parentFrame.windows.getItemCount(); i++)
+            if (((parentFrame.windows.getItem(i)).getText()).substring(0, 2).equals((m.getText()).substring(0, 2)))
                 same = true;
             else if (same) {
-                j.windows.insert(m, i);
+                parentFrame.windows.insert(m, i);
                 added = true;
                 same = false;
             }
 
         if (!added) {
-            j.windows.add(m);
+            parentFrame.windows.add(m);
             added = true;
         }
 
@@ -131,7 +133,7 @@ public class MFrame extends JFrame implements WindowListener {
 
     public void windowActivated(WindowEvent e) {
         if (((System.getProperty("os.name")).toLowerCase()).indexOf("mac") > -1)
-            this.setJMenuBar(j.menubar);                 // Add it to the frame.
+            this.setJMenuBar(parentFrame.menubar);                 // Add it to the frame.
     }
 
 

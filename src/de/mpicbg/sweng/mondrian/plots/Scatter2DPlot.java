@@ -1,13 +1,15 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MFrame;
+import de.mpicbg.sweng.mondrian.MDialog;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.core.DragBox;
 import de.mpicbg.sweng.mondrian.core.Selection;
 import de.mpicbg.sweng.mondrian.core.Table;
 import de.mpicbg.sweng.mondrian.plots.basic.MyRect;
+import de.mpicbg.sweng.mondrian.ui.ColorManager;
+import de.mpicbg.sweng.mondrian.util.GraphicsPerformance;
 import de.mpicbg.sweng.mondrian.util.StatUtil;
-import de.mpicbg.sweng.mondrian.util.Util;
+import de.mpicbg.sweng.mondrian.util.Utils;
 import de.mpicbg.sweng.mondrian.util.r.RService;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
@@ -78,7 +80,7 @@ public class Scatter2DPlot extends DragBox {
     /**
      * This constructor requires a Frame and a desired size
      */
-    public Scatter2DPlot(MFrame frame, int width, int height, DataSet data, int[] Vars, JList varList, boolean matrix) {
+    public Scatter2DPlot(MDialog frame, int width, int height, DataSet data, int[] Vars, JList varList, boolean matrix) {
         super(frame);
         boolean matrix1 = matrix;
         this.data = data;
@@ -207,11 +209,11 @@ public class Scatter2DPlot extends DragBox {
             if (smoothF.equals("ls-line") && Math.abs((int) userToWorldY(worldToUserX(e.getX()) * coeffs[1] + coeffs[0]) - e.getY()) < 4) {
                 String x = data.getName(Vars[1]) + " = " + data.getName(Vars[0]) + " * " + StatUtil.roundToString(coeffs[1], 4) + " + " + StatUtil.roundToString(coeffs[0], 4);
                 x = x + "\n" + "R<sup>2</sup>\t " + StatUtil.roundToString(100 * coeffs[2], 1);
-                return Util.info2Html(x);
+                return Utils.info2Html(x);
             } else if (smoothF.equals("ls-line") && Math.abs((int) userToWorldY(worldToUserX(e.getX()) * selCoeffs[1] + selCoeffs[0]) - e.getY()) < 4) {
                 String x = data.getName(Vars[1]) + " = " + data.getName(Vars[0]) + " * " + StatUtil.roundToString(selCoeffs[1], 4) + " + " + StatUtil.roundToString(selCoeffs[0], 4);
                 x = x + "\n" + "R<sup>2</sup>\t " + StatUtil.roundToString(100 * selCoeffs[2], 1);
-                return Util.info2Html(x);
+                return Utils.info2Html(x);
             }
             if (modeString.equals("points")) {
                 int minDist = 5000;
@@ -262,7 +264,7 @@ public class Scatter2DPlot extends DragBox {
                             }
 
                             // check to see if there is a template to modify values for this field
-                            val = Util.getHTMLValue(label, val);
+                            val = Utils.getHTMLValue(label, val);
 
                             x = x + "\n" + label + "\t " + val;
                         }
@@ -301,32 +303,32 @@ public class Scatter2DPlot extends DragBox {
                                 x = x + "\n" + label + "\t {";
                                 if (Names.length > 1)
                                     for (int i = 0; i < Names.length - 1; i++) {
-                                        x = x + Util.getHTMLValue(label, Names[i]) + ", ";
+                                        x = x + Utils.getHTMLValue(label, Names[i]) + ", ";
                                         if (((i + 1) % 3) == 0)
                                             x = x + "\n \t ";
                                     }
-                                x = x + Util.getHTMLValue(label, Names[Names.length - 1]) + "} ";
+                                x = x + Utils.getHTMLValue(label, Names[Names.length - 1]) + "} ";
                             } else {
                                 String label = data.getName(selectedIds[sel]);
                                 if (Mins[sel] == Maxs[sel])
-                                    x = x + "\n" + label + "\t " + Util.getHTMLValue(label, Double.toString(Mins[sel]));
+                                    x = x + "\n" + label + "\t " + Utils.getHTMLValue(label, Double.toString(Mins[sel]));
                                 else if (Mins[sel] != Double.MAX_VALUE && Maxs[sel] != -Double.MAX_VALUE)
                                     x = x + "\n" + label + "\t "
-                                            + " [" + Util.getHTMLValue(label, Double.toString(Mins[sel]))
-                                            + ", " + Util.getHTMLValue(label, Double.toString(Maxs[sel])) + "] ";
+                                            + " [" + Utils.getHTMLValue(label, Double.toString(Mins[sel]))
+                                            + ", " + Utils.getHTMLValue(label, Double.toString(Maxs[sel])) + "] ";
                                 else
                                     x = x + "\n" + label + "\t NA";
                             }
                         }
                     }
-                    return Util.info2Html(x);
+                    return Utils.info2Html(x);
                 } else
                     return null;
             } else {
                 for (int i = 0; i < rects.size(); i++) {
                     MyRect r = (MyRect) rects.elementAt(i);
                     if (r.contains(e.getX(), e.getY())) {
-                        return Util.info2Html(r.getLabel());
+                        return Utils.info2Html(r.getLabel());
                     }
                 }
                 return null;
@@ -584,7 +586,7 @@ public class Scatter2DPlot extends DragBox {
             } else if (command.substring(0, Math.min(5, command.length())).equals("byvar")) {
                 connectLines = true;
 //System.out.println(" ........................ by var "+command.substring(5,command.length()));
-                byVar = (int) Util.atod(command.substring(5, command.length()));
+                byVar = (int) Utils.atod(command.substring(5, command.length()));
             } else if (command.equals("axes")) {
                 int tmp = Vars[1];
                 Vars[1] = Vars[0];
@@ -630,7 +632,7 @@ public class Scatter2DPlot extends DragBox {
                 smoothChanged = true;
             }
             paint(this.getGraphics());
-        } else if (Util.isNumber(command)) {
+        } else if (Utils.isNumber(command)) {
             System.out.println("Command: " + Double.valueOf(command));
             boolean hit = false;
             double dd = Double.parseDouble(command);
@@ -666,10 +668,10 @@ public class Scatter2DPlot extends DragBox {
 
             if ((e.getModifiers() == ALT_DOWN)) {
 
-                frame.setCursor(Frame.CROSSHAIR_CURSOR);
+                frame.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 
                 info = true;
-                tttbg.setColor(MFrame.backgroundColor);
+                tttbg.setColor(ColorManager.backgroundColor);
 
                 // Draw x-Label for CRTL_DOWN event
                 int egetX = e.getX();
@@ -690,7 +692,7 @@ public class Scatter2DPlot extends DragBox {
                     tttbg.fillRect((int) userToWorldX(getUrx()) - maxWidth - 4, (int) userToWorldY(getLly()) + outside + tick + 1,
                             maxWidth + 4, fm.getMaxAscent() + fm.getMaxDescent());
 
-                tttbg.setColor(MFrame.lineColor);
+                tttbg.setColor(ColorManager.lineColor);
 
                 tttbg.drawLine(egetX, (int) userToWorldY(getLly()) + outside,
                         egetX, (int) userToWorldY(getLly()) + outside + tick);
@@ -712,7 +714,7 @@ public class Scatter2DPlot extends DragBox {
                 minWidth = fm.stringWidth(StatUtil.roundToString(getUry(), roundY));
                 maxWidth = fm.stringWidth(StatUtil.roundToString(getLly(), roundY));
 
-                tttbg.setColor(MFrame.backgroundColor);
+                tttbg.setColor(ColorManager.backgroundColor);
                 if (egetY < userToWorldY(getUry()) + minWidth + 4)
                     tttbg.fillRect(0, (int) userToWorldY(getUry()),
                             (int) userToWorldX(getLlx()) - outside - tick, minWidth + 4);
@@ -727,7 +729,7 @@ public class Scatter2DPlot extends DragBox {
                 tttbg.drawLine(egetX, egetY + outside,
                         egetX, (int) userToWorldY(getLly()));
 
-                tttbg.setColor(MFrame.lineColor);
+                tttbg.setColor(ColorManager.lineColor);
                 tttbg.drawLine((int) userToWorldX(getLlx()) - outside, egetY,
                         (int) userToWorldX(getLlx()) - outside - tick, egetY);
                 tttbg.rotate(-Math.PI / 2);
@@ -739,7 +741,7 @@ public class Scatter2DPlot extends DragBox {
                 tttbg.dispose();
             } else {
                 if (info) {
-                    frame.setCursor(Frame.DEFAULT_CURSOR);
+                    frame.setCursor(Cursor.getDefaultCursor());
                     paint(this.getGraphics());
                     info = false;
                 }
@@ -804,7 +806,7 @@ public class Scatter2DPlot extends DragBox {
 
     public void paint(Graphics2D g) {
 
-        frame.setCursor(Frame.DEFAULT_CURSOR);
+        frame.setCursor(Cursor.getDefaultCursor());
 
         int pF = 1;
         if (printing)
@@ -817,8 +819,8 @@ public class Scatter2DPlot extends DragBox {
 
         Dimension size = this.getSize();
 
-        if (oldWidth != size.width || oldHeight != size.height || scaleChanged || frame.getBackground() != MFrame.backgroundColor) {
-            frame.setBackground(MFrame.backgroundColor);
+        if (oldWidth != size.width || oldHeight != size.height || scaleChanged || frame.getBackground() != ColorManager.backgroundColor) {
+            frame.setBackground(ColorManager.backgroundColor);
             this.width = size.width;
             this.height = size.height;
 
@@ -834,7 +836,7 @@ public class Scatter2DPlot extends DragBox {
                 if (xVal[i] >= getLlx() && xVal[i] < getUrx() && yVal[i] >= getLly() && yVal[i] < getUry())
                     num++;
             if (!force)
-                if (num > data.graphicsPerf) {
+                if (num > GraphicsPerformance.getPerformance()) {
                     modeString = "bins";
                 } else
                     modeString = "points";
@@ -884,7 +886,7 @@ public class Scatter2DPlot extends DragBox {
             else
                 alphaChanged = false;
 
-            bg.setColor(MFrame.lineColor);
+            bg.setColor(ColorManager.lineColor);
             if (invert) {
 //        Properties p = new Properties(System.getProperties());
 //        p.setProperty("com.apple.macosx.AntiAliasedGraphicsOn", "false");
@@ -914,7 +916,7 @@ public class Scatter2DPlot extends DragBox {
                         if (data.colorArray[i] > 0)
                             pg.setColor(cols[data.colorArray[i]]);
                         else
-                            pg.setColor(MFrame.lineColor);
+                            pg.setColor(ColorManager.lineColor);
                     if (xVal[i] >= getLlx() && xVal[i] <= getUrx() && yVal[i] >= getLly() && yVal[i] <= getUry())
                         pg.fillOval((int) userToWorldX(xVal[i]) - (radius * pF - 1) / 2, (int) userToWorldY(yVal[i]) - (radius * pF - 1) / 2, radius * pF, radius * pF);
                 }
@@ -923,7 +925,7 @@ public class Scatter2DPlot extends DragBox {
                     media.addImage(bi, 0);
                     try {
                         media.waitForID(0);
-                        ti = Util.makeColorTransparent(fi, Color.gray);
+                        ti = Utils.makeColorTransparent(fi, Color.gray);
                         bg.drawImage(ti, 0, 0, Color.black, null);
                     }
                     catch (InterruptedException ignored) {
@@ -949,7 +951,7 @@ public class Scatter2DPlot extends DragBox {
                 }
             }
             bg.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
-            bg.setColor(MFrame.lineColor);
+            bg.setColor(ColorManager.lineColor);
 
             // x axis
             bg.drawLine((int) userToWorldX(getLlx()), (int) userToWorldY(getLly()) + outside * pF,
@@ -1025,7 +1027,7 @@ public class Scatter2DPlot extends DragBox {
 /*      for( int i=0; i<data.n; i++) {
   if( xVal[i]>=getLlx() && xVal[i]<=getUrx() && yVal[i]>=getLly() && yVal[i]<=getUry() )
     if( selection[i] > 0 ) {
-      tbg.setColor(MFrame.backgroundColor);
+      tbg.setColor(ColorManager.backgroundColor);
       tbg.fillOval( (int)userToWorldX( xVal[i] )-(radius-1)/2, (int)userToWorldY( yVal[i] )-(radius-1)/2, radius*pF, radius*pF);
     }
 }*/
@@ -1066,7 +1068,7 @@ public class Scatter2DPlot extends DragBox {
                     coeffs = data.regress(Vars[0], Vars[1], true);
                 xMin = data.getMin(Vars[0]);
                 xMax = data.getMax(Vars[0]);
-                ttbg.setColor(MFrame.lineColor);
+                ttbg.setColor(ColorManager.lineColor);
                 ttbg.drawLine((int) userToWorldX(xMin), (int) userToWorldY(xMin * coeffs[1] + coeffs[0]),
                         (int) userToWorldX(xMax), (int) userToWorldY(xMax * coeffs[1] + coeffs[0]));
             }
@@ -1125,7 +1127,7 @@ public class Scatter2DPlot extends DragBox {
                         CIl = c.eval("sP[,2]").asDoubles();
                         CIu = c.eval("sP[,3]").asDoubles();
                     }
-                    ttbg.setColor(MFrame.lineColor);
+                    ttbg.setColor(ColorManager.lineColor);
                     if (smoothF.equals("splines") || smoothF.equals("locfit")) {
                         Polygon CI = new Polygon();
                         for (int f = 0; f < 200 + 1; f++) {
