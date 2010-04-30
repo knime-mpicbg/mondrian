@@ -5,6 +5,7 @@ import de.mpicbg.sweng.mondrian.core.*;
 import de.mpicbg.sweng.mondrian.io.db.Query;
 import de.mpicbg.sweng.mondrian.plots.basic.MyRect;
 import de.mpicbg.sweng.mondrian.plots.basic.MyText;
+import de.mpicbg.sweng.mondrian.util.ModelEvent;
 import de.mpicbg.sweng.mondrian.util.Util;
 
 import javax.swing.*;
@@ -72,12 +73,8 @@ public class MosaicPlot extends DragBox implements ActionListener {
         else
             titletext += ")";
 
-        frame.setTitle(titletext);
+        setName(titletext);
 
-        frame.getContentPane().add(this);
-
-        Font SF = new Font("SansSerif", Font.PLAIN, 11);
-        frame.setFont(SF);
 
         evtq = Toolkit.getDefaultToolkit().getSystemEventQueue();
 
@@ -256,6 +253,9 @@ public class MosaicPlot extends DragBox implements ActionListener {
             drawBoldDragBox(g, S);
         }
     }
+
+
+    // todo this one is not called anymore but was befor; see MosiacPlotFactory
 
 
     public void processWindowEvent(WindowEvent e) {
@@ -956,15 +956,4 @@ public class MosaicPlot extends DragBox implements ActionListener {
 
     public void scrollTo(int id) {
     }
-}
-
-
-class ModelEvent extends AWTEvent {
-
-    public ModelEvent(MosaicPlot m) {
-        super(m, MODEL_EVENT);
-    }
-
-
-    public static final int MODEL_EVENT = AWTEvent.RESERVED_ID_MAX + 2;
 }

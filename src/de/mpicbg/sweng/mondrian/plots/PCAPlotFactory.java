@@ -4,6 +4,7 @@ import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.MonFrame;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
+import de.mpicbg.sweng.mondrian.ui.PlotPanel;
 import de.mpicbg.sweng.mondrian.util.r.RService;
 import org.rosuda.REngine.Rserve.RConnection;
 
@@ -27,14 +28,15 @@ public class PCAPlotFactory extends AbstractPlotFactory {
     }
 
 
-    public JPanel createPlotPanel(MonFrame monFrame, MFrame plotFrame, DataSet dataSet, int[] selectedVarIndices) {
+    public PlotPanel createPlotPanel(MonFrame monFrame, MFrame plotFrame, DataSet dataSet, JList varNames) {
+        int[] selectedIndices = varNames.getSelectedIndices();
         try {
             RConnection c = new RConnection();
             String call = " ~ x1 ";
-            for (int i = 0; i < selectedVarIndices.length; i++) {
-                c.assign("x", dataSet.getRawNumbers(selectedVarIndices[i]));
-                if (dataSet.n > dataSet.getN(selectedVarIndices[i])) {                      // Check for missings in this variable
-                    boolean[] missy = dataSet.getMissings(selectedVarIndices[i]);
+            for (int i = 0; i < selectedIndices.length; i++) {
+                c.assign("x", dataSet.getRawNumbers(selectedIndices[i]));
+                if (dataSet.n > dataSet.getN(selectedIndices[i])) {                      // Check for missings in this variable
+                    boolean[] missy = dataSet.getMissings(selectedIndices[i]);
                     int[] flag = new int[dataSet.n];
                     for (int j = 0; j < dataSet.n; j++)
                         if (missy[j])
@@ -53,7 +55,7 @@ public class PCAPlotFactory extends AbstractPlotFactory {
             }
             c.voidEval("tempData <- data.frame(tempData)");
 
-            for (int i = 0; i < selectedVarIndices.length; i++)
+            for (int i = 0; i < selectedIndices.length; i++)
                 c.voidEval("names(tempData)[" + (i + 1) + "] <- \"x" + (i + 1) + "\"");
 
             String opt = "TRUE";
@@ -62,7 +64,7 @@ public class PCAPlotFactory extends AbstractPlotFactory {
                 opt = "FALSE";
 
             c.voidEval("pca <- predict(princomp(" + call + " , data = tempData, cor = " + opt + ", na.action = na.exclude))");
-            for (int i = 0; i < selectedVarIndices.length; i++) {
+            for (int i = 0; i < selectedIndices.length; i++) {
                 double[] x = c.eval("pca[," + (i + 1) + "]").asDoubles();
                 boolean missy[] = new boolean[dataSet.n];
                 for (int j = 0; j < x.length; j++) {

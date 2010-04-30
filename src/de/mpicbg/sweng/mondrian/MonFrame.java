@@ -70,18 +70,17 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     public JMenuBar menubar;
     public JMenu windows, help, dv, sam, trans;
 
+    private JMenuItem saveMenuItem;
+    private JMenuItem modelNavigatorButton;
+
 
     // plot menu items // todo these should all go into the factory
     private JMenuItem mosaicPlotMenuItem;
     private JMenuItem weightedMosaicPlotMenuItem;
     private JMenuItem closeDataSetMenuItem;
-    private JMenuItem splotMenuItem;
     private JMenuItem mapPlotMenuItem;
-    private JMenuItem saveMenuItem;
     private JMenuItem saveSelectionMenuItem;
     private JMenuItem missingValuePlotMenuItem;
-    private JMenuItem modelNavigatorButton;
-    private JMenuItem barchartMenuItem;
     private JMenuItem weightedBarchartMenuItem;
     private JMenuItem parCoordinatesMenuItem;
     private JMenuItem parallelBoxplotMenuItem;
@@ -213,18 +212,11 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         plotMenu.add(missingValuePlotMenuItem = new JMenuItem("Missing Value Plot"));
         missingValuePlotMenuItem.setEnabled(false);
         plotMenu.addSeparator();
-        plotMenu.add(barchartMenuItem = new JMenuItem("Barchart"));
-        barchartMenuItem.setEnabled(false);
-        plotMenu.add(weightedBarchartMenuItem = new JMenuItem("Weighted Barchart"));
-        weightedBarchartMenuItem.setEnabled(false);
-        plotMenu.addSeparator();
         plotMenu.add(histogramMenuItem = new JMenuItem("Histogram"));
         histogramMenuItem.setEnabled(false);
         plotMenu.add(weightedHistogramMenuItem = new JMenuItem("Weighted Histogram"));
         weightedHistogramMenuItem.setEnabled(false);
         plotMenu.addSeparator();
-        plotMenu.add(scatterplotMenuItem = new JMenuItem("Scatterplot"));
-        scatterplotMenuItem.setEnabled(false);
         plotMenu.addSeparator();
         plotMenu.add(mosaicPlotMenuItem = new JMenuItem("Mosaic Plot"));
         mosaicPlotMenuItem.setEnabled(false);
@@ -389,13 +381,6 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 weightedMosaicPlot();
             }
         });
-        barchartMenuItem.addActionListener(new ActionListener() {     // Open a new mosaic plot window
-
-
-            public void actionPerformed(ActionEvent e) {
-                barChart();
-            }
-        });
         weightedBarchartMenuItem.addActionListener(new ActionListener() {     // Open a new mosaic plot window
 
 
@@ -438,13 +423,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 pc("Box");
             }
         });
-        scatterplotMenuItem.addActionListener(new ActionListener() {     // Open a scatterplot window
 
-
-            public void actionPerformed(ActionEvent e) {
-                scatterplot2D();
-            }
-        });
         o.addActionListener(new ActionListener() {     // Load a dataset
 
 
@@ -496,7 +475,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 mds();
             }
         });
-       
+
         transPlus.addActionListener(new ActionListener() {     // x + y
 
 
@@ -1670,37 +1649,6 @@ public void handlePrintFile(ApplicationEvent event) {} */
         final MFrame mondrian = new MFrame(this);
         mondrian.setSize(400, 400);
 
-        DataSet tempData = dataSets.elementAt(dataSetCounter);
-
-        int k = (varNames.getSelectedIndices()).length;
-        int[] passBuffer = new int[k];
-        for (int i = 0; i < k; i++)
-            passBuffer[i] = selectBuffer[k - i - 1];
-
-        Table breakdown = tempData.breakDown(tempData.setName, passBuffer, -1);
-        for (int i = 0; i < (varNames.getSelectedIndices()).length - 1; i++) {
-            breakdown.addInteraction(new int[]{i}, false);
-        }
-        breakdown.addInteraction(new int[]{(varNames.getSelectedIndices()).length - 1}, true);
-
-        final MosaicPlot plotw = new MosaicPlot(mondrian, 400, 400, breakdown);
-        plotw.addSelectionListener(this);
-        plotw.addDataListener(this);
-        plots.addElement(plotw);
-        //    mondrian.getContentPane().add(plotw);                      // Add it
-        mondrian.setLocation(300, 0);
-        mondrian.show();
-
-        mondrian.addWindowListener(new WindowAdapter() {
-            public void windowActivated(WindowEvent e) {
-                plotw.processWindowEvent(e);
-            }
-        });
-
-        if (modelNavigator == null)
-            modelNavigator = new ModelNavigator();
-        plotw.addModelListener(modelNavigator);
-        modelNavigatorButton.setEnabled(true);
     }
 
 
@@ -1748,46 +1696,6 @@ public void handlePrintFile(ApplicationEvent event) {} */
 
     public void weightedbarChart() {
 
-        DataSet tempData = dataSets.elementAt(dataSetCounter);
-
-        int[] vars = getWeightVariable(varNames.getSelectedIndices(), tempData);
-        int[] passed = new int[vars.length - 1];
-        System.arraycopy(vars, 0, passed, 0, vars.length - 1);
-        int weight = vars[vars.length - 1];
-        int lastY = 333;
-        int col = 0;
-
-        for (int i = 0; i < passed.length; i++) {
-            final MFrame bars = new MFrame(this);
-
-            int[] dummy = {0};
-            dummy[0] = passed[i];
-            Table breakdown = tempData.breakDown(tempData.setName, dummy, weight);
-
-            int totHeight = (Toolkit.getDefaultToolkit().getScreenSize()).height;
-            int tmpHeight = Math.min(totHeight - 20, 60 + breakdown.levels[0] * 30);
-
-            bars.setSize(300, tmpHeight);
-            final Barchart plotw = new Barchart(bars, 300, tmpHeight, breakdown);
-
-            plotw.addSelectionListener(this);
-            plotw.addDataListener(this);
-            plots.addElement(plotw);
-            if (lastY + bars.getHeight() > (Toolkit.getDefaultToolkit().getScreenSize()).height) {
-                col += 1;
-                lastY = 0;
-            }
-            if (300 * col > (Toolkit.getDefaultToolkit().getScreenSize()).width - 50) {
-                col = 0;
-                lastY = 333;
-            }
-            bars.setLocation(300 * col, lastY);
-
-            bars.show();
-            if (lastY == 0)
-                lastY += bars.getY();
-            lastY += bars.getHeight();
-        }
     }
 
 
@@ -1880,24 +1788,6 @@ public void handlePrintFile(ApplicationEvent event) {} */
     }
 
 
-    public void scatterplot2D() {
-        checkHistoryBuffer();
-
-        final MFrame scatterf = new MFrame(this);
-        scatterf.setSize(400, 400);
-
-        int[] passBuffer = new int[2];
-        passBuffer[0] = selectBuffer[1];
-        passBuffer[1] = selectBuffer[0];
-        Scatter2DPlot scat = new Scatter2DPlot(scatterf, 400, 400, dataSets.elementAt(dataSetCounter), passBuffer, varNames, false);
-        scat.addSelectionListener(this);
-        scat.addDataListener(this);
-        plots.addElement(scat);
-        scatterf.setLocation(300, 333);
-        scatterf.show();
-    }
-
-
     public void mds() {
 
         int[] varsT = varNames.getSelectedIndices();
@@ -1952,7 +1842,6 @@ public void handlePrintFile(ApplicationEvent event) {} */
             System.out.println("REngine exception : " + ren.getMessage());
         }
     }
-
 
 
     public void switchVariableMode() {
@@ -2044,7 +1933,6 @@ public void handlePrintFile(ApplicationEvent event) {} */
         switch ((varNames.getSelectedIndices()).length) {
             case 0:
                 mosaicPlotMenuItem.setEnabled(false);
-                barchartMenuItem.setEnabled(false);
                 weightedBarchartMenuItem.setEnabled(false);
                 weightedMosaicPlotMenuItem.setEnabled(false);
                 histogramMenuItem.setEnabled(false);
@@ -2052,19 +1940,16 @@ public void handlePrintFile(ApplicationEvent event) {} */
                 parCoordinatesMenuItem.setEnabled(false);
                 parallelBoxplotMenuItem.setEnabled(false);
                 //              sc.setEnabled(false);
-                scatterplotMenuItem.setEnabled(false);
                 twoDimMDSMenuItem.setEnabled(false);
                 missingValuePlotMenuItem.setEnabled(false);
                 break;
             case 1:
                 if (numCategorical == (varNames.getSelectedIndices()).length) {
-                    barchartMenuItem.setEnabled(true);
 //n.setEnabled(true);
                     histogramMenuItem.setEnabled(false);
                     weightedHistogramMenuItem.setEnabled(false);
                     parallelBoxplotMenuItem.setEnabled(false);
                 } else {
-                    barchartMenuItem.setEnabled(false);
                     histogramMenuItem.setEnabled(true);
                     weightedHistogramMenuItem.setEnabled(true);
                     parallelBoxplotMenuItem.setEnabled(true);
@@ -2076,21 +1961,17 @@ public void handlePrintFile(ApplicationEvent event) {} */
                 parCoordinatesMenuItem.setEnabled(false);
                 boxplotByXYMenuItem.setEnabled(false);
                 //              sc.setEnabled(false);
-                scatterplotMenuItem.setEnabled(false);
                 twoDimMDSMenuItem.setEnabled(false);
                 break;
             case 2:
                 parCoordinatesMenuItem.setEnabled(true);
-                scatterplotMenuItem.setEnabled(true);
                 missingValuePlotMenuItem.setEnabled(true);
                 twoDimMDSMenuItem.setEnabled(false);
                 parallelBoxplotMenuItem.setEnabled(true);
                 boxplotByXYMenuItem.setEnabled(false);
                 if (numCategorical == (varNames.getSelectedIndices()).length) {
-                    barchartMenuItem.setEnabled(true);
                     mosaicPlotMenuItem.setEnabled(true);
                 } else {
-                    barchartMenuItem.setEnabled(false);
                     mosaicPlotMenuItem.setEnabled(false);
                 }
                 if (numCategorical == 1) {
@@ -2112,10 +1993,8 @@ public void handlePrintFile(ApplicationEvent event) {} */
                 break;
             default:
                 if (numCategorical == (varNames.getSelectedIndices()).length) {
-                    barchartMenuItem.setEnabled(true);
                     mosaicPlotMenuItem.setEnabled(true);
                 } else {
-                    barchartMenuItem.setEnabled(false);
                     mosaicPlotMenuItem.setEnabled(false);
                 }
                 if (numCategorical == (varNames.getSelectedIndices()).length - 1) {

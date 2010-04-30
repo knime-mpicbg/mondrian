@@ -4,9 +4,10 @@ import com.apple.mrj.MRJApplicationUtils;
 import com.apple.mrj.MRJOpenDocumentHandler;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.io.DataFrameConverter;
+import de.mpicbg.sweng.mondrian.plots.BarchartFactory;
 import de.mpicbg.sweng.mondrian.plots.MosaicPlotFactory;
 import de.mpicbg.sweng.mondrian.plots.PCAPlotFactory;
-import de.mpicbg.sweng.mondrian.plots.SpomFactory;
+import de.mpicbg.sweng.mondrian.plots.SplomFactory;
 
 import java.io.File;
 import java.util.Vector;
@@ -30,7 +31,8 @@ public class MondrianStarter implements MRJOpenDocumentHandler {
 
         monFrame.regiserPlotFactory(new PCAPlotFactory());
         monFrame.regiserPlotFactory(new MosaicPlotFactory());
-        monFrame.regiserPlotFactory(new SpomFactory());
+        monFrame.regiserPlotFactory(new SplomFactory());
+        monFrame.regiserPlotFactory(new BarchartFactory());
 
 
 //    System.out.println(" MonFrame Created / Register Handler ...");

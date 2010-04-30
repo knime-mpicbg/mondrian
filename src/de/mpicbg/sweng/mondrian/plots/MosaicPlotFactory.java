@@ -4,6 +4,8 @@ import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.MonFrame;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
+import de.mpicbg.sweng.mondrian.core.Table;
+import de.mpicbg.sweng.mondrian.ui.PlotPanel;
 
 import javax.swing.*;
 
@@ -25,8 +27,35 @@ public class MosaicPlotFactory extends AbstractPlotFactory {
     }
 
 
-    public JPanel createPlotPanel(MonFrame monFrame, MFrame plotFrame, DataSet dataSet, int[] selectedVarIndices) {
-        return null;
+    public PlotPanel createPlotPanel(MonFrame monFrame, MFrame plotFrame, DataSet dataSet, JList varNames) {
+
+        int k = (varNames.getSelectedIndices()).length;
+        int[] passBuffer = new int[k];
+        for (int i = 0; i < k; i++)
+            passBuffer[i] = monFrame.selectBuffer[k - i - 1];
+
+        Table breakdown = dataSet.breakDown(dataSet.setName, passBuffer, -1);
+        for (int i = 0; i < (varNames.getSelectedIndices()).length - 1; i++) {
+            breakdown.addInteraction(new int[]{i}, false);
+        }
+        breakdown.addInteraction(new int[]{(varNames.getSelectedIndices()).length - 1}, true);
+
+        //    mondrian.getContentPane().add(plotw);                      // Add it
+
+        //todo renable this
+//        mondrian.addWindowListener(new WindowAdapter() {
+//            public void windowActivated(WindowEvent e) {
+//                plotw.processWindowEvent(e);
+//            }
+//        });
+
+        //todo renenable this
+//        if (modelNavigator == null)
+//            modelNavigator = new ModelNavigator();
+//        plotw.addModelListener(modelNavigator);
+//        modelNavigatorButton.setEnabled(true);
+
+        return new MosaicPlot(plotFrame, 400, 400, breakdown);
     }
 
 

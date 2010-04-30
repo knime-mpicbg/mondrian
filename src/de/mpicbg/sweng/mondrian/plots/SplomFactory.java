@@ -4,6 +4,7 @@ import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.MonFrame;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
+import de.mpicbg.sweng.mondrian.ui.PlotPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,7 +15,7 @@ import java.awt.*;
  *
  * @author Holger Brandl
  */
-public class SpomFactory extends AbstractPlotFactory {
+public class SplomFactory extends AbstractPlotFactory {
 
     public String getPlotName() {
         return "Scatterplot Matrix";
@@ -26,15 +27,15 @@ public class SpomFactory extends AbstractPlotFactory {
     }
 
 
-    public JPanel createPlotPanel(MonFrame monFrame, MFrame plotFrame, DataSet dataSet, int[] selectedVarIndices) {
-        int p = (selectedVarIndices).length;
+    public PlotPanel createPlotPanel(MonFrame monFrame, MFrame plotFrame, DataSet dataSet, JList varNames) {
+        int numVars = (varNames.getSelectedIndices()).length;
 
-        JPanel splomPanel = new JPanel();
-        splomPanel.setLayout(new GridLayout(p - 1, p - 1));
-        splomPanel.setMinimumSize(new Dimension(200 * p, 200 * p));
+        PlotPanel splomPanel = new PlotPanel();
+        splomPanel.setLayout(new GridLayout(numVars - 1, numVars - 1));
+        splomPanel.setMinimumSize(new Dimension(200 * numVars, 200 * numVars));
 
-        for (int i = 0; i < (p - 1); i++)
-            for (int j = 1; j < p; j++) {
+        for (int i = 0; i < (numVars - 1); i++)
+            for (int j = 1; j < numVars; j++) {
                 if (i >= j) {
                     JPanel Filler = new JPanel();
                     Filler.setBackground(MFrame.backgroundColor);
@@ -44,15 +45,11 @@ public class SpomFactory extends AbstractPlotFactory {
                     int[] tmpVars = new int[2];
                     //          tmpVars[0] = varNames.getSelectedIndices()[j];
                     //          tmpVars[1] = varNames.getSelectedIndices()[i];
-                    tmpVars[0] = monFrame.selectBuffer[p - j - 1];
-                    tmpVars[1] = monFrame.selectBuffer[p - i - 1];
+                    tmpVars[0] = monFrame.selectBuffer[numVars - j - 1];
+                    tmpVars[1] = monFrame.selectBuffer[numVars - i - 1];
                     //
-                    Scatter2DPlot scat = new Scatter2DPlot(plotFrame, 200, 200, dataSet, tmpVars, monFrame.varNames, true);
-                    scat.addSelectionListener(monFrame);
-                    scat.addDataListener(monFrame);
+                    Scatter2DPlot scat = new Scatter2DPlot(plotFrame, 200, 200, dataSet, tmpVars, varNames, true);
                     splomPanel.add(scat);
-
-                    monFrame.plots.addElement(scat);
                 }
             }
 

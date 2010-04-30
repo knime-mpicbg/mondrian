@@ -16,11 +16,10 @@ import java.awt.*;
  *
  * @author Holger Brandl
  */
-// todo make this to become a subclass of barchartfactory
-public class WeightedBarCharFactory extends AbstractPlotFactory {
+public class BarchartFactory extends AbstractPlotFactory {
 
     public String getPlotName() {
-        return "Weighted Barchart";
+        return "Barchart";
     }
 
 
@@ -32,30 +31,25 @@ public class WeightedBarCharFactory extends AbstractPlotFactory {
     public PlotPanel createPlotPanel(MonFrame monFrame, MFrame plotFrame, DataSet dataSet, JList varNames) {
         int[] indices = varNames.getSelectedIndices();
 
-
         PlotPanel barChartsContainer = new PlotPanel();
         plotFrame.setLayout(new GridLayout(1, indices.length));
 
 
-        int[] vars = monFrame.getWeightVariable(varNames.getSelectedIndices(), dataSet);
-        int[] passed = new int[vars.length - 1];
-        System.arraycopy(vars, 0, passed, 0, vars.length - 1);
+        int weight = -1;
 
-        int weight = vars[vars.length - 1];
-
-        for (int i = 0; i < passed.length; i++) {
+        for (int i = 0; i < indices.length; i++) {
 
             int[] dummy = {0};
-            dummy[0] = passed[i];
+            dummy[0] = indices[i];
 
             Table breakdown = dataSet.breakDown(dataSet.setName, dummy, weight);
 
             int totHeight = (Toolkit.getDefaultToolkit().getScreenSize()).height;
-            int tmpHeight = Math.min(totHeight - 20, 60 + breakdown.levels[0] * 30);
+            int tmpHeight = Math.min(totHeight - 30, 60 + breakdown.levels[0] * 30);
 
-            Barchart weightedBarchart = new Barchart(plotFrame, 300, tmpHeight, breakdown);
+            Barchart barchart = new Barchart(plotFrame, 300, tmpHeight, breakdown);
 
-            barChartsContainer.add(weightedBarchart);
+            barChartsContainer.add(barchart);
         }
 
         return barChartsContainer;

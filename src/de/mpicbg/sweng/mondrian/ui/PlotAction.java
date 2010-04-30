@@ -2,6 +2,7 @@ package de.mpicbg.sweng.mondrian.ui;
 
 import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.core.DragBox;
 import de.mpicbg.sweng.mondrian.core.PlotFactory;
 
 import javax.swing.*;
@@ -44,16 +45,24 @@ public class PlotAction extends AbstractAction {
         Font SF = new Font("SansSerif", Font.PLAIN, 11);
         plotFrame.setFont(SF);
 
-        JPanel plotPanel = plotFactory.createPlotPanel(monFrame, plotFrame, monFrame.dataSets.elementAt(monFrame.dataSetCounter), monFrame.varNames.getSelectedIndices());
+        PlotPanel plotPanel = plotFactory.createPlotPanel(monFrame, plotFrame, monFrame.dataSets.elementAt(monFrame.dataSetCounter), monFrame.varNames);
+
 
         if (plotPanel != null) {
+            for (PlotPanel plot : plotPanel.getPlots()) {
+                plot.addDataListener(monFrame);
+                plot.addSelectionListener(monFrame);
+
+                monFrame.plots.addElement((DragBox) plot);
+            }
             plotFrame.getContentPane().add(plotPanel);
-            
+
+
+            plotFrame.setTitle(plotPanel.getName());
 
             // create a new frame for it
 
             plotFrame.setSize(plotPanel.getMinimumSize());
-            plotFrame.setTitle(plotFactory.getPlotTitle());
             plotFrame.setVisible(true);
         }
 

@@ -8,6 +8,7 @@ import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.plots.Barchart;
 import de.mpicbg.sweng.mondrian.plots.Histogram;
 import de.mpicbg.sweng.mondrian.plots.ParallelCoordinates;
+import de.mpicbg.sweng.mondrian.ui.PlotPanel;
 import de.mpicbg.sweng.mondrian.util.StatUtil;
 import de.mpicbg.sweng.mondrian.util.Util;
 
@@ -32,8 +33,7 @@ import javax.swing.JTextField;*/
 
 public
 abstract class DragBox
-
-        extends JPanel
+        extends PlotPanel
         implements MouseListener, MouseMotionListener, AdjustmentListener, ActionListener, Printable
 
 {
@@ -86,6 +86,7 @@ abstract class DragBox
     public LimitDialog LD;
 
     public boolean resizeReady = true;
+
 
     //
     // The PC implementation may need two minor changes:
@@ -451,16 +452,6 @@ abstract class DragBox
 
     public Color getHiliteColor() {
         return hiliteColor;
-    }
-
-
-    public void addSelectionListener(SelectionListener l) {
-        slistener = l;
-    }
-
-
-    public void addDataListener(DataListener l) {
-        dlistener = l;
     }
 
 
@@ -1360,8 +1351,6 @@ abstract class DragBox
     }
 
 
-    private SelectionListener slistener;
-    private DataListener dlistener;
     private static EventQueue evtq;
 
 
