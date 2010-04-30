@@ -1,10 +1,10 @@
 package de.mpicbg.sweng.mondrian.plots;
 
 import de.mpicbg.sweng.mondrian.MFrame;
-import de.mpicbg.sweng.mondrian.Table;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.core.DragBox;
 import de.mpicbg.sweng.mondrian.core.Selection;
+import de.mpicbg.sweng.mondrian.core.Table;
 import de.mpicbg.sweng.mondrian.plots.basic.MyRect;
 import de.mpicbg.sweng.mondrian.util.StatUtil;
 import de.mpicbg.sweng.mondrian.util.Util;
@@ -25,7 +25,7 @@ import java.util.HashSet;
 import java.util.Vector;
 
 
-public class Scatter2D extends DragBox {
+public class Scatter2DPlot extends DragBox {
 
     private Vector rects = new Vector(512, 512);    // Store the tiles.
     private int width, height;                   // The preferred size.
@@ -77,7 +77,7 @@ public class Scatter2D extends DragBox {
     /**
      * This constructor requires a Frame and a desired size
      */
-    public Scatter2D(MFrame frame, int width, int height, DataSet data, int[] Vars, JList varList, boolean matrix) {
+    public Scatter2DPlot(MFrame frame, int width, int height, DataSet data, int[] Vars, JList varList, boolean matrix) {
         super(frame);
         boolean matrix1 = matrix;
         this.data = data;

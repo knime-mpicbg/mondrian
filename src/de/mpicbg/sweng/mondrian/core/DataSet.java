@@ -2,7 +2,6 @@ package de.mpicbg.sweng.mondrian.core;
 
 import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.MonFrame;
-import de.mpicbg.sweng.mondrian.Table;
 import de.mpicbg.sweng.mondrian.io.ScanException;
 import de.mpicbg.sweng.mondrian.io.UnacceptableFormatException;
 import de.mpicbg.sweng.mondrian.io.db.Query;

@@ -1,8 +1,5 @@
-package de.mpicbg.sweng.mondrian;
+package de.mpicbg.sweng.mondrian.core;
 
-import de.mpicbg.sweng.mondrian.core.DataSet;
-import de.mpicbg.sweng.mondrian.core.InteractionSet;
-import de.mpicbg.sweng.mondrian.core.Selection;
 import de.mpicbg.sweng.mondrian.io.db.Query;
 import de.mpicbg.sweng.mondrian.util.StatUtil;
 

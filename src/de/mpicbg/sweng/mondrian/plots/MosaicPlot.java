@@ -1,7 +1,6 @@
 package de.mpicbg.sweng.mondrian.plots;
 
 import de.mpicbg.sweng.mondrian.MFrame;
-import de.mpicbg.sweng.mondrian.Table;
 import de.mpicbg.sweng.mondrian.core.*;
 import de.mpicbg.sweng.mondrian.io.db.Query;
 import de.mpicbg.sweng.mondrian.plots.basic.MyRect;
@@ -20,7 +19,7 @@ import java.util.Vector;
  *
  * @author Holger Brandl
  */
-public class Mosaic extends DragBox implements ActionListener {
+public class MosaicPlot extends DragBox implements ActionListener {
 
     private Vector rects = new Vector(256, 256);  // Store the tiles.
     private Vector Labels = new Vector(16, 16);   // Store the labels.
@@ -40,7 +39,7 @@ public class Mosaic extends DragBox implements ActionListener {
     /**
      * This constructor requires a Frame and a desired size
      */
-    public Mosaic(MFrame frame, int width, int height, Table tablep) {
+    public MosaicPlot(MFrame frame, int width, int height, Table tablep) {
         super(frame);
         this.tablep = tablep;
         this.width = width;
@@ -962,7 +961,7 @@ public class Mosaic extends DragBox implements ActionListener {
 
 class ModelEvent extends AWTEvent {
 
-    public ModelEvent(Mosaic m) {
+    public ModelEvent(MosaicPlot m) {
         super(m, MODEL_EVENT);
     }
 

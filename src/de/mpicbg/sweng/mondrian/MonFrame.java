@@ -1592,7 +1592,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
                     tmpVars[0] = selectBuffer[p - j - 1];
                     tmpVars[1] = selectBuffer[p - i - 1];
                     //
-                    Scatter2D scat = new Scatter2D(scatterMf, 200, 200, dataSets.elementAt(dataSetCounter), tmpVars, varNames, true);
+                    Scatter2DPlot scat = new Scatter2DPlot(scatterMf, 200, 200, dataSets.elementAt(dataSetCounter), tmpVars, varNames, true);
                     scat.addSelectionListener(this);
                     scat.addDataListener(this);
                     plots.addElement(scat);
@@ -1698,7 +1698,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
         for (int i = 0; i < passed.length - 1; i++)
             breakdown.addInteraction(new int[]{i}, false);
         breakdown.addInteraction(new int[]{passed.length - 1}, true);
-        final Mosaic plotw = new Mosaic(mondrian, 400, 400, breakdown);
+        final MosaicPlot plotw = new MosaicPlot(mondrian, 400, 400, breakdown);
         plotw.addSelectionListener(this);
         plotw.addDataListener(this);
         plots.addElement(plotw);
@@ -1732,7 +1732,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
         }
         breakdown.addInteraction(new int[]{(varNames.getSelectedIndices()).length - 1}, true);
 
-        final Mosaic plotw = new Mosaic(mondrian, 400, 400, breakdown);
+        final MosaicPlot plotw = new MosaicPlot(mondrian, 400, 400, breakdown);
         plotw.addSelectionListener(this);
         plotw.addDataListener(this);
         plots.addElement(plotw);
@@ -1914,15 +1914,15 @@ public void handlePrintFile(ApplicationEvent event) {} */
         mapf.setSize(400, 400);
         mapf.setTitle("Map");
 
-        Map map = new Map(mapf, 400, 400, dataSets.elementAt(dataSetCounter), polys, varNames);
-        map.addSelectionListener(this);
-        map.addDataListener(this);
-        plots.addElement(map);
+        MapPlot mapPlot = new MapPlot(mapf, 400, 400, dataSets.elementAt(dataSetCounter), polys, varNames);
+        mapPlot.addSelectionListener(this);
+        mapPlot.addDataListener(this);
+        plots.addElement(mapPlot);
 
-        if (map.ratio > 1)
-            mapf.setSize((int) (350 * map.ratio), 350 + 56);
+        if (mapPlot.ratio > 1)
+            mapf.setSize((int) (350 * mapPlot.ratio), 350 + 56);
         else
-            mapf.setSize(350, (int) (350 / map.ratio) + 56);
+            mapf.setSize(350, (int) (350 / mapPlot.ratio) + 56);
         mapf.setLocation(0, 333);
 
         mapf.show();
@@ -1938,7 +1938,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
         int[] passBuffer = new int[2];
         passBuffer[0] = selectBuffer[1];
         passBuffer[1] = selectBuffer[0];
-        Scatter2D scat = new Scatter2D(scatterf, 400, 400, dataSets.elementAt(dataSetCounter), passBuffer, varNames, false);
+        Scatter2DPlot scat = new Scatter2DPlot(scatterf, 400, 400, dataSets.elementAt(dataSetCounter), passBuffer, varNames, false);
         scat.addSelectionListener(this);
         scat.addDataListener(this);
         plots.addElement(scat);
@@ -1986,7 +1986,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
             scatterf.setSize(400, 400);
             scatterf.setTitle("Scatterplot 2D");
 
-            Scatter2D scat = new Scatter2D(scatterf, 400, 400, dataT, new int[]{dataT.k - 2, dataT.k - 1}, varNames, false);
+            Scatter2DPlot scat = new Scatter2DPlot(scatterf, 400, 400, dataT, new int[]{dataT.k - 2, dataT.k - 1}, varNames, false);
             scat.addSelectionListener(this);
             plots.addElement(scat);
             scatterf.setLocation(300, 333);

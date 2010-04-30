@@ -2,7 +2,6 @@ package de.mpicbg.sweng.mondrian.plots;
 
 
 import de.mpicbg.sweng.mondrian.MFrame;
-import de.mpicbg.sweng.mondrian.Table;
 import de.mpicbg.sweng.mondrian.core.*;
 import de.mpicbg.sweng.mondrian.plots.basic.MyRect;
 import de.mpicbg.sweng.mondrian.plots.basic.MyText;

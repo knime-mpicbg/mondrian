@@ -2,8 +2,8 @@ package de.mpicbg.sweng.mondrian.plots.basic;
 
 
 import de.mpicbg.sweng.mondrian.MFrame;
-import de.mpicbg.sweng.mondrian.Table;
 import de.mpicbg.sweng.mondrian.core.DragBox;
+import de.mpicbg.sweng.mondrian.core.Table;
 import de.mpicbg.sweng.mondrian.util.StatUtil;
 import de.mpicbg.sweng.mondrian.util.Util;
 

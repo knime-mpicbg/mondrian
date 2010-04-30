@@ -1,7 +1,5 @@
 package de.mpicbg.sweng.mondrian.core;
 
-import de.mpicbg.sweng.mondrian.Table;
-
 
 public interface ModelListener {
 

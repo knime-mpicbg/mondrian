@@ -2,7 +2,8 @@ package de.mpicbg.sweng.mondrian;
 
 import de.mpicbg.sweng.mondrian.core.ModelListener;
 import de.mpicbg.sweng.mondrian.core.SelectionEvent;
-import de.mpicbg.sweng.mondrian.plots.Mosaic;
+import de.mpicbg.sweng.mondrian.core.Table;
+import de.mpicbg.sweng.mondrian.plots.MosaicPlot;
 import de.mpicbg.sweng.mondrian.util.StatUtil;
 import de.mpicbg.sweng.mondrian.util.Util;
 
@@ -43,7 +44,7 @@ public class ModelNavigator extends JFrame implements ActionListener, ModelListe
     private Table myT;
     private Table t;
     private Table oldT;
-    private Mosaic mosaic;
+    private MosaicPlot mosaicPlot;
 
     private int oldMax;
 
@@ -205,8 +206,8 @@ public class ModelNavigator extends JFrame implements ActionListener, ModelListe
             oldNames = t.names;
             oldMax = maxLevel;
 
-            if (mosaic != null) {
-                SelectionEvent se = new SelectionEvent(mosaic);
+            if (mosaicPlot != null) {
+                SelectionEvent se = new SelectionEvent(mosaicPlot);
                 EventQueue evtq = Toolkit.getDefaultToolkit().getSystemEventQueue();
                 evtq.postEvent(se);
             }

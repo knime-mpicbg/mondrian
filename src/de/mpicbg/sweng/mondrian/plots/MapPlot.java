@@ -1,5 +1,6 @@
-package de.mpicbg.sweng.mondrian;
+package de.mpicbg.sweng.mondrian.plots;
 
+import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.core.DragBox;
 import de.mpicbg.sweng.mondrian.core.Selection;
@@ -20,7 +21,7 @@ import java.util.Date;
 import java.util.Vector;
 
 
-public class Map extends DragBox {
+public class MapPlot extends DragBox {
 
     private Vector polys = new Vector(256, 256);  // Store the tiles.
     protected int oldWidth, oldHeight;           // The last size for constructing the polygons.
@@ -56,7 +57,7 @@ public class Map extends DragBox {
     /**
      * This constructor requires a Frame and a desired size
      */
-    public Map(MFrame frame, int width, int height, DataSet data, Vector polys, JList varList) {
+    public MapPlot(MFrame frame, int width, int height, DataSet data, Vector polys, JList varList) {
         super(frame);
         this.polys = polys;
         this.data = data;
