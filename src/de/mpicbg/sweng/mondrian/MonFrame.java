@@ -14,7 +14,9 @@ import de.mpicbg.sweng.mondrian.plots.*;
 import de.mpicbg.sweng.mondrian.plots.basic.MyPoly;
 import de.mpicbg.sweng.mondrian.ui.AttributeCellRenderer;
 import de.mpicbg.sweng.mondrian.ui.PreferencesFrame;
+import de.mpicbg.sweng.mondrian.util.StatUtil;
 import de.mpicbg.sweng.mondrian.util.Util;
+import de.mpicbg.sweng.mondrian.util.r.StartRserve;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RConnection;
@@ -68,11 +70,11 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     private JMenuItem nw;
     private JMenuItem closeDataSetMenuItem;
     private JMenuItem t;
-    private JMenuItem m;
+    private JMenuItem mapPlotMenuItem;
     private JMenuItem saveMenuItem;
     private JMenuItem saveSelectionMenuItem;
     private JMenuItem mv;
-    private JMenuItem mn;
+    private JMenuItem modelNavigatorButton;
     private JMenuItem b;
     private JMenuItem bw;
     private JMenuItem pc;
@@ -88,7 +90,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
     private JCheckBoxMenuItem ah;
     private JCheckBoxMenuItem os;
     private JCheckBoxMenuItem as;
-    private ModelNavigator Mn;
+    private ModelNavigator modelNavigator;
     public int dataSetCounter = -1;
     private int dCol = 1, dSel = 1;
     private int graphicsPerf;
@@ -234,8 +236,8 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
             t.setEnabled(false);
             plot.addSeparator();                     // Put a separator in the menu
         }
-        plot.add(m = new JMenuItem("Map"));
-        m.setEnabled(false);
+        plot.add(mapPlotMenuItem = new JMenuItem("Map"));
+        mapPlotMenuItem.setEnabled(false);
         menubar.add(plot);                         // Add to menubar.
         //
         JMenu calc = new JMenu("Calc");            // Create a Calc menu.
@@ -302,8 +304,8 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         fc.setEnabled(false);
 
         options.addSeparator();                     // Put a separator in the menu
-        options.add(mn = new JMenuItem("Model Navigator", KeyEvent.VK_J));
-        mn.setEnabled(false);
+        options.add(modelNavigatorButton = new JMenuItem("Model Navigator", KeyEvent.VK_J));
+        modelNavigatorButton.setEnabled(false);
 
         options.addSeparator();                     // Put a separator in the menu
         JMenuItem pr;
@@ -488,7 +490,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 loadDataSet(true, null, "");
             }
         });
-        m.addActionListener(new ActionListener() {     // Open a new window to draw an interactive maps
+        mapPlotMenuItem.addActionListener(new ActionListener() {     // Open a new window to draw an interactive maps
 
 
             public void actionPerformed(ActionEvent e) {
@@ -628,11 +630,11 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
                 switchAlpha();
             }
         });
-        mn.addActionListener(new ActionListener() {     // Open a new window for the model navigator
+        modelNavigatorButton.addActionListener(new ActionListener() {     // Open a new window for the model navigator
 
 
             public void actionPerformed(ActionEvent e) {
-                modelNavigator();
+                showModeNavigator();
             }
         });
         pr.addActionListener(new ActionListener() {     // Open the Preference Box
@@ -784,7 +786,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
         int nom = dataSets.elementAt(dataSetCounter).countSelection();
         int denom = dataSets.elementAt(dataSetCounter).n;
-        String Display = nom + "/" + denom + " (" + Stat.roundToString(100 * nom / denom, 2) + "%)";
+        String Display = nom + "/" + denom + " (" + StatUtil.roundToString(100 * nom / denom, 2) + "%)";
         progText.setText(Display);
         progBar.setValue(nom);
 
@@ -1181,7 +1183,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         dataSets.elementAt(dataSetCounter).selChanged = true;
         int nom = dataSets.elementAt(dataSetCounter).countSelection();
         int denom = dataSets.elementAt(dataSetCounter).n;
-        String Display = nom + "/" + denom + " (" + Stat.roundToString(100F * nom / denom, 2) + "%)";
+        String Display = nom + "/" + denom + " (" + StatUtil.roundToString(100F * nom / denom, 2) + "%)";
         progText.setText(Display);
         progBar.setValue(nom);
 
@@ -1324,7 +1326,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
 
                 int nom = dataSets.elementAt(dataSetCounter).countSelection();
                 int denom = dataSets.elementAt(dataSetCounter).n;
-                String Display = nom + "/" + denom + " (" + Stat.roundToString(100 * nom / denom, 2) + "%)";
+                String Display = nom + "/" + denom + " (" + StatUtil.roundToString(100 * nom / denom, 2) + "%)";
                 progText.setText(Display);
                 progBar.setValue(nom);
 
@@ -1450,7 +1452,7 @@ public class MonFrame extends JFrame implements ProgressIndicator, SelectionList
         currentManager.setDoubleBufferingEnabled(true);
 
         if (polys.size() > 0)
-            m.setEnabled(true);
+            mapPlotMenuItem.setEnabled(true);
 
         this.setResizable(true);
 
@@ -1554,11 +1556,11 @@ public void handlePrintFile(ApplicationEvent event) {} */
     }
 
 
-    public void modelNavigator() {
-        if (Mn == null)
-            Mn = new ModelNavigator();
+    public void showModeNavigator() {
+        if (modelNavigator == null)
+            modelNavigator = new ModelNavigator();
         else
-            Mn.show();
+            modelNavigator.show();
     }
 
 
@@ -1628,7 +1630,7 @@ public void handlePrintFile(ApplicationEvent event) {} */
         int[] passBuffer = new int[count];
         System.arraycopy(passTmpBuffer, 0, passBuffer, 0, count);
 
-        PC plotw = new PC(pC, dataSets.elementAt(dataSetCounter), passBuffer, mode, varNames);
+        ParallelCoordinates plotw = new ParallelCoordinates(pC, dataSets.elementAt(dataSetCounter), passBuffer, mode, varNames);
         plotw.addSelectionListener(this);
         plotw.addDataListener(this);
         plots.addElement(plotw);
@@ -1704,10 +1706,10 @@ public void handlePrintFile(ApplicationEvent event) {} */
         mondrian.setLocation(300, 0);
         mondrian.show();
 
-        if (Mn == null)
-            Mn = new ModelNavigator();
-        plotw.addModelListener(Mn);
-        mn.setEnabled(true);
+        if (modelNavigator == null)
+            modelNavigator = new ModelNavigator();
+        plotw.addModelListener(modelNavigator);
+        modelNavigatorButton.setEnabled(true);
     }
 
 
@@ -1744,10 +1746,10 @@ public void handlePrintFile(ApplicationEvent event) {} */
             }
         });
 
-        if (Mn == null)
-            Mn = new ModelNavigator();
-        plotw.addModelListener(Mn);
-        mn.setEnabled(true);
+        if (modelNavigator == null)
+            modelNavigator = new ModelNavigator();
+        plotw.addModelListener(modelNavigator);
+        modelNavigatorButton.setEnabled(true);
     }
 
 

@@ -5,10 +5,10 @@ package de.mpicbg.sweng.mondrian.core;
 
 
 import de.mpicbg.sweng.mondrian.MFrame;
-import de.mpicbg.sweng.mondrian.PC;
-import de.mpicbg.sweng.mondrian.Stat;
 import de.mpicbg.sweng.mondrian.plots.Barchart;
 import de.mpicbg.sweng.mondrian.plots.Histogram;
+import de.mpicbg.sweng.mondrian.plots.ParallelCoordinates;
+import de.mpicbg.sweng.mondrian.util.StatUtil;
 import de.mpicbg.sweng.mondrian.util.Util;
 
 import javax.swing.*;
@@ -1308,10 +1308,10 @@ abstract class DragBox
                 int roundX = (int) Math.max(0, 2 - Math.round((Math.log(urx - llx) / Math.log(10))));
                 int roundY = (int) Math.max(0, 2 - Math.round((Math.log(ury - lly) / Math.log(10))));
 
-                LD.tfXMinI.setText(Stat.roundToString(getLlx(), roundX));
-                LD.tfXMaxI.setText(Stat.roundToString(getUrx(), roundX));
-                LD.tfYMinI.setText(Stat.roundToString(getLly(), roundY));
-                LD.tfYMaxI.setText(Stat.roundToString(getUry(), roundY));
+                LD.tfXMinI.setText(StatUtil.roundToString(getLlx(), roundX));
+                LD.tfXMaxI.setText(StatUtil.roundToString(getUrx(), roundX));
+                LD.tfYMinI.setText(StatUtil.roundToString(getLly(), roundY));
+                LD.tfYMaxI.setText(StatUtil.roundToString(getUry(), roundY));
 
                 LD.tfWidthI.setText("" + frame.getWidth());
                 LD.tfHeightI.setText("" + frame.getHeight());
@@ -1456,7 +1456,7 @@ abstract class DragBox
             pnXPanel.add(lbXLabelMax);
 
             tfXMinI = new JTextField(10);
-            tfXMinI.setText(Stat.roundToString(llx, roundX));
+            tfXMinI.setText(StatUtil.roundToString(llx, roundX));
             tfXMinI.selectAll();
             tfXMinI.addKeyListener(new KeyAdapter() {
                 public void keyTyped(KeyEvent e) {
@@ -1485,7 +1485,7 @@ abstract class DragBox
             pnXPanel.add(tfXMinI);
 
             tfXMaxI = new JTextField(10);
-            tfXMaxI.setText(Stat.roundToString(urx, roundX));
+            tfXMaxI.setText(StatUtil.roundToString(urx, roundX));
             tfXMaxI.addKeyListener(new KeyAdapter() {
                 public void keyTyped(KeyEvent e) {
                     char c = e.getKeyChar();
@@ -1512,7 +1512,7 @@ abstract class DragBox
             gbXPanel.setConstraints(tfXMaxI, gbcXPanel);
             pnXPanel.add(tfXMaxI);
 
-            if (DB instanceof PC) {
+            if (DB instanceof ParallelCoordinates) {
                 tfXMinI.setEnabled(false);
                 tfXMaxI.setEnabled(false);
             }
@@ -1569,7 +1569,7 @@ abstract class DragBox
             pnYPanel.add(lbYLabelMax);
 
             tfYMinI = new JTextField(10);
-            tfYMinI.setText(Stat.roundToString(lly, roundY));
+            tfYMinI.setText(StatUtil.roundToString(lly, roundY));
             tfYMinI.addKeyListener(new KeyAdapter() {
                 public void keyTyped(KeyEvent e) {
                     char c = e.getKeyChar();
@@ -1597,7 +1597,7 @@ abstract class DragBox
             pnYPanel.add(tfYMinI);
 
             tfYMaxI = new JTextField(10);
-            tfYMaxI.setText(Stat.roundToString(ury, roundY));
+            tfYMaxI.setText(StatUtil.roundToString(ury, roundY));
             tfYMaxI.addKeyListener(new KeyAdapter() {
                 public void keyTyped(KeyEvent e) {
                     char c = e.getKeyChar();

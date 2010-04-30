@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.plots.basic;
 
-import de.mpicbg.sweng.mondrian.Stat;
+import de.mpicbg.sweng.mondrian.util.StatUtil;
 
 //
 
@@ -53,7 +53,7 @@ public class Axis {
             tickMMM = 2.5;
             tickMMMM = 2;
         }
-        tickM = Stat.round(tickM * Math.pow(10, d - 1), (int) (3 - d));
+        tickM = StatUtil.round(tickM * Math.pow(10, d - 1), (int) (3 - d));
         if (min % tickM != 0)
             firstM = (Math.floor(min / tickM)) * tickM;
         else
@@ -61,7 +61,7 @@ public class Axis {
         lastM = Math.floor(max / tickM) * tickM;
         numM = (int) ((lastM - firstM) / tickM) + 1;
 
-        tickMM = Stat.round(tickMM * Math.pow(10, d - 1), (int) (3 - d));
+        tickMM = StatUtil.round(tickMM * Math.pow(10, d - 1), (int) (3 - d));
         if (min % tickMM != 0)
             firstMM = (Math.floor(min / tickMM)) * tickMM;
         else
@@ -69,7 +69,7 @@ public class Axis {
         lastMM = Math.floor(max / tickMM) * tickMM;
         numMM = (int) ((lastMM - firstMM) / tickMM) + 1;
 
-        tickMMM = Stat.round(tickMMM * Math.pow(10, d - 1), (int) (3 - d));
+        tickMMM = StatUtil.round(tickMMM * Math.pow(10, d - 1), (int) (3 - d));
         if (min % tickMMM != 0)
             firstMMM = (Math.floor(min / tickMMM)) * tickMMM;
         else
@@ -77,7 +77,7 @@ public class Axis {
         lastMMM = Math.floor(max / tickMMM) * tickMMM;
         numMMM = (int) ((lastMMM - firstMMM) / tickMMM) + 1;
 
-        tickMMMM = Stat.round(tickMMMM * Math.pow(10, d - 1), (int) (3 - d));
+        tickMMMM = StatUtil.round(tickMMMM * Math.pow(10, d - 1), (int) (3 - d));
         double firstMMMM;
         if (min % tickMMMM != 0)
             firstMMMM = (Math.floor(min / tickMMMM)) * tickMMMM;

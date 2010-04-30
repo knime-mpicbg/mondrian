@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.core;
 
-import de.mpicbg.sweng.mondrian.BufferTokenizer;
+import de.mpicbg.sweng.mondrian.util.BufferTokenizer;
 import de.mpicbg.sweng.mondrian.util.Qsort;
 import de.mpicbg.sweng.mondrian.util.Util;
 

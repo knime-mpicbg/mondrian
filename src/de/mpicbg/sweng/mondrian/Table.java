@@ -4,6 +4,7 @@ import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.core.InteractionSet;
 import de.mpicbg.sweng.mondrian.core.Selection;
 import de.mpicbg.sweng.mondrian.io.db.Query;
+import de.mpicbg.sweng.mondrian.util.StatUtil;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -246,8 +247,8 @@ public class Table implements Cloneable {
                 System.out.print(names[interact[i][j]] + "*");
             System.out.println(names[interact[i][interact[i].length - 1]]);
         }
-        this.p = 1 - Stat.pchisq(G2, df);
-        System.out.println(" Df:" + df + "  G2: " + Stat.round(G2, 2) + "  X2: " + Stat.round(X2, 2) + "  p: " + Stat.round(p, 3));
+        this.p = 1 - StatUtil.pchisq(G2, df);
+        System.out.println(" Df:" + df + "  G2: " + StatUtil.round(G2, 2) + "  X2: " + StatUtil.round(X2, 2) + "  p: " + StatUtil.round(p, 3));
     }
 
 

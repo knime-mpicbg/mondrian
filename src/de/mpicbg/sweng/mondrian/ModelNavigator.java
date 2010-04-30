@@ -3,6 +3,7 @@ package de.mpicbg.sweng.mondrian;
 import de.mpicbg.sweng.mondrian.core.ModelListener;
 import de.mpicbg.sweng.mondrian.core.SelectionEvent;
 import de.mpicbg.sweng.mondrian.plots.Mosaic;
+import de.mpicbg.sweng.mondrian.util.StatUtil;
 import de.mpicbg.sweng.mondrian.util.Util;
 
 import javax.swing.*;
@@ -159,9 +160,9 @@ public class ModelNavigator extends JFrame implements ActionListener, ModelListe
             this.t = t;
             myT = (Table) t.clone();
 
-            modelP.setText(dfP.format(Stat.round(t.p, 3)));
-            modelG2.setText(dfG2.format(Stat.round(t.G2, 1)));
-            modelX2.setText(dfX2.format(Stat.round(t.X2, 1)));
+            modelP.setText(dfP.format(StatUtil.round(t.p, 3)));
+            modelG2.setText(dfG2.format(StatUtil.round(t.G2, 1)));
+            modelX2.setText(dfX2.format(StatUtil.round(t.X2, 1)));
             modelDf.setText(dfDf.format(t.df));
 
             interList.delItems(0, interList.getItemCount() - 1);
@@ -185,9 +186,9 @@ public class ModelNavigator extends JFrame implements ActionListener, ModelListe
             myT.addInteraction(interact, true);
             super.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
-            currentP.setText(dfP.format(Stat.round(myT.p, 3)));
-            currentG2.setText(dfG2.format(Stat.round(myT.G2, 1)));
-            currentX2.setText(dfX2.format(Stat.round(myT.X2, 1)));
+            currentP.setText(dfP.format(StatUtil.round(myT.p, 3)));
+            currentG2.setText(dfG2.format(StatUtil.round(myT.G2, 1)));
+            currentX2.setText(dfX2.format(StatUtil.round(myT.X2, 1)));
             currentDf.setText(dfDf.format(myT.df));
 
             for (int j = 0; j < Math.min(maxLevel, 4); j++) {
@@ -224,9 +225,9 @@ public class ModelNavigator extends JFrame implements ActionListener, ModelListe
             myT.deleteInteraction(save);
             super.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
-            interP.setText("" + Stat.round(myT.p, 3));
-            interG2.setText("" + Stat.round(myT.G2, 1));
-            interX2.setText("" + Stat.round(myT.X2, 1));
+            interP.setText("" + StatUtil.round(myT.p, 3));
+            interG2.setText("" + StatUtil.round(myT.G2, 1));
+            interX2.setText("" + StatUtil.round(myT.X2, 1));
             interDf.setText("" + myT.df);
         } else {
             interP.setText("-.----");
@@ -248,9 +249,9 @@ public class ModelNavigator extends JFrame implements ActionListener, ModelListe
             t.addInteraction(interact, true);
             super.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
-            modelP.setText(dfP.format(Stat.round(t.p, 3)));
-            modelG2.setText(dfG2.format(Stat.round(t.G2, 1)));
-            modelX2.setText(dfX2.format(Stat.round(t.X2, 1)));
+            modelP.setText(dfP.format(StatUtil.round(t.p, 3)));
+            modelG2.setText(dfG2.format(StatUtil.round(t.G2, 1)));
+            modelX2.setText(dfX2.format(StatUtil.round(t.X2, 1)));
             modelDf.setText(dfDf.format(t.df));
 
             interList.delItems(0, interList.countItems() - 1);
@@ -277,9 +278,9 @@ public class ModelNavigator extends JFrame implements ActionListener, ModelListe
                 t.deleteInteraction(save);
                 super.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
-                modelP.setText(dfP.format(Stat.round(t.p, 3)));
-                modelG2.setText(dfG2.format(Stat.round(t.G2, 1)));
-                modelX2.setText(dfX2.format(Stat.round(t.X2, 1)));
+                modelP.setText(dfP.format(StatUtil.round(t.p, 3)));
+                modelG2.setText(dfG2.format(StatUtil.round(t.G2, 1)));
+                modelX2.setText(dfX2.format(StatUtil.round(t.X2, 1)));
                 modelDf.setText(dfDf.format(t.df));
 
                 interP.setText("-.----");

@@ -2,9 +2,9 @@ package de.mpicbg.sweng.mondrian.plots.basic;
 
 
 import de.mpicbg.sweng.mondrian.MFrame;
-import de.mpicbg.sweng.mondrian.Stat;
 import de.mpicbg.sweng.mondrian.Table;
 import de.mpicbg.sweng.mondrian.core.DragBox;
+import de.mpicbg.sweng.mondrian.util.StatUtil;
 import de.mpicbg.sweng.mondrian.util.Util;
 
 import javax.swing.*;
@@ -226,8 +226,8 @@ public class MyRect extends Rectangle implements ActionListener {
             }
         }
         if (mode.equals("Expected")) {
-            int high = (int) (192 + 63 * (0.15 + Stat.pnorm((1 - p - 0.9) * 10)));
-            int low = (int) (192 * (0.85 - Stat.pnorm((1 - p - 0.9) * 10)));
+            int high = (int) (192 + 63 * (0.15 + StatUtil.pnorm((1 - p - 0.9) * 10)));
+            int low = (int) (192 * (0.85 - StatUtil.pnorm((1 - p - 0.9) * 10)));
             //System.out.println(Stat.pnorm((1-p-0.9)*15));
             if (obs - exp > 0.00001)
                 g.setColor(new Color(low, low, high));
@@ -308,11 +308,11 @@ public class MyRect extends Rectangle implements ActionListener {
         else
             pinfo += "\n" + "Empty Bin ";
         if (hilite > 0)
-            pinfo += "\n" + "Hilited\t " + Stat.round(hilite * obs, 0) + " (" + Stat.round(100 * hilite, 2) + "%)";
+            pinfo += "\n" + "Hilited\t " + StatUtil.round(hilite * obs, 0) + " (" + StatUtil.round(100 * hilite, 2) + "%)";
         if (mode.equals("Expected")) {
-            pinfo += "\n" + "Expected\t " + Stat.round(exp, 2);
-            pinfo += "\n" + "Residual\t " + Stat.round(obs - exp, 3);
-            pinfo += "\n" + "Scaled Res.\t" + Stat.round(Math.abs((obs - exp) / Math.sqrt(exp) * scale * 100), 1) + "%";
+            pinfo += "\n" + "Expected\t " + StatUtil.round(exp, 2);
+            pinfo += "\n" + "Residual\t " + StatUtil.round(obs - exp, 3);
+            pinfo += "\n" + "Scaled Res.\t" + StatUtil.round(Math.abs((obs - exp) / Math.sqrt(exp) * scale * 100), 1) + "%";
         }
 
         return pinfo;

@@ -1,12 +1,12 @@
 package de.mpicbg.sweng.mondrian.plots;
 
 import de.mpicbg.sweng.mondrian.MFrame;
-import de.mpicbg.sweng.mondrian.Stat;
 import de.mpicbg.sweng.mondrian.Table;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.core.DragBox;
 import de.mpicbg.sweng.mondrian.core.Selection;
 import de.mpicbg.sweng.mondrian.plots.basic.MyRect;
+import de.mpicbg.sweng.mondrian.util.StatUtil;
 import de.mpicbg.sweng.mondrian.util.Util;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
@@ -209,12 +209,12 @@ public class Scatter2D extends DragBox {
     public String getToolTipText(MouseEvent e) {
         if (e.isControlDown() && !e.isAltDown()) {
             if (smoothF.equals("ls-line") && Math.abs((int) userToWorldY(worldToUserX(e.getX()) * coeffs[1] + coeffs[0]) - e.getY()) < 4) {
-                String x = data.getName(Vars[1]) + " = " + data.getName(Vars[0]) + " * " + Stat.roundToString(coeffs[1], 4) + " + " + Stat.roundToString(coeffs[0], 4);
-                x = x + "\n" + "R<sup>2</sup>\t " + Stat.roundToString(100 * coeffs[2], 1);
+                String x = data.getName(Vars[1]) + " = " + data.getName(Vars[0]) + " * " + StatUtil.roundToString(coeffs[1], 4) + " + " + StatUtil.roundToString(coeffs[0], 4);
+                x = x + "\n" + "R<sup>2</sup>\t " + StatUtil.roundToString(100 * coeffs[2], 1);
                 return Util.info2Html(x);
             } else if (smoothF.equals("ls-line") && Math.abs((int) userToWorldY(worldToUserX(e.getX()) * selCoeffs[1] + selCoeffs[0]) - e.getY()) < 4) {
-                String x = data.getName(Vars[1]) + " = " + data.getName(Vars[0]) + " * " + Stat.roundToString(selCoeffs[1], 4) + " + " + Stat.roundToString(selCoeffs[0], 4);
-                x = x + "\n" + "R<sup>2</sup>\t " + Stat.roundToString(100 * selCoeffs[2], 1);
+                String x = data.getName(Vars[1]) + " = " + data.getName(Vars[0]) + " * " + StatUtil.roundToString(selCoeffs[1], 4) + " + " + StatUtil.roundToString(selCoeffs[0], 4);
+                x = x + "\n" + "R<sup>2</sup>\t " + StatUtil.roundToString(100 * selCoeffs[2], 1);
                 return Util.info2Html(x);
             }
             if (modeString.equals("points")) {
@@ -357,16 +357,16 @@ public class Scatter2D extends DragBox {
                     if (smoothF.equals("ls-line") && Math.abs((int) userToWorldY(worldToUserX(e.getX()) * coeffs[1] + coeffs[0]) - e.getY()) < 4) {
                         //System.out.println(data.getName(Vars[1])+" = "+data.getName(Vars[0])+" * "+coeffs[1]+" + "+coeffs[0]);
                         JPopupMenu line = new JPopupMenu();
-                        JMenuItem formula = new JMenuItem(data.getName(Vars[1]) + " = " + data.getName(Vars[0]) + " * " + Stat.roundToString(coeffs[1], 4) + " + " + Stat.roundToString(coeffs[0], 4));
+                        JMenuItem formula = new JMenuItem(data.getName(Vars[1]) + " = " + data.getName(Vars[0]) + " * " + StatUtil.roundToString(coeffs[1], 4) + " + " + StatUtil.roundToString(coeffs[0], 4));
                         line.add(formula);
-                        JMenuItem r2 = new JMenuItem("R^2: " + Stat.roundToString(100 * coeffs[2], 1));
+                        JMenuItem r2 = new JMenuItem("R^2: " + StatUtil.roundToString(100 * coeffs[2], 1));
                         line.add(r2);
                         line.show(e.getComponent(), e.getX(), e.getY());
                     } else if (smoothF.equals("ls-line") && Math.abs((int) userToWorldY(worldToUserX(e.getX()) * selCoeffs[1] + selCoeffs[0]) - e.getY()) < 4) {
                         JPopupMenu line = new JPopupMenu();
-                        JMenuItem formula = new JMenuItem(data.getName(Vars[1]) + " = " + data.getName(Vars[0]) + " * " + Stat.roundToString(selCoeffs[1], 4) + " + " + Stat.roundToString(selCoeffs[0], 4));
+                        JMenuItem formula = new JMenuItem(data.getName(Vars[1]) + " = " + data.getName(Vars[0]) + " * " + StatUtil.roundToString(selCoeffs[1], 4) + " + " + StatUtil.roundToString(selCoeffs[0], 4));
                         line.add(formula);
-                        JMenuItem r2 = new JMenuItem("R^2: " + Stat.roundToString(100 * selCoeffs[2], 1));
+                        JMenuItem r2 = new JMenuItem("R^2: " + StatUtil.roundToString(100 * selCoeffs[2], 1));
                         line.add(r2);
                         line.show(e.getComponent(), e.getX(), e.getY());
                     } else {
@@ -405,7 +405,7 @@ public class Scatter2D extends DragBox {
                         mode.add(alphaVal);
                         JCheckBoxMenuItem[] alphians = new JCheckBoxMenuItem[20];
                         for (int k = 0; k < alphas.length; k++) {
-                            alphians[k] = new JCheckBoxMenuItem(Stat.roundToString((double) alphas[k] / 100, 3));
+                            alphians[k] = new JCheckBoxMenuItem(StatUtil.roundToString((double) alphas[k] / 100, 3));
                             if (alpha == alphas[k])
                                 alphians[k].setState(true);
                             else
@@ -433,7 +433,7 @@ public class Scatter2D extends DragBox {
                             lsline.setSelected(true);
                             lsline.setEnabled(false);
                         }
-                        JCheckBoxMenuItem loess = new JCheckBoxMenuItem("loess (" + Stat.round(3.75 / smoother, 2) + ")");
+                        JCheckBoxMenuItem loess = new JCheckBoxMenuItem("loess (" + StatUtil.round(3.75 / smoother, 2) + ")");
                         smoothers.add(loess);
                         loess.setActionCommand("loess");
                         loess.addActionListener(this);
@@ -449,7 +449,7 @@ public class Scatter2D extends DragBox {
                             splines.setSelected(true);
                             splines.setEnabled(false);
                         }
-                        JCheckBoxMenuItem locfit = new JCheckBoxMenuItem("locfit (" + Stat.round(3.5 / smoother, 2) + ")");
+                        JCheckBoxMenuItem locfit = new JCheckBoxMenuItem("locfit (" + StatUtil.round(3.5 / smoother, 2) + ")");
 //              smoothers.add(locfit);
                         locfit.setActionCommand("locfit");
                         locfit.addActionListener(this);
@@ -684,8 +684,8 @@ public class Scatter2D extends DragBox {
                     egetX = (int) userToWorldX(getUrx());
 
                 double ratioX = (worldToUserX(egetX) - getLlx()) / (getUrx() - getLlx());
-                int minWidth = fm.stringWidth(Stat.roundToString(getLlx(), roundX));
-                int maxWidth = fm.stringWidth(Stat.roundToString(getUrx(), roundX));
+                int minWidth = fm.stringWidth(StatUtil.roundToString(getLlx(), roundX));
+                int maxWidth = fm.stringWidth(StatUtil.roundToString(getUrx(), roundX));
 
                 if (egetX <= userToWorldX(getLlx()) + minWidth + 4)
                     tttbg.fillRect((int) userToWorldX(getLlx()), (int) userToWorldY(getLly()) + outside + tick + 1,
@@ -698,9 +698,9 @@ public class Scatter2D extends DragBox {
 
                 tttbg.drawLine(egetX, (int) userToWorldY(getLly()) + outside,
                         egetX, (int) userToWorldY(getLly()) + outside + tick);
-                tttbg.drawString(Stat.roundToString(worldToUserX(egetX), roundX),
-                        egetX - fm.stringWidth(Stat.roundToString(worldToUserX(egetX), roundX)) / 2
-                                - (int) (fm.stringWidth(Stat.roundToString(worldToUserX(egetX), roundX)) *
+                tttbg.drawString(StatUtil.roundToString(worldToUserX(egetX), roundX),
+                        egetX - fm.stringWidth(StatUtil.roundToString(worldToUserX(egetX), roundX)) / 2
+                                - (int) (fm.stringWidth(StatUtil.roundToString(worldToUserX(egetX), roundX)) *
                                 (ratioX - 0.5)),
                         (int) userToWorldY(getLly()) + outside + tick + fm.getMaxAscent() + fm.getMaxDescent());
 
@@ -713,8 +713,8 @@ public class Scatter2D extends DragBox {
                     egetY = (int) userToWorldY(getLly());
 
                 double ratioY = (worldToUserY(egetY) - getLly()) / (getUry() - getLly());
-                minWidth = fm.stringWidth(Stat.roundToString(getUry(), roundY));
-                maxWidth = fm.stringWidth(Stat.roundToString(getLly(), roundY));
+                minWidth = fm.stringWidth(StatUtil.roundToString(getUry(), roundY));
+                maxWidth = fm.stringWidth(StatUtil.roundToString(getLly(), roundY));
 
                 tttbg.setColor(MFrame.backgroundColor);
                 if (egetY < userToWorldY(getUry()) + minWidth + 4)
@@ -735,8 +735,8 @@ public class Scatter2D extends DragBox {
                 tttbg.drawLine((int) userToWorldX(getLlx()) - outside, egetY,
                         (int) userToWorldX(getLlx()) - outside - tick, egetY);
                 tttbg.rotate(-Math.PI / 2);
-                tttbg.drawString(Stat.roundToString(worldToUserY(egetY), roundY),
-                        (int) (-egetY - ratioY * fm.stringWidth(Stat.roundToString(worldToUserY(egetY), roundY))),
+                tttbg.drawString(StatUtil.roundToString(worldToUserY(egetY), roundY),
+                        (int) (-egetY - ratioY * fm.stringWidth(StatUtil.roundToString(worldToUserY(egetY), roundY))),
                         (int) userToWorldY(getUry()) - fm.getMaxAscent() - tick + 1 + (xShift - yShift));
                 tttbg.rotate(Math.PI / 2);
                 g.drawImage(tttbi, 0, 0, Color.black, null);
@@ -965,12 +965,12 @@ public class Scatter2D extends DragBox {
             bg.drawLine((int) userToWorldX(getUrx()), (int) userToWorldY(getLly()) + outside * pF,
                     (int) userToWorldX(getUrx()), (int) userToWorldY(getLly()) + outside * pF + tick * pF);
 
-            bg.drawString(Stat.roundToString(getLlx(), roundX),
+            bg.drawString(StatUtil.roundToString(getLlx(), roundX),
                     (int) userToWorldX(getLlx()),
                     (int) userToWorldY(getLly()) + outside * pF + tick * pF + fm.getMaxAscent() + fm.getMaxDescent());
 
-            bg.drawString(Stat.roundToString(getUrx(), roundX),
-                    (int) userToWorldX(getUrx()) - fm.stringWidth(Stat.roundToString(getUrx(), roundX)),
+            bg.drawString(StatUtil.roundToString(getUrx(), roundX),
+                    (int) userToWorldX(getUrx()) - fm.stringWidth(StatUtil.roundToString(getUrx(), roundX)),
                     (int) userToWorldY(getLly()) + outside * pF + tick * pF + fm.getMaxAscent() + fm.getMaxDescent());
 
             // y-axis
@@ -984,11 +984,11 @@ public class Scatter2D extends DragBox {
                     (int) userToWorldX(getLlx()) - outside * pF - tick * pF, (int) userToWorldY(getUry()));
 
             bg.rotate(-Math.PI / 2);
-            bg.drawString(Stat.roundToString(getLly(), roundY),
+            bg.drawString(StatUtil.roundToString(getLly(), roundY),
                     -(int) userToWorldY(getLly()),
                     (int) userToWorldY(getUry()) - fm.getMaxAscent() - tick * pF + pF + (xShift - yShift) * pF);
-            bg.drawString(Stat.roundToString(getUry(), roundY),
-                    -(int) userToWorldY(getUry()) - fm.stringWidth(Stat.roundToString(getUry(), roundY)),
+            bg.drawString(StatUtil.roundToString(getUry(), roundY),
+                    -(int) userToWorldY(getUry()) - fm.stringWidth(StatUtil.roundToString(getUry(), roundY)),
                     (int) userToWorldY(getUry()) - fm.getMaxAscent() - tick * pF + pF + (xShift - yShift) * pF);
             bg.rotate(Math.PI / 2);
         } // end, new background graphics

@@ -4,6 +4,7 @@ import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.core.DragBox;
 import de.mpicbg.sweng.mondrian.core.Selection;
 import de.mpicbg.sweng.mondrian.plots.basic.MyPoly;
+import de.mpicbg.sweng.mondrian.util.StatUtil;
 import de.mpicbg.sweng.mondrian.util.Util;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RConnection;
@@ -664,7 +665,7 @@ public class Map extends DragBox {
                         else if (intensity == 1)
                             intensity = 3;
                         else
-                            intensity = (float) ((Stat.qnorm(intensity) + 3) / 6.0);
+                            intensity = (float) ((StatUtil.qnorm(intensity) + 3) / 6.0);
                         intensity = Math.max(0, intensity);
                         intensity = Math.min(1, intensity);
                     }

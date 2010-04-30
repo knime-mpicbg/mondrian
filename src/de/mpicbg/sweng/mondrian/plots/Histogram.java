@@ -1,12 +1,12 @@
 package de.mpicbg.sweng.mondrian.plots;
 
 import de.mpicbg.sweng.mondrian.MFrame;
-import de.mpicbg.sweng.mondrian.Stat;
 import de.mpicbg.sweng.mondrian.Table;
 import de.mpicbg.sweng.mondrian.core.*;
 import de.mpicbg.sweng.mondrian.io.db.Query;
 import de.mpicbg.sweng.mondrian.plots.basic.Axis;
 import de.mpicbg.sweng.mondrian.plots.basic.MyRect;
+import de.mpicbg.sweng.mondrian.util.StatUtil;
 import de.mpicbg.sweng.mondrian.util.Util;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
@@ -237,12 +237,12 @@ public class Histogram extends DragBox implements ActionListener {
         bg.drawLine((int) userToWorldX(xMax), (int) userToWorldY(0) + outside,
                 (int) userToWorldX(xMax), (int) userToWorldY(0) + outside + tick);
 
-        bg.drawString(Stat.roundToString(xMin, round),
+        bg.drawString(StatUtil.roundToString(xMin, round),
                 (int) userToWorldX(xMin),
                 (int) userToWorldY(0) + outside + tick + fm.getMaxAscent() + fm.getMaxDescent());
 
-        bg.drawString(Stat.roundToString(xMax, round),
-                (int) userToWorldX(xMax) - fm.stringWidth(Stat.roundToString(xMax, round)),
+        bg.drawString(StatUtil.roundToString(xMax, round),
+                (int) userToWorldX(xMax) - fm.stringWidth(StatUtil.roundToString(xMax, round)),
                 (int) userToWorldY(0) + outside + tick + fm.getMaxAscent() + fm.getMaxDescent());
 
         if (CDPlot) {
@@ -554,19 +554,19 @@ public class Histogram extends DragBox implements ActionListener {
                 int egetX = e.getX();
                 int egetY = e.getY();
 
-                String print = Stat.roundToString(worldToUserX(egetX), round);
+                String print = StatUtil.roundToString(worldToUserX(egetX), round);
                 if (egetX < (int) userToWorldX(xMin)) {
                     egetX = (int) userToWorldX(xMin);
-                    print = Stat.roundToString(xMin, round);
+                    print = StatUtil.roundToString(xMin, round);
                 }
                 if (egetX > (int) userToWorldX(xMax)) {
                     egetX = (int) userToWorldX(xMax);
-                    print = Stat.roundToString(xMax, round);
+                    print = StatUtil.roundToString(xMax, round);
                 }
 
                 double ratioX = (worldToUserX(egetX) - getLlx()) / (getUrx() - getLlx());
-                int minWidth = fm.stringWidth(Stat.roundToString(getLlx(), round));
-                int maxWidth = fm.stringWidth(Stat.roundToString(getUrx(), round));
+                int minWidth = fm.stringWidth(StatUtil.roundToString(getLlx(), round));
+                int maxWidth = fm.stringWidth(StatUtil.roundToString(getUrx(), round));
 
                 if (egetX <= (int) userToWorldX(xMin) + minWidth + 4)
                     tbg.fillRect((int) userToWorldX(xMin), (int) userToWorldY(getLly()) + outside + tick + 1,
@@ -753,7 +753,7 @@ public class Histogram extends DragBox implements ActionListener {
                             int insert = 0;
                             double ticker = Util.atod(wdt[i][j].getText());
                             if (xMax - xMin > ticker) {
-                                starter = Stat.round((Math.floor(xMin / ticker)) * ticker, 8);
+                                starter = StatUtil.round((Math.floor(xMin / ticker)) * ticker, 8);
 
                                 while (k < menuStart.getItemCount()) {
                                     if (starter > Util.atod(menuStart.getItem(k).getText()))

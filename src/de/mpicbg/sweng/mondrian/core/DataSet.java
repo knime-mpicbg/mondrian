@@ -1,9 +1,13 @@
 package de.mpicbg.sweng.mondrian.core;
 
-import de.mpicbg.sweng.mondrian.*;
+import de.mpicbg.sweng.mondrian.MFrame;
+import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.Table;
 import de.mpicbg.sweng.mondrian.io.ScanException;
 import de.mpicbg.sweng.mondrian.io.UnacceptableFormatException;
 import de.mpicbg.sweng.mondrian.io.db.Query;
+import de.mpicbg.sweng.mondrian.util.BufferTokenizer;
+import de.mpicbg.sweng.mondrian.util.StatUtil;
 import de.mpicbg.sweng.mondrian.util.Util;
 
 import javax.swing.*;
@@ -405,7 +409,7 @@ public class DataSet {
 
     public Table discretize(String name, int dvar, double start, double width, int weight) {
 
-        int tablelength = (int) Stat.round((this.getMax(dvar) - start) / width, 8) + 1;
+        int tablelength = (int) StatUtil.round((this.getMax(dvar) - start) / width, 8) + 1;
         int[] vars = new int[1];
         vars[0] = dvar;
         double[] bdtable = new double[tablelength];    // !
@@ -428,11 +432,11 @@ public class DataSet {
                 Query query = new Query();
                 String itemStr = "CASE ";
                 String filler = "                                                                                          ";
-                itemStr += "WHEN " + getName(dvar) + "<" + Stat.roundToString(start, round) + " THEN '[" + filler.substring(0, tablelength) + Stat.roundToString(start, round) + ", " + Stat.roundToString(start + 1 * width, round) + ")' ";
+                itemStr += "WHEN " + getName(dvar) + "<" + StatUtil.roundToString(start, round) + " THEN '[" + filler.substring(0, tablelength) + StatUtil.roundToString(start, round) + ", " + StatUtil.roundToString(start + 1 * width, round) + ")' ";
                 for (int i = 0; i < tablelength; i++) {
-                    itemStr += "WHEN " + getName(dvar) + ">=" + Stat.roundToString(start + i * width, round) + " AND " + getName(dvar) + "<" + Stat.roundToString(start + (i + 1) * width, round) + " THEN '[" + filler.substring(0, tablelength - i) + Stat.roundToString(start + i * width, round) + ", " + Stat.roundToString(start + (i + 1) * width, round) + ")' ";
+                    itemStr += "WHEN " + getName(dvar) + ">=" + StatUtil.roundToString(start + i * width, round) + " AND " + getName(dvar) + "<" + StatUtil.roundToString(start + (i + 1) * width, round) + " THEN '[" + filler.substring(0, tablelength - i) + StatUtil.roundToString(start + i * width, round) + ", " + StatUtil.roundToString(start + (i + 1) * width, round) + ")' ";
                 }
-                itemStr += "ELSE '[" + Stat.roundToString(start + tablelength * width, round) + ", " + Stat.roundToString(start + (tablelength + 1) * width, round) + ")' END AS category42";
+                itemStr += "ELSE '[" + StatUtil.roundToString(start + tablelength * width, round) + ", " + StatUtil.roundToString(start + (tablelength + 1) * width, round) + ")' END AS category42";
 
 //System.out.println(itemStr); 
                 query.addItem(itemStr);
@@ -483,7 +487,7 @@ public class DataSet {
 
         for (int i = 0; i < tablelength; i++) {
             if (!isDB) {
-                lnames[0][i] = "[" + Stat.roundToString(start + i * width, round) + ", " + Stat.roundToString(start + (i + 1) * width, round) + ")";
+                lnames[0][i] = "[" + StatUtil.roundToString(start + i * width, round) + ", " + StatUtil.roundToString(start + (i + 1) * width, round) + ")";
                 Ids[i] = new int[tableDim[i]];
             } else
                 Ids[i] = new int[1];
@@ -544,12 +548,12 @@ public class DataSet {
 
         for (int i = 0; i < nX; i++) {
             if (!isDB) {
-                lnames[0][i] = "[" + Stat.roundToString(xStart + i * xWidth, roundX) + ", " + Stat.roundToString(xStart + (i + 1) * xWidth, roundX) + ")";
+                lnames[0][i] = "[" + StatUtil.roundToString(xStart + i * xWidth, roundX) + ", " + StatUtil.roundToString(xStart + (i + 1) * xWidth, roundX) + ")";
             }
         }
         for (int i = 0; i < nY; i++) {
             if (!isDB) {
-                lnames[1][i] = "[" + Stat.roundToString(yStart + i * yWidth, roundY) + ", " + Stat.roundToString(yStart + (i + 1) * yWidth, roundY) + ")";
+                lnames[1][i] = "[" + StatUtil.roundToString(yStart + i * yWidth, roundY) + ", " + StatUtil.roundToString(yStart + (i + 1) * yWidth, roundY) + ")";
             }
         }
         for (int i = 0; i < tablelength; i++) {
