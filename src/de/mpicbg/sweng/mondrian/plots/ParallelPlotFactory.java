@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MDialog;
+import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
@@ -28,7 +28,7 @@ public class ParallelPlotFactory extends AbstractPlotFactory {
     }
 
 
-    public PlotPanel createPlotPanel(Mondrian mondrian, MDialog plotDialog, DataSet dataSet, JList varNames) {
+    public PlotPanel createPlotPanel(Mondrian mondrian, MFrame plotFrame, DataSet dataSet, JList varNames) {
 
         int totWidth = (Toolkit.getDefaultToolkit().getScreenSize()).width;
         int tmpWidth = 50 * (1 + (varNames.getSelectedIndices()).length);
@@ -38,8 +38,8 @@ public class ParallelPlotFactory extends AbstractPlotFactory {
             else
                 tmpWidth = 20 * (1 + (varNames.getSelectedIndices()).length);
 
-        plotDialog.setSize(tmpWidth, 400);
-        plotDialog.setLocation(Utils.genRandomLoacation(plotDialog));
+        plotFrame.setSize(tmpWidth, 400);
+        plotFrame.setLocation(Utils.genRandomLoacation(plotFrame));
 
         int k = (varNames.getSelectedIndices()).length;
         int[] passTmpBuffer = new int[k];
@@ -52,7 +52,7 @@ public class ParallelPlotFactory extends AbstractPlotFactory {
         int[] passBuffer = new int[count];
         System.arraycopy(passTmpBuffer, 0, passBuffer, 0, count);
 
-        return new ParallelPlot(plotDialog, dataSet, passBuffer, getMode(), varNames);
+        return new ParallelPlot(plotFrame, dataSet, passBuffer, getMode(), varNames);
     }
 
 

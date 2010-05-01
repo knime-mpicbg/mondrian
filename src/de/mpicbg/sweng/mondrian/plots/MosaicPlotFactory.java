@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MDialog;
+import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
@@ -28,7 +28,7 @@ public class MosaicPlotFactory extends AbstractPlotFactory {
     }
 
 
-    public PlotPanel createPlotPanel(Mondrian mondrian, MDialog plotDialog, DataSet dataSet, JList varNames) {
+    public PlotPanel createPlotPanel(Mondrian mondrian, MFrame plotFrame, DataSet dataSet, JList varNames) {
 
         int k = (varNames.getSelectedIndices()).length;
         int[] passBuffer = new int[k];
@@ -42,8 +42,8 @@ public class MosaicPlotFactory extends AbstractPlotFactory {
         breakdown.addInteraction(new int[]{(varNames.getSelectedIndices()).length - 1}, true);
 
 
-        plotDialog.setSize(400, 400);
-        plotDialog.setLocation(Utils.genRandomLoacation(plotDialog));
+        plotFrame.setSize(400, 400);
+        plotFrame.setLocation(Utils.genRandomLoacation(plotFrame));
         //    mondrian.getContentPane().add(plotw);                      // Add it
 
         //todo renable this
@@ -59,7 +59,7 @@ public class MosaicPlotFactory extends AbstractPlotFactory {
 //        plotw.addModelListener(modelNavigator);
 //        modelNavigatorButton.setEnabled(true);
 
-        return new MosaicPlot(plotDialog, 400, 400, breakdown);
+        return new MosaicPlot(plotFrame, 400, 400, breakdown);
     }
 
 

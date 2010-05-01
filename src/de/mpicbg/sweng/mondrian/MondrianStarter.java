@@ -21,7 +21,7 @@ public class MondrianStarter implements MRJOpenDocumentHandler {
 
     public MondrianStarter(String dataFileName) {
 
-        MonFrame monFrame = new MonFrame();
+        AppFrame appFrame = new AppFrame();
 
 
         MRJApplicationUtils.registerOpenDocumentHandler(this);
@@ -31,9 +31,9 @@ public class MondrianStarter implements MRJOpenDocumentHandler {
 
             if (dataFile.canRead()) {
                 if (dataFile.getName().endsWith(".RData")) {
-                    new DataFrameConverter(monFrame).loadDataFrame(dataFile);
+                    new DataFrameConverter(appFrame).loadDataFrame(dataFile);
                 } else {
-                    monFrame.getController().loadDataSet(dataFile, dataFile.getName());
+                    appFrame.getController().loadDataSet(dataFile, dataFile.getName());
                 }
             }
         }
@@ -49,9 +49,9 @@ public class MondrianStarter implements MRJOpenDocumentHandler {
     public void handleOpenFile(File inFile) {
         // this can not work!!
 
-        MonFrame theMonFrame = ((MonFrame) new Vector(5, 5).lastElement());
+        AppFrame theAppFrame = ((AppFrame) new Vector(5, 5).lastElement());
 //    while( !theMonFrame.mondrianRunning ) {System.out.println(" wait for Mondrian to initialize ...");}   // Wait until Mondrian initialized
 //    System.out.println(".......... CALL loadDataSet("+inFile+") FROM handleOpenFile .........");
-        theMonFrame.getController().loadDataSet(inFile, "");
+        theAppFrame.getController().loadDataSet(inFile, "");
     }
 }

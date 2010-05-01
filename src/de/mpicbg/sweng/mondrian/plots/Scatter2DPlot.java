@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MDialog;
+import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.core.DragBox;
 import de.mpicbg.sweng.mondrian.core.Selection;
@@ -80,7 +80,7 @@ public class Scatter2DPlot extends DragBox {
     /**
      * This constructor requires a Frame and a desired size
      */
-    public Scatter2DPlot(MDialog frame, int width, int height, DataSet data, int[] Vars, JList varList, boolean matrix) {
+    public Scatter2DPlot(MFrame frame, int width, int height, DataSet data, int[] Vars, JList varList, boolean matrix) {
         super(frame);
         boolean matrix1 = matrix;
         this.data = data;

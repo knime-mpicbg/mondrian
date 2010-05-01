@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MDialog;
+import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.ui.PlotPanel;
@@ -23,7 +23,7 @@ public class WeightedHistogramFactory extends HistogramFactory {
 
 
     @Override
-    public PlotPanel createPlotPanel(Mondrian mondrian, MDialog plotDialog, DataSet dataSet, JList varNames) {
+    public PlotPanel createPlotPanel(Mondrian mondrian, MFrame plotFrame, DataSet dataSet, JList varNames) {
 
         int[] vars = WeightCaclulator.getWeightVariable(varNames.getSelectedIndices(), dataSet, mondrian.calcNumCategoricalVars(), mondrian.determineWeightIndex(), null, varNames);
 
@@ -34,10 +34,10 @@ public class WeightedHistogramFactory extends HistogramFactory {
 
             //      System.out.println(passed[0]+", "+weight);
 
-            return super.createHistogram(plotDialog, dataSet, passed, weight);
+            return super.createHistogram(plotFrame, dataSet, passed, weight);
 
         } else {
-            return super.createHistogram(plotDialog, dataSet, vars, vars[0]);
+            return super.createHistogram(plotFrame, dataSet, vars, vars[0]);
         }
     }
 }

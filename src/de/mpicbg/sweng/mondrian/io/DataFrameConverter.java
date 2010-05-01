@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.io;
 
-import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.AppFrame;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
@@ -23,12 +23,12 @@ import java.util.List;
  */
 public class DataFrameConverter {
 
-    MonFrame monFrame;
+    AppFrame appFrame;
     public RConnection rC;
 
 
-    public DataFrameConverter(MonFrame monFrame) {
-        this.monFrame = monFrame;
+    public DataFrameConverter(AppFrame appFrame) {
+        this.appFrame = appFrame;
 
         rC = createRConnection();
     }
@@ -80,7 +80,7 @@ public class DataFrameConverter {
                 }
             }
 
-            final JDialog dataFrames = new JDialog(monFrame, "Choose a data-frame");
+            final JDialog dataFrames = new JDialog(appFrame, "Choose a data-frame");
             dataFrames.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
             JPanel dfPanel = new JPanel();
@@ -215,7 +215,7 @@ public class DataFrameConverter {
             rC.voidEval("write.table(" + dataFrameName + ", '" + tmpFile.getAbsolutePath() + "', quote=FALSE, sep=\"\\t\", row.names = FALSE)");
 
             rC.close();
-            monFrame.getController().loadDataSet(tmpFile, dataFrameName);
+            appFrame.getController().loadDataSet(tmpFile, dataFrameName);
             tmpFile.delete();
 
         } catch (RserveException rse) {

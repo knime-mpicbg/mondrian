@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MDialog;
+import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
@@ -30,12 +30,12 @@ public class WeightedBarCharFactory extends AbstractPlotFactory {
     }
 
 
-    public PlotPanel createPlotPanel(Mondrian mondrian, MDialog plotDialog, DataSet dataSet, JList varNames) {
+    public PlotPanel createPlotPanel(Mondrian mondrian, MFrame plotFrame, DataSet dataSet, JList varNames) {
         int[] indices = varNames.getSelectedIndices();
 
 
         PlotPanel barChartsContainer = new PlotPanel();
-        plotDialog.setLayout(new GridLayout(1, indices.length));
+        plotFrame.setLayout(new GridLayout(1, indices.length));
 
         int[] vars = WeightCaclulator.getWeightVariable(varNames.getSelectedIndices(), dataSet, mondrian.calcNumCategoricalVars(), mondrian.determineWeightIndex(), null, varNames);
         int[] passed = new int[vars.length - 1];
@@ -53,13 +53,13 @@ public class WeightedBarCharFactory extends AbstractPlotFactory {
             int totHeight = (Toolkit.getDefaultToolkit().getScreenSize()).height;
             int tmpHeight = Math.min(totHeight - 20, 60 + breakdown.levels[0] * 30);
 
-            Barchart weightedBarchart = new Barchart(plotDialog, 300, tmpHeight, breakdown);
+            Barchart weightedBarchart = new Barchart(plotFrame, 300, tmpHeight, breakdown);
 
             barChartsContainer.setSize(300, tmpHeight);
             barChartsContainer.add(weightedBarchart);
         }
 
-        plotDialog.setLocation(100, 100);
+        plotFrame.setLocation(100, 100);
 
         return barChartsContainer;
     }

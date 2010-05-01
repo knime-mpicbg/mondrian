@@ -1,7 +1,7 @@
 package de.mpicbg.sweng.mondrian.ui;
 
-import de.mpicbg.sweng.mondrian.MDialog;
-import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.AppFrame;
+import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.core.DragBox;
@@ -20,12 +20,12 @@ import java.awt.event.ActionEvent;
 public class PlotAction extends AbstractAction {
 
     private PlotFactory plotFactory;
-    private MonFrame monFrame;
+    private AppFrame appFrame;
 
 
-    public PlotAction(PlotFactory plotFactory, MonFrame monFrame) {
+    public PlotAction(PlotFactory plotFactory, AppFrame appFrame) {
         this.plotFactory = plotFactory;
-        this.monFrame = monFrame;
+        this.appFrame = appFrame;
 
         // actions are enabled if the user changes the variable selection
         setEnabled(false);
@@ -40,10 +40,10 @@ public class PlotAction extends AbstractAction {
 
 
     public void actionPerformed(ActionEvent e) {
-        Mondrian mondrian = monFrame.getController().getCurrent();
+        Mondrian mondrian = appFrame.getController().getCurrent();
         mondrian.getSelector().checkHistoryBuffer();
 
-        MDialog plotFrame = new MDialog(monFrame, mondrian);
+        MFrame plotFrame = new MFrame(appFrame, mondrian);
         Font SF = new Font("SansSerif", Font.PLAIN, 11);
         plotFrame.setFont(SF);
 

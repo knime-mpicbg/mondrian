@@ -4,7 +4,7 @@ package de.mpicbg.sweng.mondrian.core;
 //
 
 
-import de.mpicbg.sweng.mondrian.MDialog;
+import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.plots.Barchart;
 import de.mpicbg.sweng.mondrian.plots.Histogram;
 import de.mpicbg.sweng.mondrian.plots.ParallelPlot;
@@ -46,7 +46,7 @@ abstract class DragBox
     public Color dragboxcolor = Color.red;
     public Graphics dragboxgraphics = null;
 
-    public MDialog frame;                               // The frame we are within.
+    public MFrame frame;                               // The frame we are within.
     public JScrollBar sb;                             // We might need a scroll bar
 
     public int colorSet = -1;                         // The color which as assigned with meta-n
@@ -346,7 +346,7 @@ abstract class DragBox
     ///////////////////////////////////////////////////////////////////////////
 
 
-    public DragBox(MDialog frame) {
+    public DragBox(MFrame frame) {
 
         this.frame = frame;
 

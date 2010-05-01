@@ -19,7 +19,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 
-public class MonFrame extends JFrame implements MRJQuitHandler {
+public class AppFrame extends JFrame implements MRJQuitHandler {
 
     public MonController controller;
 
@@ -42,7 +42,7 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
     public DeriveVariableAction deriveVarByColAction;
 
 
-    public MonFrame() {
+    public AppFrame() {
 
         controller = new MonController(this);
 

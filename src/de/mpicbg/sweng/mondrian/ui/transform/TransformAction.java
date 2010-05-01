@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.ui.transform;
 
-import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.AppFrame;
 import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 
@@ -16,16 +16,16 @@ import java.awt.event.ActionEvent;
 public class TransformAction extends AbstractAction {
 
     private int trafoMode;
-    private MonFrame monFrame;
+    private AppFrame appFrame;
     private int numArguments;
 
 
-    public TransformAction(String title, int trafoMode, MonFrame monFrame, int numArguments) {
+    public TransformAction(String title, int trafoMode, AppFrame appFrame, int numArguments) {
         super(title);
 
 
         this.trafoMode = trafoMode;
-        this.monFrame = monFrame;
+        this.appFrame = appFrame;
         this.numArguments = numArguments;
     }
 
@@ -41,13 +41,13 @@ public class TransformAction extends AbstractAction {
 
 
     public void transform(int mode) {
-        Mondrian mondrian = monFrame.getController().getCurrent();
+        Mondrian mondrian = appFrame.getController().getCurrent();
 
         mondrian.getSelector().checkHistoryBuffer();
 
         System.out.println("Transform: " + mode);
         String name = "";
-        DataSet data = monFrame.getController().getCurrentDataSet();
+        DataSet data = appFrame.getController().getCurrentDataSet();
 
         double[] tData = new double[data.n];
         boolean[] tMiss = new boolean[data.n];
@@ -138,19 +138,19 @@ public class TransformAction extends AbstractAction {
     }
 
 
-    public static JMenu createTrafoMenu(MonFrame monFrame) {
+    public static JMenu createTrafoMenu(AppFrame appFrame) {
         JMenu transformMenu = new JMenu("Transform");
 
         transformMenu.setEnabled(false);
-        transformMenu.add(new JMenuItem(new TransformAction("x + y", 1, monFrame, 2)));
-        transformMenu.add(new JMenuItem(new TransformAction("x - y", 2, monFrame, 2)));
-        transformMenu.add(new JMenuItem(new TransformAction("x * y", 3, monFrame, 2)));
-        transformMenu.add(new JMenuItem(new TransformAction("x / y", 4, monFrame, 2)));
+        transformMenu.add(new JMenuItem(new TransformAction("x + y", 1, appFrame, 2)));
+        transformMenu.add(new JMenuItem(new TransformAction("x - y", 2, appFrame, 2)));
+        transformMenu.add(new JMenuItem(new TransformAction("x * y", 3, appFrame, 2)));
+        transformMenu.add(new JMenuItem(new TransformAction("x / y", 4, appFrame, 2)));
         transformMenu.addSeparator();
-        transformMenu.add(new JMenuItem(new TransformAction("- x", 5, monFrame, 1)));
-        transformMenu.add(new JMenuItem(new TransformAction("1/x", 6, monFrame, 1)));
-        transformMenu.add(new JMenuItem(new TransformAction("log(x)", 7, monFrame, 1)));
-        transformMenu.add(new JMenuItem(new TransformAction("exp(x)", 8, monFrame, 1)));
+        transformMenu.add(new JMenuItem(new TransformAction("- x", 5, appFrame, 1)));
+        transformMenu.add(new JMenuItem(new TransformAction("1/x", 6, appFrame, 1)));
+        transformMenu.add(new JMenuItem(new TransformAction("log(x)", 7, appFrame, 1)));
+        transformMenu.add(new JMenuItem(new TransformAction("exp(x)", 8, appFrame, 1)));
 
         return transformMenu;
     }

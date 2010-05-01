@@ -17,9 +17,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class MDialog extends JFrame {
+public class MFrame extends JFrame {
 
-    public MonFrame parentFrame;
+    public AppFrame parentFrame;
     private JMenuItem m;
     private String selString = "";
     private int counter = 0;
@@ -33,7 +33,7 @@ public class MDialog extends JFrame {
     //  static Color backgroundColor = new Color(223, 184, 96);
 
 
-    public MDialog(MonFrame parentFrame, Mondrian mondrian) {
+    public MFrame(AppFrame parentFrame, Mondrian mondrian) {
         refreshMenuBar(parentFrame);
 
         this.mondrian = mondrian;
@@ -50,14 +50,14 @@ public class MDialog extends JFrame {
 
             @Override
             public void windowActivated(WindowEvent windowEvent) {
-                refreshMenuBar(MDialog.this.parentFrame);
+                refreshMenuBar(MFrame.this.parentFrame);
             }
         });
 
     }
 
 
-    private void refreshMenuBar(MonFrame parentFrame) {
+    private void refreshMenuBar(AppFrame parentFrame) {
         if (Utils.isMacOS() && Utils.isDeployed())
             this.setJMenuBar(parentFrame.menubar);
     }
@@ -109,7 +109,9 @@ public class MDialog extends JFrame {
                 continue;
             }
 
-            if (entryName.substring(0, 2).equals((m.getText()).substring(0, 2))) {
+            //originial
+//            if (entryName.substring(0, 2).equals((m.getText()).substring(0, 2))) {
+            if (entryName.substring(0, 2).equals((m.getText()).substring(0, 1))) {
                 same = true;
             } else if (same) {
                 parentFrame.windowMenu.insert(m, i);

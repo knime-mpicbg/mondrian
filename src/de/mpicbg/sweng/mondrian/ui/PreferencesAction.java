@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.ui;
 
-import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.AppFrame;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,13 +15,13 @@ import java.awt.event.KeyEvent;
  */
 public class PreferencesAction extends AbstractAction {
 
-    private MonFrame monFrame;
+    private AppFrame appFrame;
 
 
-    public PreferencesAction(String name, MonFrame monFrame) {
+    public PreferencesAction(String name, AppFrame appFrame) {
         super(name);
 
-        this.monFrame = monFrame;
+        this.appFrame = appFrame;
 
         // actions are enabled if the user changes the variable selection
         setEnabled(true);
@@ -35,6 +35,6 @@ public class PreferencesAction extends AbstractAction {
 
 
     public void actionPerformed(ActionEvent e) {
-        PreferencesFrame.showPrefsDialog(monFrame);
+        PreferencesFrame.showPrefsDialog(appFrame);
     }
 }

@@ -8,7 +8,7 @@ package de.mpicbg.sweng.mondrian.ui;
 //  Copyright (c) 2003 __MyCompanyName__. All rights reserved.
 //
 
-import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.AppFrame;
 import de.mpicbg.sweng.mondrian.core.DragBox;
 import de.mpicbg.sweng.mondrian.util.Utils;
 
@@ -21,13 +21,13 @@ import java.util.prefs.Preferences;         // for preferences
 public class PreferencesFrame extends Frame implements WindowListener, MouseListener, ActionListener, ItemListener {
 
     private PrefCanvas pc;
-    private MonFrame frame;
+    private AppFrame frame;
     private Choice cs;
 
     private static PreferencesFrame last = null;
 
 
-    public static PreferencesFrame showPrefsDialog(MonFrame frame) {
+    public static PreferencesFrame showPrefsDialog(AppFrame frame) {
         if (last == null)
             last = new PreferencesFrame();
         last.frame = frame;

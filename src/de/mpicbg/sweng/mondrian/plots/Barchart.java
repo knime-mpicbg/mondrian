@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MDialog;
+import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.core.*;
 import de.mpicbg.sweng.mondrian.io.db.Query;
 import de.mpicbg.sweng.mondrian.plots.basic.MyRect;
@@ -41,7 +41,7 @@ public class Barchart extends DragBox implements ActionListener {
     private int globalStart = -1;
 
 
-    public Barchart(MDialog frame, int width, int height, Table tablep) {
+    public Barchart(MFrame frame, int width, int height, Table tablep) {
         super(frame);
         this.tablep = tablep;
         this.name = tablep.name;

@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MDialog;
+import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.core.*;
 import de.mpicbg.sweng.mondrian.io.db.Query;
 import de.mpicbg.sweng.mondrian.plots.basic.Axis;
@@ -54,7 +54,7 @@ public class Histogram extends DragBox implements ActionListener {
     private int eventID;
 
 
-    public Histogram(MDialog frame, int width, int height, Table tablep, double bStart, double bWidth, int weight) {
+    public Histogram(MFrame frame, int width, int height, Table tablep, double bStart, double bWidth, int weight) {
         super(frame);
         this.tablep = tablep;
         this.name = tablep.name;

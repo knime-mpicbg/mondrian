@@ -14,7 +14,7 @@ import java.awt.*;
  *
  * @author Holger Brandl
  */
-public class MondrianDialog extends MDialog {
+public class MondrianFrame extends MFrame {
 
 
     private JProgressBar progBar;
@@ -24,7 +24,7 @@ public class MondrianDialog extends MDialog {
     private Mondrian mondrian;
 
 
-    public MondrianDialog(MonFrame parentFrame, Mondrian mondrian) {
+    public MondrianFrame(AppFrame parentFrame, Mondrian mondrian) {
         super(parentFrame, mondrian);
         this.mondrian = mondrian;
 
@@ -41,7 +41,7 @@ public class MondrianDialog extends MDialog {
         progBar.setValue(0);
         progBar.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                paintAll(MondrianDialog.this.getGraphics());
+                paintAll(MondrianFrame.this.getGraphics());
             }
         });
         progPanel.add(progBar, BorderLayout.EAST);

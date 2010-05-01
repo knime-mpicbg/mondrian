@@ -18,20 +18,20 @@ import java.util.List;
  */
 public class MonController {
 
-    MonFrame monFrame;
+    AppFrame appFrame;
 
     private Mondrian current;
 
     List<Mondrian> mondrians = new ArrayList<Mondrian>();
 
 
-    public MonController(MonFrame monFrame) {
-        this.monFrame = monFrame;
+    public MonController(AppFrame appFrame) {
+        this.appFrame = appFrame;
     }
 
 
-    public MonFrame getMonFrame() {
-        return monFrame;
+    public AppFrame getMonFrame() {
+        return appFrame;
     }
 
 
@@ -60,7 +60,7 @@ public class MonController {
         mondrians.add(mondrian);
         setCurrent(mondrian);
 
-        monFrame.maintainOptionMenu();
+        appFrame.maintainOptionMenu();
 
     }
 
@@ -98,7 +98,7 @@ public class MonController {
         if (countInstances() > 0) {
             String message = "Are you sure that you would like to close all current data-sets";
 
-            int answer = JOptionPane.showConfirmDialog(monFrame, message);
+            int answer = JOptionPane.showConfirmDialog(appFrame, message);
             if (answer == JOptionPane.YES_OPTION) {
                 System.exit(0);
             }
@@ -115,7 +115,7 @@ public class MonController {
 
         String message = "Close dataset \"" + getCurrentDataSet().setName + "\" and\n all corresponding plots?";
 
-        int answer = JOptionPane.showConfirmDialog(monFrame, message);
+        int answer = JOptionPane.showConfirmDialog(appFrame, message);
         if (answer == JOptionPane.YES_OPTION) {
             mondrian.close();
         }
@@ -156,6 +156,6 @@ public class MonController {
 
 
     public void fireVarSelectionChanged() {
-        monFrame.maintainPlotMenu();
+        appFrame.maintainPlotMenu();
     }
 }

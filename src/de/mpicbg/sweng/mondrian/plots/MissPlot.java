@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MDialog;
+import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.core.*;
 import de.mpicbg.sweng.mondrian.plots.basic.MyRect;
 import de.mpicbg.sweng.mondrian.plots.basic.MyText;
@@ -40,7 +40,7 @@ public class MissPlot extends DragBox implements ActionListener {
     private int k;
 
 
-    public MissPlot(MDialog frame, DataSet data, int[] vars) {
+    public MissPlot(MFrame frame, DataSet data, int[] vars) {
         super(frame);
 
         this.vars = vars;

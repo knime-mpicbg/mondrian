@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MDialog;
+import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
@@ -27,8 +27,8 @@ public class MapPlotFactory extends AbstractPlotFactory {
     }
 
 
-    public PlotPanel createPlotPanel(Mondrian mondrian, MDialog plotDialog, DataSet dataSet, JList varNames) {
-        MapPlot mapPlot = new MapPlot(plotDialog, 400, 400, dataSet, MapCache.getInstance().getPolys(dataSet), varNames);
+    public PlotPanel createPlotPanel(Mondrian mondrian, MFrame plotFrame, DataSet dataSet, JList varNames) {
+        MapPlot mapPlot = new MapPlot(plotFrame, 400, 400, dataSet, MapCache.getInstance().getPolys(dataSet), varNames);
 
         if (mapPlot.ratio > 1)
             mapPlot.setSize((int) (350 * mapPlot.ratio), 350 + 56);

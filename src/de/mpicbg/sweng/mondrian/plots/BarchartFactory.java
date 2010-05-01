@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MDialog;
+import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
@@ -28,7 +28,7 @@ public class BarchartFactory extends AbstractPlotFactory {
     }
 
 
-    public PlotPanel createPlotPanel(Mondrian mondrian, MDialog plotDialog, DataSet dataSet, JList varNames) {
+    public PlotPanel createPlotPanel(Mondrian mondrian, MFrame plotFrame, DataSet dataSet, JList varNames) {
         int[] indices = varNames.getSelectedIndices();
 
         PlotPanel barChartsContainer = new PlotPanel();
@@ -57,10 +57,10 @@ public class BarchartFactory extends AbstractPlotFactory {
         int frameWidth = Math.min(screenSize.width - 50, 300 * numPlots);
         int plotWidth = frameWidth / numPlots;
 
-        plotDialog.setSize(frameWidth - plotDialog.getInsets().left - plotDialog.getInsets().right, height);
+        plotFrame.setSize(frameWidth - plotFrame.getInsets().left - plotFrame.getInsets().right, height);
 
         for (int i = 0; i < numPlots; i++) {
-            Barchart barchart = new Barchart(plotDialog, plotWidth, height, breakdowns[i]);
+            Barchart barchart = new Barchart(plotFrame, plotWidth, height, breakdowns[i]);
 
             barChartsContainer.add(barchart);
 

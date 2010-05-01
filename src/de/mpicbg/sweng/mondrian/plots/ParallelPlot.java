@@ -1,7 +1,7 @@
 package de.mpicbg.sweng.mondrian.plots;
 
 
-import de.mpicbg.sweng.mondrian.MDialog;
+import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.core.*;
 import de.mpicbg.sweng.mondrian.plots.basic.MyRect;
 import de.mpicbg.sweng.mondrian.plots.basic.MyText;
@@ -70,7 +70,7 @@ public class ParallelPlot extends DragBox implements ActionListener {
     private static EventQueue evtq;
 
 
-    public ParallelPlot(MDialog frame, DataSet data, int[] vars, String mode, JList varList) {
+    public ParallelPlot(MFrame frame, DataSet data, int[] vars, String mode, JList varList) {
         super(frame);
         Dimension size = frame.getSize();
         this.width = size.width;

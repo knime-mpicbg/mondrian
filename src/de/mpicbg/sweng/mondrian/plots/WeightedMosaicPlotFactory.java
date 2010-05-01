@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MDialog;
+import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
@@ -29,7 +29,7 @@ public class WeightedMosaicPlotFactory extends AbstractPlotFactory {
     }
 
 
-    public PlotPanel createPlotPanel(Mondrian mondrian, MDialog plotDialog, DataSet dataSet, JList varNames) {
+    public PlotPanel createPlotPanel(Mondrian mondrian, MFrame plotFrame, DataSet dataSet, JList varNames) {
         int k = (varNames.getSelectedIndices()).length;
         int[] passBuffer = new int[k];
         for (int i = 0; i < k; i++)
@@ -46,10 +46,10 @@ public class WeightedMosaicPlotFactory extends AbstractPlotFactory {
 
         breakdown.addInteraction(new int[]{passed.length - 1}, true);
 
-        plotDialog.setSize(400, 400);
-        plotDialog.setLocation(Utils.genRandomLoacation(plotDialog));
+        plotFrame.setSize(400, 400);
+        plotFrame.setLocation(Utils.genRandomLoacation(plotFrame));
 
-        return new MosaicPlot(plotDialog, 400, 400, breakdown);
+        return new MosaicPlot(plotFrame, 400, 400, breakdown);
 
         // todo reenable this
 //                if (modelNavigator == null)

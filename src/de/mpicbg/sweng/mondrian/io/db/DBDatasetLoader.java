@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.io.db;
 
-import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.AppFrame;
 import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.util.Utils;
@@ -18,14 +18,14 @@ import java.sql.*;
  */
 public class DBDatasetLoader {
 
-    MonFrame monFrame;
+    AppFrame appFrame;
     Driver d;
     Connection con;
     public JDialog dbLoadDialog;
 
 
-    public DBDatasetLoader(MonFrame monFrame) {
-        this.monFrame = monFrame;
+    public DBDatasetLoader(AppFrame appFrame) {
+        this.appFrame = appFrame;
     }
 
 
@@ -213,7 +213,7 @@ public class DBDatasetLoader {
                     DataSet data = new DataSet(con, DBList.getSelectedItem(), tableList.getSelectedItem());
                     dbLoadDialog.dispose();
 
-                    monFrame.getController().addAndActiviate(new Mondrian(data, monFrame.getController()));
+                    appFrame.getController().addAndActiviate(new Mondrian(data, appFrame.getController()));
                 }
             });
         }

@@ -24,7 +24,7 @@ public class Mondrian implements SelectionListener, ProgressIndicator, DataListe
     DataSet dataSet;
     public Vector<Selection> selList = new Vector<Selection>();
 
-    MondrianDialog dialog;
+    MondrianFrame dialog;
 
 
     public Mondrian(DataSet dataSet, MonController controller) {
@@ -33,7 +33,7 @@ public class Mondrian implements SelectionListener, ProgressIndicator, DataListe
 
         // create the dialog
 
-        dialog = new MondrianDialog(controller.getMonFrame(), this);
+        dialog = new MondrianFrame(controller.getMonFrame(), this);
     }
 
 
@@ -51,7 +51,7 @@ public class Mondrian implements SelectionListener, ProgressIndicator, DataListe
     }
 
 
-    public MondrianDialog getDialog() {
+    public MondrianFrame getDialog() {
         return dialog;
     }
 
@@ -117,7 +117,7 @@ public class Mondrian implements SelectionListener, ProgressIndicator, DataListe
                 plots.elementAt(i).switchSel = false;
                 JCheckBoxMenuItem selSeqCheckItem = controller.getMonFrame().selSeqCheckItem;
                 selSeqCheckItem.setSelected(!selSeqCheckItem.isSelected());                // perform the tick mark change manually ...
-                controller.monFrame.switchSelection();
+                controller.appFrame.switchSelection();
                 return;
             }
             if (plots.elementAt(i).switchAlpha) {    // This window has caused the switch alpha event
@@ -153,7 +153,7 @@ public class Mondrian implements SelectionListener, ProgressIndicator, DataListe
                         plots.elementAt(i).selectFlag = false;    // We need to get the last selection from this plot
                         Selection S = (Selection) (((DragBox) plots.elementAt(i)).Selections.lastElement());
                         if (selList.indexOf(S) == -1) { // Not in the list yet => new Selection to add !
-                            if (!(S.r.width < 3 || S.r.height < 3) && controller.monFrame.selseq) {
+                            if (!(S.r.width < 3 || S.r.height < 3) && controller.appFrame.selseq) {
                                 System.out.println("Selection Sequence  !!");
                                 S.step = selList.size() + 1;
                                 selList.addElement(S);

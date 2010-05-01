@@ -1,6 +1,6 @@
 package de.mpicbg.sweng.mondrian.plots;
 
-import de.mpicbg.sweng.mondrian.MDialog;
+import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.core.*;
 import de.mpicbg.sweng.mondrian.io.db.Query;
 import de.mpicbg.sweng.mondrian.plots.basic.MyRect;
@@ -41,7 +41,7 @@ public class MosaicPlot extends DragBox implements ActionListener {
     /**
      * This constructor requires a Frame and a desired size
      */
-    public MosaicPlot(MDialog frame, int width, int height, Table tablep) {
+    public MosaicPlot(MFrame frame, int width, int height, Table tablep) {
         super(frame);
         this.tablep = tablep;
         this.width = width;
