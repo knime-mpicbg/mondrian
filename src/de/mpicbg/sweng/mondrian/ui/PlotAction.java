@@ -57,7 +57,6 @@ public class PlotAction extends AbstractAction {
             plotFrame.getContentPane().add(plotPanel);
 
             plotFrame.setTitle(plotPanel.getName() != null ? plotPanel.getName() : plotFactory.getPlotName());
-            plotFrame.setSize(plotPanel.getMinimumSize());
             plotFrame.setVisible(true);
         }
     }

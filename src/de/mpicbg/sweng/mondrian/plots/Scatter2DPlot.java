@@ -1321,7 +1321,7 @@ public class Scatter2DPlot extends DragBox {
             xVal = data.getRawNumbers(Vars[0]);
             yVal = data.getRawNumbers(Vars[1]);
 
-            frame.setTitle("Scatterplot(x: " + data.getName(Vars[0]) + " y: " + data.getName(Vars[1]) + ")");
+            setName("Scatterplot(x: " + data.getName(Vars[0]) + " y: " + data.getName(Vars[1]) + ")");
             //(15-radius)*15
             binning = data.discretize2D("Dummy", Vars[0], getLlx(), getUrx() + 0.01 * (getUrx() - getLlx()), width / radius,
                     Vars[1], getLly(), getUry() + 0.01 * (getUry() - getLly()), width / radius);
