@@ -11,12 +11,11 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class MDialog extends JDialog implements WindowListener {
+public class MDialog extends JDialog {
 
     public MonFrame parentFrame;
     private JMenuItem m;
@@ -37,7 +36,6 @@ public class MDialog extends JDialog implements WindowListener {
         this.parentFrame = parentFrame;
 
         this.getContentPane().setBackground(ColorManager.backgroundColor);
-        addWindowListener(this);
     }
 
 
@@ -112,32 +110,6 @@ public class MDialog extends JDialog implements WindowListener {
         });
 
         super.show();
-    }
-
-
-    public void windowClosed(WindowEvent e) {
-    }
-
-
-    public void windowIconified(WindowEvent e) {
-    }
-
-
-    public void windowOpened(WindowEvent e) {
-    }
-
-
-    public void windowDeiconified(WindowEvent e) {
-    }
-
-
-    public void windowActivated(WindowEvent e) {
-        if (((System.getProperty("os.name")).toLowerCase()).indexOf("mac") > -1)
-            this.setJMenuBar(parentFrame.menubar);                 // Add it to the frame.
-    }
-
-
-    public void windowDeactivated(WindowEvent e) {
     }
 
 

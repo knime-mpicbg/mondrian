@@ -434,7 +434,7 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
 
 
     public void toggleSelection() {
-        if (controller.countInstances() > -1) {
+        if (controller.countInstances() > 0) {
             controller.getCurrentDataSet().toggleSelection();
             controller.getCurrent().updateSelection();
         }
@@ -442,7 +442,7 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
 
 
     public void clearColors() {
-        if (controller.countInstances() > -1) {
+        if (controller.countInstances() > 0) {
             controller.getCurrentDataSet().colorsOff();
             controller.getCurrent().dataChanged(-1);
         }
