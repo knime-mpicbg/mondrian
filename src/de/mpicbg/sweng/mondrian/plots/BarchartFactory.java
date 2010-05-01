@@ -29,48 +29,55 @@ public class BarchartFactory extends AbstractPlotFactory {
 
 
     public PlotPanel createPlotPanel(Mondrian mondrian, MFrame plotFrame, DataSet dataSet, JList varNames) {
+
+
         int[] indices = varNames.getSelectedIndices();
-
-        PlotPanel barChartsContainer = new PlotPanel();
-
-        int numPlots = indices.length;
-        barChartsContainer.setLayout(new GridLayout(1, numPlots));
-
         int weight = -1;
 
-        Table[] breakdowns = new Table[numPlots];
-        int maxLevels = -1;
-        for (int i = 0; i < numPlots; i++) {
+
+        return createBarChart(mondrian, plotFrame, dataSet, indices, weight);
+    }
+
+
+    public PlotPanel createBarChart(Mondrian mondrian, MFrame plotFrame, DataSet dataSet, int[] indices, int weight) {
+
+        int lastY = 333;
+        int col = 0;
+
+        for (int i = 0; i < indices.length; i++) {
+            MFrame mFrame = new MFrame(plotFrame.parentFrame, mondrian);
 
             int[] dummy = {0};
             dummy[0] = indices[i];
 
             Table breakdown = dataSet.breakDown(dataSet.setName, dummy, weight);
 
-            maxLevels = Math.max(maxLevels, breakdown.levels[0]);
+            int totHeight = (Toolkit.getDefaultToolkit().getScreenSize()).height;
+            int tmpHeight = Math.min(totHeight - 30, 60 + breakdown.levels[0] * 30);
 
-            breakdowns[i] = breakdown;
+            mFrame.setSize(300, tmpHeight);
+            final Barchart barchart = new Barchart(mFrame, 300, tmpHeight, breakdown);
+
+            if (lastY + mFrame.getHeight() > (Toolkit.getDefaultToolkit().getScreenSize()).height) {
+                col += 1;
+                lastY = 0;
+            }
+            if (300 * col > (Toolkit.getDefaultToolkit().getScreenSize()).width - 50) {
+                col = 0;
+                lastY = 353;
+            }
+            mFrame.setLocation(300 * col, lastY);
+
+            if (lastY == 0)
+                lastY += mFrame.getY();
+            lastY += mFrame.getHeight();
+
+
+            makeVisible(mondrian, mFrame, barchart);
         }
 
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int height = Math.min(screenSize.height - 30, 60 + maxLevels * 30);
-        int frameWidth = Math.min(screenSize.width - 50, 300 * numPlots);
-        int plotWidth = frameWidth / numPlots;
 
-        plotFrame.setSize(frameWidth - plotFrame.getInsets().left - plotFrame.getInsets().right, height);
-
-        for (int i = 0; i < numPlots; i++) {
-            Barchart barchart = new Barchart(plotFrame, plotWidth, height, breakdowns[i]);
-
-            barChartsContainer.add(barchart);
-
-            if (barChartsContainer.getName() != null)
-                barChartsContainer.setName(barChartsContainer.getName() + " | " + barchart.getName());
-            else
-                barChartsContainer.setName(barchart.getName());
-        }
-
-        return barChartsContainer;
+        return null;
     }
 
 
