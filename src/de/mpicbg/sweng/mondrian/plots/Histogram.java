@@ -86,7 +86,7 @@ public class Histogram extends DragBox implements ActionListener {
         else
             titletext = "Histogram(" + names[0] + "|" + data.getName(weight) + ")";
 
-        frame.setTitle(titletext);
+        setName(titletext);
 
         //this.setBackground(new Color(255, 255, 152));
 

@@ -5,8 +5,10 @@ import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.ui.PlotPanel;
+import de.mpicbg.sweng.mondrian.util.Utils;
 
 import javax.swing.*;
+import java.awt.*;
 
 
 /**
@@ -27,6 +29,18 @@ public class ParallelPlotFactory extends AbstractPlotFactory {
 
 
     public PlotPanel createPlotPanel(Mondrian mondrian, MDialog plotDialog, DataSet dataSet, JList varNames) {
+
+        int totWidth = (Toolkit.getDefaultToolkit().getScreenSize()).width;
+        int tmpWidth = 50 * (1 + (varNames.getSelectedIndices()).length);
+        if (tmpWidth > totWidth)
+            if (20 * (1 + (varNames.getSelectedIndices()).length) < totWidth)
+                tmpWidth = totWidth;
+            else
+                tmpWidth = 20 * (1 + (varNames.getSelectedIndices()).length);
+
+        plotDialog.setSize(tmpWidth, 400);
+        plotDialog.setLocation(Utils.genRandomLoacation(plotDialog));
+
         int k = (varNames.getSelectedIndices()).length;
         int[] passTmpBuffer = new int[k];
         int count = 0;

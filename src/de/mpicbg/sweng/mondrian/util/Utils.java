@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.prefs.Preferences;
 
@@ -315,6 +316,20 @@ public class Utils {
 
     public static boolean isDeployed() {
         return System.getProperty("apple.laf.useScreenMenuBar") != null;
+    }
+
+
+    private static Random r = new Random(24);
+
+
+    public static Point genRandomLoacation(Component comp) {
+        // todo refactor this to make use of several screens
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+        int xPos = Math.max(0, r.nextInt(screenSize.width - comp.getWidth() - 20));
+        int yPos = Math.max(0, r.nextInt(screenSize.height - comp.getHeight() - 20));
+
+        return new Point(xPos, yPos);
     }
 }
 

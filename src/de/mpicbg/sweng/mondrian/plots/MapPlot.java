@@ -71,7 +71,7 @@ public class MapPlot extends DragBox {
             this.displayVar = -1;
         allVarList = varList;
 
-        frame.setTitle("Map(" + data.setName + ")");
+        setName("Map(" + data.setName + ")");
 
         int xMin = ((MyPoly) polys.elementAt(0)).xpoints[0];
         int xMax = ((MyPoly) polys.elementAt(0)).xpoints[0];

@@ -62,7 +62,6 @@ public class Barchart extends DragBox implements ActionListener {
         setCoordinates(0, 0, max, 1, -1);
 
         this.setScrollX();
-        frame.getContentPane().add(this, "Center");
 
         Font SF = new Font("SansSerif", Font.PLAIN, 11);
         frame.setFont(SF);
@@ -75,7 +74,7 @@ public class Barchart extends DragBox implements ActionListener {
         else
             titletext = "Barchart(" + names[0] + "|" + tablep.data.getName(tablep.count) + ")";
 
-        frame.setTitle(titletext);
+        setName(titletext);
 
         evtq = Toolkit.getDefaultToolkit().getSystemEventQueue();
 

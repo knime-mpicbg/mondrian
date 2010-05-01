@@ -35,6 +35,9 @@ public class SplomFactory extends AbstractPlotFactory {
         splomPanel.setLayout(new GridLayout(numVars - 1, numVars - 1));
         splomPanel.setMinimumSize(new Dimension(200 * numVars, 200 * numVars));
 
+        int dims = Math.min(200 * numVars, (Toolkit.getDefaultToolkit().getScreenSize()).height);
+        plotDialog.setSize(dims - 20, dims);
+
         for (int i = 0; i < (numVars - 1); i++)
             for (int j = 1; j < numVars; j++) {
                 if (i >= j) {

@@ -6,6 +6,7 @@ import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.core.Table;
 import de.mpicbg.sweng.mondrian.ui.PlotPanel;
+import de.mpicbg.sweng.mondrian.util.Utils;
 import de.mpicbg.sweng.mondrian.util.WeightCaclulator;
 
 import javax.swing.*;
@@ -44,6 +45,9 @@ public class WeightedMosaicPlotFactory extends AbstractPlotFactory {
             breakdown.addInteraction(new int[]{i}, false);
 
         breakdown.addInteraction(new int[]{passed.length - 1}, true);
+
+        plotDialog.setSize(400, 400);
+        plotDialog.setLocation(Utils.genRandomLoacation(plotDialog));
 
         return new MosaicPlot(plotDialog, 400, 400, breakdown);
 

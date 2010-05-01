@@ -52,7 +52,7 @@ public class PlotAction extends AbstractAction {
 
         if (plotPanel != null) {
             for (PlotPanel plot : plotPanel.getPlots()) {
-                monFrame.getController().getCurrent().addPlot((DragBox) plot);
+                mondrian.addPlot((DragBox) plot);
             }
             plotFrame.getContentPane().add(plotPanel);
 

@@ -55,14 +55,17 @@ public class WeightedBarCharFactory extends AbstractPlotFactory {
 
             Barchart weightedBarchart = new Barchart(plotDialog, 300, tmpHeight, breakdown);
 
+            barChartsContainer.setSize(300, tmpHeight);
             barChartsContainer.add(weightedBarchart);
         }
+
+        plotDialog.setLocation(100, 100);
 
         return barChartsContainer;
     }
 
 
     public boolean isCompliant(DataSet dataSet, int numVariables, int numCategoricalVariables) {
-        return numVariables == numCategoricalVariables;
+        return numVariables == 1 && numVariables == numCategoricalVariables;
     }
 }

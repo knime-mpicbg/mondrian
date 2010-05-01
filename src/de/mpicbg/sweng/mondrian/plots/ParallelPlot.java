@@ -131,11 +131,11 @@ public class ParallelPlot extends DragBox implements ActionListener {
         setCoordinates(0, 0, 0, 0, -1);  // initialize the Coordinate System
 
         if (paintMode.equals("XbyY"))
-            frame.setTitle("PB(" + data.getName(xVar) + "|" + data.getName(yVar) + ")");
+            setName("PB(" + data.getName(xVar) + "|" + data.getName(yVar) + ")");
         else if (paintMode.equals("Poly"))
-            frame.setTitle("PC(" + data.setName + ")");
+            setName("PC(" + data.setName + ")");
         else
-            frame.setTitle("PB(" + data.setName + ")");
+            setName("PB(" + data.setName + ")");
 
         evtq = Toolkit.getDefaultToolkit().getSystemEventQueue();
 

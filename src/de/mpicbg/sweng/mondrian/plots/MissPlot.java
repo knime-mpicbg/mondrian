@@ -87,7 +87,7 @@ public class MissPlot extends DragBox implements ActionListener {
             tables.addElement(new Table("Missing Table", values, 1, new int[]{2}, new String[]{data.getName(vars[j])}, new String[][]{{"Observed", "Missing"}}, new int[]{vars[j]}, Ids, data, -1));
         }
 
-        frame.setTitle(titletext);
+        setName(titletext);
         setScrollX();
 
         EventQueue evtq = Toolkit.getDefaultToolkit().getSystemEventQueue();

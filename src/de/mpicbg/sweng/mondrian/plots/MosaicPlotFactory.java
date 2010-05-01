@@ -6,6 +6,7 @@ import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.core.Table;
 import de.mpicbg.sweng.mondrian.ui.PlotPanel;
+import de.mpicbg.sweng.mondrian.util.Utils;
 
 import javax.swing.*;
 
@@ -18,7 +19,7 @@ import javax.swing.*;
 public class MosaicPlotFactory extends AbstractPlotFactory {
 
     public String getPlotName() {
-        return "New Mosaic";
+        return "Mosaic Plot";
     }
 
 
@@ -40,6 +41,9 @@ public class MosaicPlotFactory extends AbstractPlotFactory {
         }
         breakdown.addInteraction(new int[]{(varNames.getSelectedIndices()).length - 1}, true);
 
+
+        plotDialog.setSize(400, 400);
+        plotDialog.setLocation(Utils.genRandomLoacation(plotDialog));
         //    mondrian.getContentPane().add(plotw);                      // Add it
 
         //todo renable this
@@ -60,6 +64,6 @@ public class MosaicPlotFactory extends AbstractPlotFactory {
 
 
     public boolean isCompliant(DataSet dataSet, int numVariables, int numCategoricalVariables) {
-        return numVariables > 2 && (numVariables - 1) == numCategoricalVariables;
+        return numVariables >= 2 && numVariables == numCategoricalVariables;
     }
 }

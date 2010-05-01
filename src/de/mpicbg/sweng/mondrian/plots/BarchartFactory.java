@@ -32,24 +32,42 @@ public class BarchartFactory extends AbstractPlotFactory {
         int[] indices = varNames.getSelectedIndices();
 
         PlotPanel barChartsContainer = new PlotPanel();
-        plotDialog.setLayout(new GridLayout(1, indices.length));
 
+        int numPlots = indices.length;
+        barChartsContainer.setLayout(new GridLayout(1, numPlots));
 
         int weight = -1;
 
-        for (int i = 0; i < indices.length; i++) {
+        Table[] breakdowns = new Table[numPlots];
+        int maxLevels = -1;
+        for (int i = 0; i < numPlots; i++) {
 
             int[] dummy = {0};
             dummy[0] = indices[i];
 
             Table breakdown = dataSet.breakDown(dataSet.setName, dummy, weight);
 
-            int totHeight = (Toolkit.getDefaultToolkit().getScreenSize()).height;
-            int tmpHeight = Math.min(totHeight - 30, 60 + breakdown.levels[0] * 30);
+            maxLevels = Math.max(maxLevels, breakdown.levels[0]);
 
-            Barchart barchart = new Barchart(plotDialog, 300, tmpHeight, breakdown);
+            breakdowns[i] = breakdown;
+        }
+
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int height = Math.min(screenSize.height - 30, 60 + maxLevels * 30);
+        int frameWidth = Math.min(screenSize.width - 50, 300 * numPlots);
+        int plotWidth = frameWidth / numPlots;
+
+        plotDialog.setSize(frameWidth - plotDialog.getInsets().left - plotDialog.getInsets().right, height);
+
+        for (int i = 0; i < numPlots; i++) {
+            Barchart barchart = new Barchart(plotDialog, plotWidth, height, breakdowns[i]);
 
             barChartsContainer.add(barchart);
+
+            if (barChartsContainer.getName() != null)
+                barChartsContainer.setName(barChartsContainer.getName() + " | " + barchart.getName());
+            else
+                barChartsContainer.setName(barchart.getName());
         }
 
         return barChartsContainer;

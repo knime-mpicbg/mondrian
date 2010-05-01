@@ -201,7 +201,7 @@ public class MosaicPlot extends DragBox implements ActionListener {
         else
             titletext += ")";
 
-        frame.setTitle(titletext);
+        setName(titletext);
 
         if (displayMode.equals("Fluctuation") || displayMode.equals("Multiple Barcharts")) {
             if (!printing)
