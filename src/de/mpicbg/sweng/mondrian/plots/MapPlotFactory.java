@@ -28,7 +28,7 @@ public class MapPlotFactory extends AbstractPlotFactory {
 
 
     public PlotPanel createPlotPanel(MonFrame monFrame, MDialog plotDialog, DataSet dataSet, JList varNames) {
-        MapPlot mapPlot = new MapPlot(plotDialog, 400, 400, dataSet, monFrame.polys, varNames);
+        MapPlot mapPlot = new MapPlot(plotDialog, 400, 400, dataSet, MapCache.getInstance().getPolys(dataSet), varNames);
 
         if (mapPlot.ratio > 1)
             mapPlot.setSize((int) (350 * mapPlot.ratio), 350 + 56);

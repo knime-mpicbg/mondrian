@@ -1,10 +1,12 @@
 package de.mpicbg.sweng.mondrian;
 
 import de.mpicbg.sweng.mondrian.ui.VariableSelector;
+import de.mpicbg.sweng.mondrian.util.StatUtil;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.*;
 
 
 /**
@@ -19,11 +21,18 @@ public class MondrianDialog extends MDialog {
     private JLabel progText;
 
     private VariableSelector varSelector;
+    private Mondrian mondrian;
 
 
     public MondrianDialog(MonFrame parentFrame, Mondrian mondrian) {
         super(parentFrame, mondrian);
+        this.mondrian = mondrian;
 
+        JPanel content = new JPanel(new BorderLayout());
+        getContentPane().add(content);
+
+        varSelector = new VariableSelector(mondrian.getDataSet());
+        content.add(varSelector, BorderLayout.CENTER);
 
         // Add the status/progress bar
         JPanel progPanel = new JPanel();
@@ -37,9 +46,26 @@ public class MondrianDialog extends MDialog {
                 paintAll(MondrianDialog.this.getGraphics());
             }
         });
-        progPanel.add("South", progBar);
+        progPanel.add(progBar, BorderLayout.CENTER);
 
-        add("South", progPanel);
+        progText = new JLabel();
+        progPanel.add(progText, BorderLayout.WEST);
+
+        content.add(progPanel, BorderLayout.CENTER);
+    }
+
+
+    public void setTitle() {
+        setTitle("Mondrian(" + mondrian.getDataSet().setName + ")");               //
+    }
+
+
+    public void updateSelectionInfo() {
+        int nom = mondrian.getDataSet().countSelection();
+        int denom = mondrian.getDataSet().n;
+        String Display = nom + "/" + denom + " (" + StatUtil.roundToString(100 * nom / denom, 2) + "%)";
+        progText.setText(Display);
+        progBar.setValue(nom);
     }
 
 
@@ -50,5 +76,10 @@ public class MondrianDialog extends MDialog {
 
     public JProgressBar getProgBar() {
         return progBar;
+    }
+
+
+    public VariableSelector getVarSelector() {
+        return varSelector;
     }
 }

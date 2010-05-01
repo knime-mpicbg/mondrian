@@ -215,7 +215,7 @@ public class DataFrameConverter {
             rC.voidEval("write.table(" + dataFrameName + ", '" + tmpFile.getAbsolutePath() + "', quote=FALSE, sep=\"\\t\", row.names = FALSE)");
 
             rC.close();
-            monFrame.loadDataSet(false, tmpFile, dataFrameName);
+            monFrame.getController().loadDataSet(tmpFile, dataFrameName);
             tmpFile.delete();
 
         } catch (RserveException rse) {

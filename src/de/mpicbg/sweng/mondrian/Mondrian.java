@@ -1,16 +1,11 @@
 package de.mpicbg.sweng.mondrian;
 
-import de.mpicbg.sweng.mondrian.core.DataSet;
-import de.mpicbg.sweng.mondrian.core.DragBox;
-import de.mpicbg.sweng.mondrian.core.Selection;
-import de.mpicbg.sweng.mondrian.core.SelectionListener;
+import de.mpicbg.sweng.mondrian.core.*;
 import de.mpicbg.sweng.mondrian.io.ProgressIndicator;
-import de.mpicbg.sweng.mondrian.io.db.Query;
 import de.mpicbg.sweng.mondrian.ui.VariableSelector;
 import de.mpicbg.sweng.mondrian.util.StatUtil;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.List;
 import java.util.Vector;
 
@@ -20,21 +15,28 @@ import java.util.Vector;
  *
  * @author Holger Brandl
  */
-public class Mondrian implements SelectionListener, ProgressIndicator {
+public class Mondrian implements SelectionListener, ProgressIndicator, DataListener {
+
+    MonController controller;
 
     public Vector<DragBox> plots = new Vector<DragBox>();
 
     DataSet dataSet;
+    public Vector<Selection> selList = new Vector<Selection>();
 
     MondrianDialog dialog;
 
 
-    public Mondrian() {
+    public Mondrian(DataSet dataSet, MonController controller) {
+        this.dataSet = dataSet;
+        this.controller = controller;
 
+        // create the dialog
+
+        dialog = new MondrianDialog(controller.getMonFrame(), this);
+        dialog.setSize(300, 400);
+        dialog.setVisible(true);
     }
-
-
-    private Component con;
 
 
     public void addPlot(DragBox plot) {
@@ -78,14 +80,18 @@ public class Mondrian implements SelectionListener, ProgressIndicator {
             }
             if (plots.elementAt(i).switchSel) {    // This window has caused the switch event
                 plots.elementAt(i).switchSel = false;
+                JCheckBoxMenuItem selSeqCheckItem = controller.getMonFrame().selSeqCheckItem;
                 selSeqCheckItem.setSelected(!selSeqCheckItem.isSelected());                // perform the tick mark change manually ...
-                switchSelection();
+                controller.monFrame.switchSelection();
                 return;
             }
             if (plots.elementAt(i).switchAlpha) {    // This window has caused the switch alpha event
                 plots.elementAt(i).switchAlpha = false;
+
+                JCheckBoxMenuItem alphaOnHighlightCheckMenuItem = controller.getMonFrame().alphaOnHighlightCheckMenuItem;
+
                 alphaOnHighlightCheckMenuItem.setSelected(!alphaOnHighlightCheckMenuItem.isSelected());
-                switchAlpha();
+                controller.getMonFrame().switchAlpha();
                 plots.elementAt(i).updateSelection();
                 return;
             }
@@ -112,7 +118,7 @@ public class Mondrian implements SelectionListener, ProgressIndicator {
                         plots.elementAt(i).selectFlag = false;    // We need to get the last selection from this plot
                         Selection S = (Selection) (((DragBox) plots.elementAt(i)).Selections.lastElement());
                         if (selList.indexOf(S) == -1) { // Not in the list yet => new Selection to add !
-                            if (!(S.r.width < 3 || S.r.height < 3) && selseq) {
+                            if (!(S.r.width < 3 || S.r.height < 3) && controller.monFrame.selseq) {
                                 System.out.println("Selection Sequence  !!");
                                 S.step = selList.size() + 1;
                                 selList.addElement(S);
@@ -138,7 +144,7 @@ public class Mondrian implements SelectionListener, ProgressIndicator {
                 oneClick.r.height += 1;
                 (oneClick.d).maintainSelection(oneClick);
             } else {
-                maintainWindowMenu(false);
+                controller.getMonFrame().maintainWindowMenu(false);
 
                 for (int i = 0; i < selList.size(); i++) {
                     Selection S = selList.elementAt(i);
@@ -148,17 +154,6 @@ public class Mondrian implements SelectionListener, ProgressIndicator {
                     (S.d).frame.maintainMenu(S.step);
                 }
             }
-            sqlConditions = new Query();                // Replace ???
-            if (controller.getCurrentDataSet().isDB)
-                for (int i = 0; i < selList.size(); i++) {
-                    Selection S = selList.elementAt(i);
-                    if (S.mode == Selection.MODE_STANDARD)
-                        sqlConditions.clearConditions();
-                    String condStr = S.condition.getConditions();
-                    if (!condStr.equals(""))
-                        sqlConditions.addCondition(Selection.getSQLModeString(S.mode), "(" + condStr + ")");
-                }
-            controller.getCurrentDataSet().sqlConditions = sqlConditions;
 
             //      System.out.println("Main Update: "+sqlConditions.makeQuery());
 
@@ -173,31 +168,26 @@ public class Mondrian implements SelectionListener, ProgressIndicator {
                 System.out.println(" SELECT ALL ... ");
                 controller.getCurrentDataSet().selectAll();
             }
-            if (controller.getCurrentDataSet().isDB)
-                sqlConditions.clearConditions();
         }
 
         // Finally get the plots updated
         //
         for (int i = 0; i < plots.size(); i++) {
             //     progText.setText("Query: "+i);
-            progBar.setValue(1);
+            getProgBar().setValue(1);
             plots.elementAt(i).updateSelection();
         }
 
         controller.getCurrentDataSet().selChanged = true;
-        int nom = controller.getCurrentDataSet().countSelection();
+        int selectionCount = controller.getCurrentDataSet().countSelection();
         int denom = controller.getCurrentDataSet().n;
-        String Display = nom + "/" + denom + " (" + StatUtil.roundToString(100F * nom / denom, 2) + "%)";
-        progText.setText(Display);
-        progBar.setValue(nom);
+        String msg = selectionCount + "/" + denom + " (" + StatUtil.roundToString(100F * selectionCount / denom, 2) + "%)";
+        setProgText(msg);
+        getProgBar().setValue(selectionCount);
 
-        maintainOptionMenu();
+        controller.getMonFrame().maintainOptionMenu();
 
-        if (nom > 0)
-            saveSelectionMenuItem.setEnabled(true);
-        else
-            saveSelectionMenuItem.setEnabled(false);
+        controller.getMonFrame().saveSelectionMenuItem.setEnabled(selectionCount > 0);
     }
 
 
@@ -205,7 +195,7 @@ public class Mondrian implements SelectionListener, ProgressIndicator {
 
         //System.out.println("MonFrame got the event !!!!"+id);
 
-        maintainOptionMenu();
+        controller.getMonFrame().maintainOptionMenu();
 
         System.out.println("Key Event in MonFrame");
 
@@ -241,18 +231,22 @@ public class Mondrian implements SelectionListener, ProgressIndicator {
 
     public void deleteSelection() {
         if (selList.size() > 0) {
-            for (int i = 0; i < plots.size(); i++)
+            for (int i = 0; i < plots.size(); i++) {
                 (plots.elementAt(i).Selections).removeAllElements();
-            for (int i = 0; i < selList.size(); i++)
+            }
+
+            for (int i = 0; i < selList.size(); i++) {
                 selList.elementAt(i).status = Selection.KILLED;
-            maintainWindowMenu(false);
+            }
+
+            controller.getMonFrame().maintainWindowMenu(false);
             updateSelection();
         }
     }
 
 
     public void setProgress(double progress) {
-        progBar.setValue((int) (100 * progress));
+        getProgBar().setValue((int) (100 * progress));
     }
 
 
@@ -262,8 +256,8 @@ public class Mondrian implements SelectionListener, ProgressIndicator {
 
 
     public void close() {
-        if (varSelector.isDisplayable())
-            varSelector.dispose();
+        if (dialog.isDisplayable())
+            dialog.dispose();
 
 
         for (int i = plots.size() - 1; i >= 0; i--) {
@@ -273,17 +267,12 @@ public class Mondrian implements SelectionListener, ProgressIndicator {
 
 
     public VariableSelector getSelector() {
-        return varSelector;
+        return dialog.getVarSelector();
     }
 
 
     public JProgressBar getProgBar() {
         return dialog.getProgBar();
-    }
-
-
-    public Component getParent() {
-        return con;
     }
 
 

@@ -30,7 +30,7 @@ public class SaveDataSetAction extends AbstractAction {
         this.saveSelection = saveSelection;
         this.monController = monController;
 
-        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         setEnabled(false);
     }
 

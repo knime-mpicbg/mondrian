@@ -1,7 +1,5 @@
 package de.mpicbg.sweng.mondrian.io;
 
-import de.mpicbg.sweng.mondrian.MonController;
-import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.core.MapCache;
 import de.mpicbg.sweng.mondrian.plots.basic.MyPoly;
@@ -26,17 +24,17 @@ public class AsciiFileLoader {
     private String justFile = "";
 
 
-    private Mondrian mondrian;
+    private ProgressIndicator progressIndicator;
     private JFrame parent;
 
 
-    public AsciiFileLoader(Mondrian mondrian, JFrame parent) {
-        this.mondrian = mondrian;
+    public AsciiFileLoader(ProgressIndicator progressIndicator, JFrame parent) {
+        this.progressIndicator = progressIndicator;
         this.parent = parent;
     }
 
 
-    public boolean loadAsciiFile(File file) {
+    public DataSet loadAsciiFile(File file) {
 
         DataSet data;
         String filename;
@@ -61,30 +59,29 @@ public class AsciiFileLoader {
         }
 
         if (filename.equals("")) {
-            return false;
+            return null;
         }
         String line = "";
 
-        mondrian.getProgBar().setMinimum(0);
-        mondrian.getProgBar().setMaximum(100);
+        progressIndicator.getProgBar().setMinimum(0);
+        progressIndicator.getProgBar().setMaximum(100);
         data = new DataSet(justFile);
-        MonController.dataSets.addElement(data);
-        mondrian.getProgBar().setString("Loading ...");
+        progressIndicator.getProgBar().setString("Loading ...");
 
-        String mapFile = data.turboRead(filename, mondrian);
+        String mapFile = data.turboRead(filename, progressIndicator);
         if (mapFile == null)
-            JOptionPane.showMessageDialog(mondrian.getParent(), "No mapfile found although an index column\nwas specified via '/P'.");
+            JOptionPane.showMessageDialog(parent, "No mapfile found although an index column\nwas specified via '/P'.");
 
         else if (mapFile.indexOf("ERROR") == 0) {
-            JOptionPane.showMessageDialog(mondrian.getParent(), mapFile.substring(mapFile.indexOf(":") + 2), "Open File Error", JOptionPane.ERROR_MESSAGE);
-            mondrian.setProgText("");
-            mondrian.setProgress(0.0);
-            return false;
+            JOptionPane.showMessageDialog(parent, mapFile.substring(mapFile.indexOf(":") + 2), "Open File Error", JOptionPane.ERROR_MESSAGE);
+            progressIndicator.setProgText("");
+            progressIndicator.setProgress(0.0);
+            return null;
         }
 
-        mondrian.getProgText().setText("");
-        mondrian.getProgBar().setValue(0);
-        mondrian.getProgBar().setMaximum(data.n);
+        progressIndicator.setProgText("");
+        progressIndicator.getProgBar().setValue(0);
+        progressIndicator.getProgBar().setMaximum(data.n);
 
         //todo do we need this
 //        mondrian.selectBuffer = new int[data.k + 15];
@@ -95,7 +92,7 @@ public class AsciiFileLoader {
                     try {
                         BufferedReader br = new BufferedReader(new FileReader(path + mapFile));
                         br.mark(1000000);
-                        mondrian.getProgText().setText("Polygons ...");
+                        progressIndicator.setProgText("Polygons ...");
 
                         double xMin = 10e10;
                         double xMax = -10e10;
@@ -140,7 +137,7 @@ public class AsciiFileLoader {
                             MyPoly p = new MyPoly();
                             p.read(br, xMin, 100000 / Math.min(xMax - xMin, yMax - yMin), yMin, 100000 / Math.min(xMax - xMin, yMax - yMin));
                             if (count++ % Math.max(data.n / 20, 1) == 0)
-                                mondrian.getProgBar().setValue(Math.min(count, data.n));
+                                progressIndicator.getProgBar().setValue(Math.min(count, data.n));
 
                             MapCache.getInstance().getPolys(data).addElement(p);
                             line = br.readLine();                          // Read seperator (single blank line)
@@ -151,10 +148,10 @@ public class AsciiFileLoader {
                         System.exit(1);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(mondrian.getParent(), "Can't open mapfile: " + mapFile + "\nPlease check file name and location\n(the datafile will still be loaded)");
+                    JOptionPane.showMessageDialog(parent, "Can't open mapfile: " + mapFile + "\nPlease check file name and location\n(the datafile will still be loaded)");
                 }
 
-        return true;
+        return data;
     }
 
     // old reader

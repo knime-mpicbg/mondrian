@@ -6,12 +6,8 @@ import com.apple.mrj.MRJQuitHandler;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.core.DragBox;
 import de.mpicbg.sweng.mondrian.core.PlotFactory;
-import de.mpicbg.sweng.mondrian.core.Selection;
-import de.mpicbg.sweng.mondrian.io.db.Query;
-import de.mpicbg.sweng.mondrian.plots.basic.MyPoly;
 import de.mpicbg.sweng.mondrian.ui.*;
 import de.mpicbg.sweng.mondrian.ui.transform.TransformAction;
-import de.mpicbg.sweng.mondrian.util.StatUtil;
 import de.mpicbg.sweng.mondrian.util.Utils;
 import de.mpicbg.sweng.mondrian.util.r.RService;
 import org.rosuda.REngine.Rserve.RConnection;
@@ -20,11 +16,9 @@ import org.rosuda.REngine.Rserve.RserveException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Vector;
 
 
@@ -37,45 +31,38 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
      */
     protected static int num_windows = 0;
 
-    protected static Vector<MonFrame> monFrames;
-
-    private java.util.List<PlotFactory> plotFacRegistry = new ArrayList<PlotFactory>();
-
-    public Vector<Selection> selList = new Vector<Selection>();
-    public Query sqlConditions;
     public boolean selseq = false;
     public boolean alphaHi = false;
-    public Vector<MyPoly> polys = new Vector<MyPoly>(256, 256);
+
     private int numCategorical = 0;
     private int weightIndex = 0;
-    private JProgressBar progBar;
 
     public JMenuBar menubar;
-    public JMenu windowMenu, helpMenu, deriveVarMenu, transformMenu;
+    public JMenu plotMenu, windowMenu, helpMenu, deriveVarMenu, transformMenu;
 
-    private JMenuItem saveMenuItem;
-    private JMenuItem saveSelectionMenuItem;
+    public JMenuItem saveMenuItem;
+    public JMenuItem saveSelectionMenuItem;
 
-    private JMenuItem modelNavigatorButton;
-    private JMenuItem closeDataSetMenuItem;
+    public JMenuItem modelNavigatorButton;
+    public JMenuItem closeDataSetMenuItem;
 
 
     public JMenuItem closeAllMenuItem, colorsMenuItem, selectionMenuItem, me, transPlus, transMinus, transTimes, transDiv, transNeg, transInv, transLog, transExp;
-    private JCheckBoxMenuItem selSeqCheckItem;
-    private JCheckBoxMenuItem alphaOnHighlightCheckMenuItem;
+    public JCheckBoxMenuItem selSeqCheckItem;
+    public JCheckBoxMenuItem alphaOnHighlightCheckMenuItem;
     private JCheckBoxMenuItem orSelectionCheckMenuItem;
     private JCheckBoxMenuItem andSelectionCheckMenuItem;
 
     private ModelNavigator modelNavigator;
-    public int dataSetCounter = -1;
+
     private int dCol = 1, dSel = 1;
     public boolean mondrianRunning = false;
-    public JMenu plotMenu;
+    public SaveDataSetAction saveAction;
+    public SaveDataSetAction saveDataSetAction;
 
 
-    public MonFrame(Vector<MonFrame> monFrames, Vector<DataSet> dataSets, boolean load, boolean loadDB, File loadFile) {
+    public MonFrame() {
 
-        monFrames.addElement(this);
 
         Toolkit.getDefaultToolkit().setDynamicLayout(false);
         MRJApplicationUtils.registerQuitHandler(this);
@@ -85,8 +72,6 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
 
         Font SF = new Font("SansSerif", Font.BOLD, 12);
         this.setFont(SF);
-        MonController.dataSets = dataSets;
-        MonFrame.monFrames = monFrames;
         this.setTitle("Mondrian");               // Create the window.
         num_windows++;                           // Count it.
 
@@ -95,18 +80,14 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
         // Create menu items, with menu shortcuts, and add to the menu.
         JMenu file = menubar.add(new JMenu("File"));
         file.add(new JMenuItem(new OpenDataSetAction(controller)));
-
-
         file.add(new JMenuItem(new LoadRDataFrameAction(controller)));
-
         file.add(new JMenuItem(new CreateDBDataSetAction(controller)));
 
+        saveAction = new SaveDataSetAction("Save", false, controller);
+        file.add(new JMenuItem(saveAction));
 
-        file.add(saveMenuItem = new JMenuItem(new SaveDataSetAction("Save", false, controller)));
-        file.add(saveSelectionMenuItem = new JMenuItem(new SaveDataSetAction("Save Selection", true, controller)));
-
-        saveSelectionMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        saveSelectionMenuItem.setEnabled(false);
+        saveDataSetAction = new SaveDataSetAction("Save Selection", true, controller);
+        file.add(new JMenuItem(saveDataSetAction));
 
         file.add(closeDataSetMenuItem = new JMenuItem(new CloseDataSetAction(controller)));
 
@@ -409,11 +390,6 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
     }
 
 
-    public JProgressBar getProgBar() {
-        return progBar;
-    }
-
-
     /**
      * this constructor is useful to create a Mondrian instance with a pre-loaded dataset. It will initialize Mondrians
      * and dataSets if necessary, otherwise the dataset will be added to the existing static list.
@@ -423,31 +399,7 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
     public MonFrame(DataSet data) {
         this((monFrames == null) ? new Vector<MonFrame>(5, 5) : monFrames, (MonController.dataSets == null) ? new Vector<DataSet>(5, 5) : MonController.dataSets, false, false, null);
 
-        initWithData(data);
-    }
-
-
-    /**
-     * adds a dataset and makes is current.
-     *
-     * @param data dataset to use
-     */
-    public void initWithData(DataSet data) {
-        MonController.dataSets.addElement(data);
-        dataSetCounter = MonController.dataSets.size() - 1;
-        setVarList();
-        this.setTitle("Mondrian(" + controller.getCurrentDataSet().setName + ")");               //
-        me.setText(this.getTitle());
-        closeDataSetMenuItem.setEnabled(true);
-        saveMenuItem.setEnabled(true);
-
-        int nom = controller.getCurrentDataSet().countSelection();
-        int denom = controller.getCurrentDataSet().n;
-        String Display = nom + "/" + denom + " (" + StatUtil.roundToString(100 * nom / denom, 2) + "%)";
-        progText.setText(Display);
-        progBar.setValue(nom);
-
-        maintainOptionMenu();
+        controller.initWithData(data, this);
     }
 
 
@@ -462,7 +414,7 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
     void close() {
         // Modal dialog with OK button
 
-        if (dataSetCounter == -1) {
+        if (monController.countInstances() == -1) {
             this.dispose();
             if (--num_windows == 0)
                 System.exit(0);
@@ -474,10 +426,11 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
 
         int answer = JOptionPane.showConfirmDialog(this, message);
         if (answer == JOptionPane.YES_OPTION) {
+            selList
             num_windows--;
             for (int i = plots.size() - 1; i >= 0; i--)
                 plots.elementAt(i).frame.close();
-            MonController.dataSets.setElementAt(new DataSet("nullinger"), dataSetCounter);
+            MonController.dataSets.setElementAt(new DataSet("nullinger"), monController.countInstances());
             this.dispose();
             if (num_windows == 0) {
                 new MonFrame(monFrames, MonController.dataSets, false, false, null);
@@ -497,43 +450,43 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
 
 
     public void switchSelection() {
-        if (dataSetCounter > -1 && controller.getCurrentDataSet().isDB)
+        if (monController.countInstances() > -1 && controller.getCurrentDataSet().isDB)
             selseq = true;
         else {
             selseq = selSeqCheckItem.isSelected();
             //System.out.println("Selection Sequences : "+selseq);
             if (!selseq)
-                deleteSelection();
+                getController().getCurrent().deleteSelection();
         }
     }
 
 
     public void switchAlpha() {
         alphaHi = alphaOnHighlightCheckMenuItem.isSelected();
-        updateSelection();
+        controller.getCurrent().updateSelection();
     }
 
 
     public void selectAll() {
-        if (dataSetCounter > -1) {
+        if (monController.countInstances() > -1) {
             controller.getCurrentDataSet().selectAll();
-            updateSelection();
+            controller.getCurrent().updateSelection();
         }
     }
 
 
     public void toggleSelection() {
-        if (dataSetCounter > -1) {
+        if (monController.countInstances() > -1) {
             controller.getCurrentDataSet().toggleSelection();
-            updateSelection();
+            controller.getCurrent().updateSelection();
         }
     }
 
 
     public void clearColors() {
-        if (dataSetCounter > -1) {
+        if (monController.countInstances() > -1) {
             controller.getCurrentDataSet().colorsOff();
-            dataChanged(-1);
+            controller.getCurrent().dataChanged(-1);
         }
     }
 
@@ -574,8 +527,8 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
             paint(this.getGraphics());
             return;
         }
-        if (dataSetCounter == -1)
-            dataSetCounter = MonController.dataSets.size() - 1;
+        if (monController.countInstances() == -1)
+            monController.countInstances() = MonController.dataSets.size() - 1;
 
 
         this.show();
@@ -743,9 +696,9 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
 
 
     public void maintainPlotMenu() {
-        if (dataSetCounter == -1) {
+        if (monController.countInstances() == -1) {
             if (MonController.dataSets.size() > 0)
-                dataSetCounter = MonController.dataSets.size() - 1;
+                monController.countInstances() = MonController.dataSets.size() - 1;
             else return; // invalid state, don't bother
         }
 

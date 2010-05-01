@@ -2,7 +2,6 @@ package de.mpicbg.sweng.mondrian;
 
 import com.apple.mrj.MRJApplicationUtils;
 import com.apple.mrj.MRJOpenDocumentHandler;
-import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.io.DataFrameConverter;
 import de.mpicbg.sweng.mondrian.plots.*;
 
@@ -24,7 +23,7 @@ public class MondrianStarter implements MRJOpenDocumentHandler {
 
     public MondrianStarter(String dataFileName) {
 
-        MonFrame monFrame = new MonFrame(new Vector<MonFrame>(), new Vector<DataSet>(), false, false, null);
+        MonFrame monFrame = new MonFrame();
 
         monFrame.registerPlotFactory(new MissPlotFactory());
         monFrame.plotMenu.add(new JSeparator());
@@ -65,7 +64,7 @@ public class MondrianStarter implements MRJOpenDocumentHandler {
                 if (dataFile.getName().endsWith(".RData")) {
                     new DataFrameConverter(monFrame).loadDataFrame(dataFile);
                 } else {
-                    monFrame.loadDataSet(false, dataFile, "");
+                    monFrame.getController().loadDataSet(dataFile, "");
                 }
             }
         }
@@ -79,10 +78,11 @@ public class MondrianStarter implements MRJOpenDocumentHandler {
 
 
     public void handleOpenFile(File inFile) {
+        // this can not work!!
+
         MonFrame theMonFrame = ((MonFrame) new Vector(5, 5).lastElement());
 //    while( !theMonFrame.mondrianRunning ) {System.out.println(" wait for Mondrian to initialize ...");}   // Wait until Mondrian initialized
 //    System.out.println(".......... CALL loadDataSet("+inFile+") FROM handleOpenFile .........");
-        theMonFrame.loadDataSet(false, inFile, "");
+        theMonFrame.getController().loadDataSet(inFile, "");
     }
-
 }

@@ -1,7 +1,13 @@
-package de.mpicbg.sweng.mondrian.io;// Fuck? Häääh??
+package de.mpicbg.sweng.mondrian.io;
+
+import javax.swing.*;
 
 
 public interface ProgressIndicator {
 
-    public void setProgress(double progress);
+    void setProgress(double progress);
+
+    JProgressBar getProgBar();
+
+    void setProgText(String msg);
 }
