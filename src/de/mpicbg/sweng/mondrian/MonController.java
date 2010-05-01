@@ -59,14 +59,12 @@ public class MonController {
     public void addAndActiviate(Mondrian mondrian) {
         mondrians.add(mondrian);
         setCurrent(mondrian);
-
-        appFrame.maintainOptionMenu();
-
     }
 
 
-    private void setCurrent(Mondrian mondrian) {
+    public void setCurrent(Mondrian mondrian) {
         current = mondrian;
+        appFrame.updateMenusToSelection();
     }
 
 
@@ -156,6 +154,6 @@ public class MonController {
 
 
     public void fireVarSelectionChanged() {
-        appFrame.maintainPlotMenu();
+        appFrame.updateMenusToSelection();
     }
 }

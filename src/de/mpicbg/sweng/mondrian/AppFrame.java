@@ -177,7 +177,7 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
 
         helpMenu.add(new JMenuItem(new GoToWebsiteAction("Online Help")));
 
-        this.setJMenuBar(menubar);                 // Add it to the frame.
+        setJMenuBar(menubar);                 // Add it to the frame.
 
         Icon MondrianIcon = new ImageIcon(Utils.readGif("/Logo.gif"));
         JLabel MondrianLabel = new JLabel(MondrianIcon);
@@ -370,7 +370,28 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
     }
 
 
-    public void maintainPlotMenu() {
+    public void updateMenusToSelection() {
+        DataSet data = controller.getCurrentDataSet();
+
+        closeDataSetMenuItem.setEnabled(true);
+        saveAction.setEnabled(true);
+
+        deriveVarBySelAction.setEnabled(data.countSelection() > 0);
+        deriveVarByColAction.setEnabled(data.colorBrush);
+
+        boolean mode = DragBox.extSelMode;
+        orSelectionCheckMenuItem.setSelected(mode);
+        andSelectionCheckMenuItem.setSelected(!mode);
+
+        // update all plots
+        maintainPlotMenu();
+
+        // update the transform menu
+        updateTrafoMenuToVarSelection();
+    }
+
+
+    private void maintainPlotMenu() {
 
         int numCategorical = controller.getCurrent().calcNumCategoricalVars();
 
@@ -392,10 +413,6 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
                 }
             }
         }
-
-
-        // Now handle transform menu
-        updateTrafoMenuToVarSelection();
     }
 
 
@@ -429,24 +446,11 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
     }
 
 
-    public void maintainOptionMenu() {
-        DataSet data = controller.getCurrentDataSet();
-
-        closeDataSetMenuItem.setEnabled(true);
-        saveAction.setEnabled(true);
-
-        deriveVarBySelAction.setEnabled(data.countSelection() > 0);
-        deriveVarByColAction.setEnabled(data.colorBrush);
-
-        boolean mode = DragBox.extSelMode;
-        orSelectionCheckMenuItem.setSelected(mode);
-        andSelectionCheckMenuItem.setSelected(!mode);
-    }
-
-
+    /**
+     * Register a new plot-factory. This will create a new entry in the plot-menu.
+     */
     public void registerPlotFactory(PlotFactory plotFactory) {
 
-        // add the new factory to the main-menu
         plotMenu.add(new JMenuItem(new PlotAction(plotFactory, this)));
     }
 

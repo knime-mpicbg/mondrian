@@ -39,10 +39,13 @@ public class DataFrameConverter {
 
         JFileChooser f = new JFileChooser("~/.");
         f.setFileHidingEnabled(false);
-        f.setSelectedFile(new File("~/.RData"));
+//        f.setSelectedFile(new File("~/.RData"));
         f.showDialog(null, "Open .RData File");
 
         final File rDataFile = f.getSelectedFile();
+        if (rDataFile == null) {
+            return;
+        }
 
         System.out.println("->" + rDataFile.getAbsolutePath() + "<-");
 

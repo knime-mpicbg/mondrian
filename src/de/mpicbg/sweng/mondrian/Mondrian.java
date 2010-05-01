@@ -218,7 +218,7 @@ public class Mondrian implements SelectionListener, ProgressIndicator, DataListe
         setProgText(msg);
         getProgBar().setValue(selectionCount);
 
-        controller.getMonFrame().maintainOptionMenu();
+        controller.getMonFrame().updateMenusToSelection();
 
         controller.getMonFrame().saveSelectionAction.setEnabled(selectionCount > 0);
     }
@@ -228,7 +228,7 @@ public class Mondrian implements SelectionListener, ProgressIndicator, DataListe
 
         //System.out.println("MonFrame got the event !!!!"+id);
 
-        controller.getMonFrame().maintainOptionMenu();
+        controller.getMonFrame().updateMenusToSelection();
 
         System.out.println("Key Event in MonFrame");
 

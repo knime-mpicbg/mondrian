@@ -33,7 +33,7 @@ public class MFrame extends JFrame {
     //  static Color backgroundColor = new Color(223, 184, 96);
 
 
-    public MFrame(AppFrame parentFrame, Mondrian mondrian) {
+    public MFrame(final AppFrame parentFrame, final Mondrian mondrian) {
         refreshMenuBar(parentFrame);
 
         this.mondrian = mondrian;
@@ -50,8 +50,11 @@ public class MFrame extends JFrame {
 
             @Override
             public void windowActivated(WindowEvent windowEvent) {
+                parentFrame.getController().setCurrent(mondrian);
+
                 refreshMenuBar(MFrame.this.parentFrame);
             }
+
         });
 
     }
