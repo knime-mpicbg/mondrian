@@ -10,6 +10,7 @@ import de.mpicbg.sweng.mondrian.ui.ResizePlotTask;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -36,6 +37,14 @@ public class MDialog extends JDialog {
         this.parentFrame = parentFrame;
 
         this.getContentPane().setBackground(ColorManager.backgroundColor);
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                close();
+            }
+        });
+
     }
 
 
@@ -46,11 +55,6 @@ public class MDialog extends JDialog {
                 lblPlotComponentResized(DB, evt);
             }
         });
-    }
-
-
-    public void windowClosing(WindowEvent e) {
-        close();
     }
 
 
@@ -67,6 +71,7 @@ public class MDialog extends JDialog {
             parentFrame.closeAllMenuItem.setEnabled(false);
         if (!selString.equals(""))
             mondrian.updateSelection();
+
         this.setVisible(false);
         this.dispose();
     }

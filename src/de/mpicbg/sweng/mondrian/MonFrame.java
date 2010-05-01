@@ -24,25 +24,17 @@ import java.net.URL;
 
 public class MonFrame extends JFrame implements MRJQuitHandler {
 
-    MonController controller;
-
-    /**
-     * Remember # of open windows so we can quit when last one is closed
-     */
-    protected static int num_windows = 0;
+    private MonController controller;
 
     public boolean selseq = false;
     public boolean alphaHi = false;
 
-
     public JMenuBar menubar;
-    public JMenu plotMenu, windowMenu, helpMenu, deriveVarMenu, transformMenu;
+    public JMenu plotMenu, windowMenu, deriveVarMenu, transformMenu, helpMenu;
 
     public JMenuItem modelNavigatorButton;
     public JMenuItem closeDataSetMenuItem;
-
-
-    public JMenuItem closeAllMenuItem, colorsMenuItem, selectionMenuItem, me, transPlus, transMinus, transTimes, transDiv, transNeg, transInv, transLog, transExp;
+    public JMenuItem closeAllMenuItem, me;
     public JCheckBoxMenuItem selSeqCheckItem;
     public JCheckBoxMenuItem alphaOnHighlightCheckMenuItem;
     private JCheckBoxMenuItem orSelectionCheckMenuItem;
@@ -50,10 +42,10 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
 
     private ModelNavigator modelNavigator;
 
-    private int dCol = 1, dSel = 1;
-
     public SaveDataSetAction saveAction;
     public SaveDataSetAction saveSelectionAction;
+    public DeriveVariableAction deriveVarBySelAction;
+    public DeriveVariableAction deriveVarByColAction;
 
 
     public MonFrame() {
@@ -69,7 +61,6 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
         Font SF = new Font("SansSerif", Font.BOLD, 12);
         this.setFont(SF);
         this.setTitle("Mondrian");               // Create the window.
-        num_windows++;                           // Count it.
 
         menubar = new JMenuBar();         // Create a menubar.
 
@@ -90,7 +81,7 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
         //    file.add(p = new JMenuItem("Print Window",new JMenuShortcut(KeyEvent.VK_P)));
         JMenuItem q = new JMenuItem("Quit");
         if (((System.getProperty("os.name")).toLowerCase()).indexOf("mac") == -1) {
-            file.addSeparator();                     // Put a separator in the menu
+            file.addSeparator();
             file.add(q);
             q.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
@@ -107,10 +98,10 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
                 }
             });
         }
-        menubar.add(file);                         // Add to menubar.
+        menubar.add(file);
 
         plotMenu = new JMenu("Plot");
-        menubar.add(plotMenu);                         // Add to menubar.
+        menubar.add(plotMenu);
 
         transformMenu = TransformAction.createTrafoMenu(this);
 
@@ -131,12 +122,12 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
         sam.add(andSelectionCheckMenuItem = new JCheckBoxMenuItem("AND Selection"));
         andSelectionCheckMenuItem.setSelected(true);
 
-        options.addSeparator();                     // Put a separator in the menu
+        options.addSeparator();
         JMenuItem cc;
         options.add(cc = new JMenuItem("Clear all Colors"));
         cc.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, Event.ALT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
-        options.addSeparator();                     // Put a separator in the menu
+        options.addSeparator();
         options.add(selSeqCheckItem = new JCheckBoxMenuItem("Selection Sequences", selseq));
         selSeqCheckItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
@@ -144,31 +135,33 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
         options.add(cs = new JMenuItem("Clear Sequences"));
         cs.setAccelerator(KeyStroke.getKeyStroke(Event.BACK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
-        options.addSeparator();                     // Put a separator in the menu
+        options.addSeparator();
         options.add(alphaOnHighlightCheckMenuItem = new JCheckBoxMenuItem("Alpha on Highlight", alphaHi));
         alphaOnHighlightCheckMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
-        options.addSeparator();                     // Put a separator in the menu
+        options.addSeparator();
         JMenuItem vm;
         options.add(vm = new JMenuItem("Switch Variable Mode"));
         vm.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
         options.add(deriveVarMenu = new JMenu("Derive Variable from"));
-        deriveVarMenu.add(selectionMenuItem = new JMenuItem("Selection"));
-        selectionMenuItem.setEnabled(false);
-        deriveVarMenu.add(colorsMenuItem = new JMenuItem("Colors"));
-        colorsMenuItem.setEnabled(false);
+        deriveVarBySelAction = new DeriveVariableAction("Selection", controller, false);
+        deriveVarMenu.add(new JMenuItem(deriveVarBySelAction));
 
-        options.addSeparator();                     // Put a separator in the menu
+        deriveVarByColAction = new DeriveVariableAction("Colors", controller, true);
+        deriveVarMenu.add(new JMenuItem(deriveVarByColAction));
+
+
+        options.addSeparator();
         options.add(modelNavigatorButton = new JMenuItem("Model Navigator", KeyEvent.VK_J));
         modelNavigatorButton.setEnabled(false);
 
-        options.addSeparator();                     // Put a separator in the menu
+        options.addSeparator();
         JMenuItem pr;
         options.add(pr = new JMenuItem("Preferences ...", KeyEvent.VK_K));
         pr.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_COMMA, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
-        menubar.add(options);                      // Add to menubar.
+        menubar.add(options);
 
         windowMenu = menubar.add(new JMenu("Window"));
 
@@ -214,20 +207,7 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
                 switchSelection();
             }
         });
-        selectionMenuItem.addActionListener(new ActionListener() {     // Derive variable from selection (false) or color (true)
 
-
-            public void actionPerformed(ActionEvent e) {
-                deriveVariable(false);
-            }
-        });
-        colorsMenuItem.addActionListener(new ActionListener() {     // Derive variable from selection (false) or color (true)
-
-
-            public void actionPerformed(ActionEvent e) {
-                deriveVariable(true);
-            }
-        });
         orSelectionCheckMenuItem.addActionListener(new ActionListener() {     // Set extended selection mode AND (false) or OR (true)
 
 
@@ -456,28 +436,6 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
     }
 
 
-    public void deriveVariable(boolean color) {
-
-        String name;
-        DataSet data = controller.getCurrentDataSet();
-        if (color)
-            name = "Colors " + dCol++;
-        else
-            name = "Selection " + dSel++;
-        name = JOptionPane.showInputDialog(this, "Please name the new variable:", name);
-
-        double[] dData;
-        if (color) {
-            dData = new double[data.n];
-            for (int i = 0; i < data.n; i++)
-                dData[i] = (double) data.colorArray[i];
-        } else {
-            dData = data.getSelection();
-        }
-        data.addVariable(name, false, true, dData, new boolean[data.n]);
-    }
-
-
     public void showModeNavigator() {
         if (modelNavigator == null) {
             modelNavigator = new ModelNavigator();
@@ -557,17 +515,8 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
         closeDataSetMenuItem.setEnabled(true);
         saveAction.setEnabled(true);
 
-
-        // Selection
-        if (data.countSelection() == 0)
-            selectionMenuItem.setEnabled(false);
-        else
-            selectionMenuItem.setEnabled(true);
-        // Colors
-        if (data.colorBrush)
-            colorsMenuItem.setEnabled(true);
-        else
-            colorsMenuItem.setEnabled(false);
+        deriveVarBySelAction.setEnabled(data.countSelection() > 0);
+        deriveVarByColAction.setEnabled(data.colorBrush);
 
         boolean mode = DragBox.extSelMode;
         orSelectionCheckMenuItem.setSelected(mode);
