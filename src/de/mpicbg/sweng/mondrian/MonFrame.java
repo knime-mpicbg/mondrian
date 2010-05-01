@@ -17,14 +17,11 @@ import org.rosuda.REngine.Rserve.RserveException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 
 
 public class MonFrame extends JFrame implements MRJQuitHandler {
 
-    private MonController controller;
+    public MonController controller;
 
     public boolean selseq = false;
     public boolean alphaHi = false;
@@ -32,15 +29,12 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
     public JMenuBar menubar;
     public JMenu plotMenu, windowMenu, deriveVarMenu, transformMenu, helpMenu;
 
-    public JMenuItem modelNavigatorButton;
     public JMenuItem closeDataSetMenuItem;
     public JMenuItem closeAllMenuItem, me;
     public JCheckBoxMenuItem selSeqCheckItem;
     public JCheckBoxMenuItem alphaOnHighlightCheckMenuItem;
     private JCheckBoxMenuItem orSelectionCheckMenuItem;
     private JCheckBoxMenuItem andSelectionCheckMenuItem;
-
-    private ModelNavigator modelNavigator;
 
     public SaveDataSetAction saveAction;
     public SaveDataSetAction saveSelectionAction;
@@ -150,16 +144,12 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
 
         deriveVarByColAction = new DeriveVariableAction("Colors", controller, true);
         deriveVarMenu.add(new JMenuItem(deriveVarByColAction));
-
-
         options.addSeparator();
-        options.add(modelNavigatorButton = new JMenuItem("Model Navigator", KeyEvent.VK_J));
-        modelNavigatorButton.setEnabled(false);
 
+        options.add(new JMenuItem(new StartModelNavAction("Model Navigator", controller)));
         options.addSeparator();
-        JMenuItem pr;
-        options.add(pr = new JMenuItem("Preferences ...", KeyEvent.VK_K));
-        pr.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_COMMA, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
+        options.add(new JMenuItem(new PreferencesAction("Preferences ...", this)));
 
         menubar.add(options);
 
@@ -185,17 +175,12 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
         ih.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_HELP, Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         ih.setEnabled(false);
 
-        JMenuItem oh;
-        helpMenu.add(oh = new JMenuItem("Online Help"));
-        oh.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_HELP, Event.SHIFT_MASK | Event.ALT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        oh.setEnabled(true);
+        helpMenu.add(new JMenuItem(new GoToWebsiteAction("Online Help")));
 
         this.setJMenuBar(menubar);                 // Add it to the frame.
 
         Icon MondrianIcon = new ImageIcon(Utils.readGif("/Logo.gif"));
-
         JLabel MondrianLabel = new JLabel(MondrianIcon);
-
         JScrollPane scrollPane = new JScrollPane(MondrianLabel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         getContentPane().add("Center", scrollPane);
 
@@ -226,21 +211,21 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
 
 
             public void actionPerformed(ActionEvent e) {
-                selectAll();
+                controller.selectAll();
             }
         });
         ts.addActionListener(new ActionListener() {     // Toggle Selection via Menu
 
 
             public void actionPerformed(ActionEvent e) {
-                toggleSelection();
+                controller.toggleSelection();
             }
         });
         cc.addActionListener(new ActionListener() {     // Clear all Colors
 
 
             public void actionPerformed(ActionEvent e) {
-                clearColors();
+                controller.clearColors();
             }
         });
         alphaOnHighlightCheckMenuItem.addActionListener(new ActionListener() {     // Change the alpha mode for highlighted cases
@@ -250,20 +235,7 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
                 switchAlpha();
             }
         });
-        modelNavigatorButton.addActionListener(new ActionListener() {     // Open a new window for the model navigator
-
-
-            public void actionPerformed(ActionEvent e) {
-                showModeNavigator();
-            }
-        });
-        pr.addActionListener(new ActionListener() {     // Open the Preference Box
-
-
-            public void actionPerformed(ActionEvent e) {
-                preferenceFrame();
-            }
-        });
+        ;
         cs.addActionListener(new ActionListener() {     // Delete the current selection sequence
 
 
@@ -305,20 +277,6 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
 
             public void actionPerformed(ActionEvent e) {
                 Utils.showRefCard();
-            }
-        });
-        oh.addActionListener(new ActionListener() {     // Show Mondrian Webpage.
-
-
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    Desktop.getDesktop().browse(new URL("http://www.rosuda.org/Mondrian").toURI());
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                } catch (URISyntaxException e11) {
-                    e11.printStackTrace();
-                }
-
             }
         });
 
@@ -405,48 +363,10 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
     }
 
 
-    public void selectAll() {
-        if (controller.countInstances() > -1) {
-            controller.getCurrentDataSet().selectAll();
-            controller.getCurrent().updateSelection();
-        }
-    }
-
-
-    public void toggleSelection() {
-        if (controller.countInstances() > 0) {
-            controller.getCurrentDataSet().toggleSelection();
-            controller.getCurrent().updateSelection();
-        }
-    }
-
-
-    public void clearColors() {
-        if (controller.countInstances() > 0) {
-            controller.getCurrentDataSet().colorsOff();
-            controller.getCurrent().dataChanged(-1);
-        }
-    }
-
-
     public void setExtSelMode(boolean mode) {
         DragBox.extSelMode = mode;
         orSelectionCheckMenuItem.setSelected(mode);
         andSelectionCheckMenuItem.setSelected(!mode);
-    }
-
-
-    public void showModeNavigator() {
-        if (modelNavigator == null) {
-            modelNavigator = new ModelNavigator();
-        } else {
-            modelNavigator.show();
-        }
-    }
-
-
-    public void preferenceFrame() {
-        PreferencesFrame.showPrefsDialog(this);
     }
 
 

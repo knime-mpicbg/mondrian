@@ -131,4 +131,26 @@ public class MonController {
     }
 
 
+    public void clearColors() {
+        if (countInstances() > 0) {
+            getCurrentDataSet().colorsOff();
+            getCurrent().dataChanged(-1);
+        }
+    }
+
+
+    public void toggleSelection() {
+        if (countInstances() > 0) {
+            getCurrentDataSet().toggleSelection();
+            getCurrent().updateSelection();
+        }
+    }
+
+
+    public void selectAll() {
+        if (countInstances() > -1) {
+            getCurrentDataSet().selectAll();
+            getCurrent().updateSelection();
+        }
+    }
 }

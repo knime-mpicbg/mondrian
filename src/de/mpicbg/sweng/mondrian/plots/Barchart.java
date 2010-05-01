@@ -443,7 +443,7 @@ public class Barchart extends DragBox implements ActionListener {
                         brush.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, Event.ALT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
                         brush.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
-                                frame.parentFrame.clearColors();
+                                controller.clearColors();
                             }
 
 
