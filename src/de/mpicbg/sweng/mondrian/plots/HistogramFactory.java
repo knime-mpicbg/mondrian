@@ -31,30 +31,54 @@ public class HistogramFactory extends AbstractPlotFactory {
     public PlotPanel createPlotPanel(Mondrian mondrian, MFrame plotFrame, DataSet dataSet, JList varNames) {
 
         int[] indices = varNames.getSelectedIndices();
-        int weight = 0;
+        int weight = -1;
 
-        return createHistogram(plotFrame, dataSet, indices, weight);
+        return createHistogram(plotFrame, mondrian, dataSet, indices, weight);
     }
 
 
-    protected PlotPanel createHistogram(MFrame plotFrame, DataSet dataSet, int[] indices, int weight) {
-        PlotPanel plotPanel = new PlotPanel();
-        plotPanel.setLayout(new GridLayout(1, indices.length));
-
+    protected PlotPanel createHistogram(MFrame plotFrame, Mondrian mondrian, DataSet dataSet, int[] indices, int weight) {
+        int lastX = 310, oldX = 0;
+        int row = 0;
+        int menuOffset = 0, xOff = 0;
 
         for (int i = 0; i < indices.length; i++) {
+            final MFrame mFrame = new MFrame(plotFrame.parentFrame, mondrian);
 
-            int dummy = indices[i];
+            int dummy;
+            dummy = indices[i];
             double start = dataSet.getMin(dummy);
             double width = (dataSet.getMax(dummy) - dataSet.getMin(dummy)) / 8.9;
-
             Table discrete = dataSet.discretize(dataSet.setName, dummy, start, width, weight);
 
-            Histogram histogram = new Histogram(plotFrame, 250, 310, discrete, start, width, weight);
-            plotPanel.add(histogram);
+            mFrame.setSize(310, 250);
+            Histogram histogram = new Histogram(mFrame, 310, 250, discrete, start, width, weight);
+
+
+            if (lastX + mFrame.getWidth() > (Toolkit.getDefaultToolkit().getScreenSize()).width + 50) {       // new Row
+                row += 1;
+                lastX = oldX % 310;
+            }
+
+            if (250 * row > (Toolkit.getDefaultToolkit().getScreenSize()).height - 125) {                                    // new Page
+                row = 0;
+                lastX = 310 + xOff;
+                xOff += menuOffset;
+            }
+
+            mFrame.setLocation(lastX, xOff + 250 * row);
+            lastX += mFrame.getWidth();
+            oldX = lastX;
+
+            if (i == 0) {
+                menuOffset = mFrame.getY();
+                xOff = menuOffset;
+            }
+
+            makeVisible(mondrian, mFrame, histogram);
         }
 
-        return plotPanel;
+        return null;
     }
 
 

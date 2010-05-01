@@ -25,4 +25,10 @@ public interface PlotFactory {
      * in the menu.
      */
     boolean isCompliant(DataSet dataSet, int numVariables, int numCategoricalVariables);
+
+    /**
+     * Unles a factory creates several plot windows (like histogram or barchart) this method does NOT neeed to be
+     * invoked by the factory class.
+     */
+    void makeVisible(Mondrian mondrian, MFrame plotFrame, PlotPanel plotPanel);
 }

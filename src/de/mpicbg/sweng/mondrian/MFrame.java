@@ -9,6 +9,7 @@ import de.mpicbg.sweng.mondrian.ui.ResizePlotTask;
 import de.mpicbg.sweng.mondrian.util.Utils;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -35,6 +36,9 @@ public class MFrame extends JFrame {
 
     public MFrame(final AppFrame parentFrame, final Mondrian mondrian) {
         refreshMenuBar(parentFrame);
+
+        Font SF = new Font("SansSerif", Font.PLAIN, 11);
+        setFont(SF);
 
         this.mondrian = mondrian;
         this.parentFrame = parentFrame;

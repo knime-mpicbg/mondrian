@@ -67,8 +67,6 @@ public class Histogram extends DragBox implements ActionListener {
         this.height = height;
         this.weight = weight;
 
-        frame.getContentPane().add(this);
-
         border = 20;
         yShift = -10;
 

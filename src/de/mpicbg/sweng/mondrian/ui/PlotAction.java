@@ -4,11 +4,9 @@ import de.mpicbg.sweng.mondrian.AppFrame;
 import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.DataSet;
-import de.mpicbg.sweng.mondrian.core.DragBox;
 import de.mpicbg.sweng.mondrian.core.PlotFactory;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 
 
@@ -44,20 +42,11 @@ public class PlotAction extends AbstractAction {
         mondrian.getSelector().checkHistoryBuffer();
 
         MFrame plotFrame = new MFrame(appFrame, mondrian);
-        Font SF = new Font("SansSerif", Font.PLAIN, 11);
-        plotFrame.setFont(SF);
 
         PlotPanel plotPanel = plotFactory.createPlotPanel(mondrian, plotFrame, mondrian.getDataSet(), mondrian.getSelector().getVarNames());
 
-
         if (plotPanel != null) {
-            for (PlotPanel plot : plotPanel.getPlots()) {
-                mondrian.addPlot((DragBox) plot);
-            }
-            plotFrame.getContentPane().add(plotPanel);
-
-            plotFrame.setTitle(plotPanel.getName() != null ? plotPanel.getName() : plotFactory.getPlotName());
-            plotFrame.setVisible(true);
+            plotFactory.makeVisible(mondrian, plotFrame, plotPanel);
         }
     }
 

@@ -27,10 +27,16 @@ public class SaveDataSetAction extends AbstractAction {
 
     public SaveDataSetAction(String name, boolean saveSelection, MonController monController) {
         super(name);
+
         this.saveSelection = saveSelection;
         this.monController = monController;
 
-        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        if (name.contains("Selection")) {
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        } else {
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        }
+
         setEnabled(false);
     }
 

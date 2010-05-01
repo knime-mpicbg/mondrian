@@ -34,10 +34,10 @@ public class WeightedHistogramFactory extends HistogramFactory {
 
             //      System.out.println(passed[0]+", "+weight);
 
-            return super.createHistogram(plotFrame, dataSet, passed, weight);
+            return super.createHistogram(plotFrame, mondrian, dataSet, passed, weight);
 
         } else {
-            return super.createHistogram(plotFrame, dataSet, vars, vars[0]);
+            return super.createHistogram(plotFrame, mondrian, dataSet, vars, vars[0]);
         }
     }
 }
