@@ -6,6 +6,7 @@ import com.apple.mrj.MRJQuitHandler;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.core.DragBox;
 import de.mpicbg.sweng.mondrian.core.PlotFactory;
+import de.mpicbg.sweng.mondrian.plots.*;
 import de.mpicbg.sweng.mondrian.ui.*;
 import de.mpicbg.sweng.mondrian.ui.transform.TransformAction;
 import de.mpicbg.sweng.mondrian.util.Utils;
@@ -37,9 +38,6 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
     public JMenuBar menubar;
     public JMenu plotMenu, windowMenu, helpMenu, deriveVarMenu, transformMenu;
 
-    public JMenuItem saveMenuItem;
-    public JMenuItem saveSelectionMenuItem;
-
     public JMenuItem modelNavigatorButton;
     public JMenuItem closeDataSetMenuItem;
 
@@ -55,11 +53,12 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
     private int dCol = 1, dSel = 1;
 
     public SaveDataSetAction saveAction;
-    public SaveDataSetAction saveDataSetAction;
+    public SaveDataSetAction saveSelectionAction;
 
 
     public MonFrame() {
 
+        controller = new MonController(this);
 
         Toolkit.getDefaultToolkit().setDynamicLayout(false);
         MRJApplicationUtils.registerQuitHandler(this);
@@ -83,8 +82,8 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
         saveAction = new SaveDataSetAction("Save", false, controller);
         file.add(new JMenuItem(saveAction));
 
-        saveDataSetAction = new SaveDataSetAction("Save Selection", true, controller);
-        file.add(new JMenuItem(saveDataSetAction));
+        saveSelectionAction = new SaveDataSetAction("Save Selection", true, controller);
+        file.add(new JMenuItem(saveSelectionAction));
 
         file.add(closeDataSetMenuItem = new JMenuItem(new CloseDataSetAction(controller)));
 
@@ -127,7 +126,7 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
         ts.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
         JMenu sam = new JMenu("<SHIFT><ALT> is");
-        options.add(sam = new JMenu("<SHIFT><ALT> is"));
+        options.add(sam);
         sam.add(orSelectionCheckMenuItem = new JCheckBoxMenuItem("OR Selection"));
         sam.add(andSelectionCheckMenuItem = new JCheckBoxMenuItem("AND Selection"));
         andSelectionCheckMenuItem.setSelected(true);
@@ -365,6 +364,41 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
         Graphics g = this.getGraphics();
         g.setFont(new Font("SansSerif", 0, 11));
         g.drawString("v1.1", 260, 285);
+
+        registerCommonPlots();
+    }
+
+
+    private void registerCommonPlots() {
+        registerPlotFactory(new MissPlotFactory());
+        plotMenu.add(new JSeparator());
+
+        registerPlotFactory(new BarchartFactory());
+        registerPlotFactory(new WeightedBarCharFactory());
+        plotMenu.add(new JSeparator());
+
+        registerPlotFactory(new HistogramFactory());
+        registerPlotFactory(new WeightedHistogramFactory());
+        plotMenu.add(new JSeparator());
+
+        registerPlotFactory(new ScatterplotFactory());
+        registerPlotFactory(new SplomFactory());
+        plotMenu.add(new JSeparator());
+
+
+        registerPlotFactory(new MosaicPlotFactory());
+        registerPlotFactory(new WeightedMosaicPlotFactory());
+        plotMenu.add(new JSeparator());
+
+        registerPlotFactory(new BoxplotByXYFactory());
+        registerPlotFactory(new ParallelBoxplotFactory());
+        registerPlotFactory(new ParallelPlotFactory());
+        plotMenu.add(new JSeparator());
+
+        registerPlotFactory(new TwoDimMDSFactory());
+        registerPlotFactory(new MapPlotFactory());
+        registerPlotFactory(new PCAPlotFactory());
+
     }
 
 
@@ -445,10 +479,11 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
 
 
     public void showModeNavigator() {
-        if (modelNavigator == null)
+        if (modelNavigator == null) {
             modelNavigator = new ModelNavigator();
-        else
+        } else {
             modelNavigator.show();
+        }
     }
 
 
@@ -520,7 +555,7 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
         DataSet data = controller.getCurrentDataSet();
 
         closeDataSetMenuItem.setEnabled(true);
-        saveMenuItem.setEnabled(true);
+        saveAction.setEnabled(true);
 
 
         // Selection

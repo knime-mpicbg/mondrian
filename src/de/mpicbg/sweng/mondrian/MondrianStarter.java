@@ -3,9 +3,7 @@ package de.mpicbg.sweng.mondrian;
 import com.apple.mrj.MRJApplicationUtils;
 import com.apple.mrj.MRJOpenDocumentHandler;
 import de.mpicbg.sweng.mondrian.io.DataFrameConverter;
-import de.mpicbg.sweng.mondrian.plots.*;
 
-import javax.swing.*;
 import java.io.File;
 import java.util.Vector;
 
@@ -25,35 +23,6 @@ public class MondrianStarter implements MRJOpenDocumentHandler {
 
         MonFrame monFrame = new MonFrame();
 
-        monFrame.registerPlotFactory(new MissPlotFactory());
-        monFrame.plotMenu.add(new JSeparator());
-
-        monFrame.registerPlotFactory(new BarchartFactory());
-        monFrame.registerPlotFactory(new WeightedBarCharFactory());
-        monFrame.plotMenu.add(new JSeparator());
-
-        monFrame.registerPlotFactory(new HistogramFactory());
-        monFrame.registerPlotFactory(new WeightedHistogramFactory());
-        monFrame.plotMenu.add(new JSeparator());
-
-        monFrame.registerPlotFactory(new ScatterplotFactory());
-        monFrame.registerPlotFactory(new SplomFactory());
-        monFrame.plotMenu.add(new JSeparator());
-
-
-        monFrame.registerPlotFactory(new MosaicPlotFactory());
-        monFrame.registerPlotFactory(new WeightedMosaicPlotFactory());
-        monFrame.plotMenu.add(new JSeparator());
-
-        monFrame.registerPlotFactory(new BoxplotByXYFactory());
-        monFrame.registerPlotFactory(new ParallelBoxplotFactory());
-        monFrame.registerPlotFactory(new ParallelPlotFactory());
-        monFrame.plotMenu.add(new JSeparator());
-
-        monFrame.registerPlotFactory(new TwoDimMDSFactory());
-        monFrame.registerPlotFactory(new MapPlotFactory());
-        monFrame.registerPlotFactory(new PCAPlotFactory());
-
 
         MRJApplicationUtils.registerOpenDocumentHandler(this);
 
@@ -64,7 +33,7 @@ public class MondrianStarter implements MRJOpenDocumentHandler {
                 if (dataFile.getName().endsWith(".RData")) {
                     new DataFrameConverter(monFrame).loadDataFrame(dataFile);
                 } else {
-                    monFrame.getController().loadDataSet(dataFile, "");
+                    monFrame.getController().loadDataSet(dataFile, dataFile.getName());
                 }
             }
         }

@@ -34,8 +34,6 @@ public class Mondrian implements SelectionListener, ProgressIndicator, DataListe
         // create the dialog
 
         dialog = new MondrianDialog(controller.getMonFrame(), this);
-        dialog.setSize(300, 400);
-        dialog.setVisible(true);
     }
 
 
@@ -45,6 +43,11 @@ public class Mondrian implements SelectionListener, ProgressIndicator, DataListe
         plot.addDataListener(this);
         plot.addSelectionListener(this);
 
+    }
+
+
+    public MondrianDialog getDialog() {
+        return dialog;
     }
 
 
@@ -212,7 +215,7 @@ public class Mondrian implements SelectionListener, ProgressIndicator, DataListe
 
         controller.getMonFrame().maintainOptionMenu();
 
-        controller.getMonFrame().saveSelectionMenuItem.setEnabled(selectionCount > 0);
+        controller.getMonFrame().saveSelectionAction.setEnabled(selectionCount > 0);
     }
 
 

@@ -36,7 +36,6 @@ public class MondrianDialog extends MDialog {
 
         // Add the status/progress bar
         JPanel progPanel = new JPanel();
-        progPanel.add("North", progText);
         progBar = new JProgressBar();
         progBar.setMinimum(0);
         progBar.setMaximum(1);
@@ -46,12 +45,15 @@ public class MondrianDialog extends MDialog {
                 paintAll(MondrianDialog.this.getGraphics());
             }
         });
-        progPanel.add(progBar, BorderLayout.CENTER);
+        progPanel.add(progBar, BorderLayout.EAST);
 
         progText = new JLabel();
         progPanel.add(progText, BorderLayout.WEST);
 
         content.add(progPanel, BorderLayout.CENTER);
+
+        setTitle(mondrian.getDataSet().setName);
+        setSize(300, 400);
 
         updateSelectionInfo();
     }

@@ -20,13 +20,6 @@ public class ColorManager {
     public static Color lineColor = Color.black;
 
 
-    static {
-        setScheme(0);
-
-        initialize();
-    }
-
-
     public static String[] defaultColSchemes = {
             "Classic", "#ffff99", "#c0c0c0", "#000000", "#ff0000",
             "Fancy", "#ffff99", "#c0c0c0", "#000000", "#00ff00",
@@ -35,6 +28,13 @@ public class ColorManager {
             "Daltonian", "#009999", "#c0c0c0", "#000000", "#ff7400",
             null
     };
+
+
+    static {
+        setScheme(0);
+
+        initialize();
+    }
 
 
     public static void initialize() {

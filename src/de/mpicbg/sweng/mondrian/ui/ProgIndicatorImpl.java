@@ -17,7 +17,7 @@ public class ProgIndicatorImpl extends JDialog implements ProgressIndicator {
 
 
     public ProgIndicatorImpl() {
-        setSize(300, 300);
+        setSize(200, 30);
 
         setLayout(new BorderLayout());
 
@@ -25,7 +25,8 @@ public class ProgIndicatorImpl extends JDialog implements ProgressIndicator {
         progBar.setMaximum(100);
         add(progBar, BorderLayout.CENTER);
 
-        setModal(true);
+        setLocationRelativeTo(null);
+
         setVisible(true);
     }
 
@@ -35,10 +36,13 @@ public class ProgIndicatorImpl extends JDialog implements ProgressIndicator {
 
 
     public JProgressBar getProgBar() {
-        return null;
+        return progBar;
     }
 
 
     public void setProgText(String msg) {
+        setTitle(msg);
+//        progBar.setString(msg);
+//        progBar.setStringPainted(true);
     }
 }

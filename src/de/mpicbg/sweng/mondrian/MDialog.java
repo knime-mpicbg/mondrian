@@ -36,7 +36,7 @@ public class MDialog extends JDialog implements WindowListener {
         this.mondrian = mondrian;
         this.parentFrame = parentFrame;
 
-        this.setBackground(ColorManager.backgroundColor);
+        this.getContentPane().setBackground(ColorManager.backgroundColor);
         addWindowListener(this);
     }
 
@@ -85,14 +85,20 @@ public class MDialog extends JDialog implements WindowListener {
         m = new JMenuItem(getTitle());
         parentFrame.closeAllMenuItem.setEnabled(true);
 
-        for (int i = 2; i < parentFrame.windowMenu.getItemCount(); i++)
-            if (((parentFrame.windowMenu.getItem(i)).getText()).substring(0, 2).equals((m.getText()).substring(0, 2)))
+        for (int i = 2; i < parentFrame.windowMenu.getItemCount(); i++) {
+            String entryName = (parentFrame.windowMenu.getItem(i)).getText();
+            if (entryName.length() < 3) {
+                continue;
+            }
+
+            if (entryName.substring(0, 2).equals((m.getText()).substring(0, 2))) {
                 same = true;
-            else if (same) {
+            } else if (same) {
                 parentFrame.windowMenu.insert(m, i);
                 added = true;
                 same = false;
             }
+        }
 
         if (!added) {
             parentFrame.windowMenu.add(m);

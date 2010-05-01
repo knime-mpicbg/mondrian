@@ -34,12 +34,12 @@ public class VariableSelector extends JPanel {
     private String searchText = "";
     private long startT = 0;
     private Vector<Integer> setIndices = new Vector<Integer>(10, 0);
-    private DataSet datSet;
+    private DataSet dataSet;
 
 
-    public VariableSelector(DataSet datSet) {
-        this.datSet = datSet;
-        selectBuffer = new int[datSet.k + 15];
+    public VariableSelector(DataSet dataSet) {
+        this.dataSet = dataSet;
+        selectBuffer = new int[dataSet.k + 15];
 
         rebuild();
     }
@@ -53,7 +53,7 @@ public class VariableSelector extends JPanel {
     public void switchVariableMode() {
         for (int i = 0; i < varNames.getSelectedIndices().length; i++) {
             int index = (varNames.getSelectedIndices())[i];
-            DataSet data = datSet;
+            DataSet data = dataSet;
             if (!data.alpha(index)) {
                 if (data.categorical(index))
                     data.catToNum(index);
@@ -102,10 +102,9 @@ public class VariableSelector extends JPanel {
 
 
     private void rebuild() {
-        final DataSet data = monFrame.getController().getCurrentDataSet();
-        String listNames[] = new String[data.k];
-        for (int j = 0; j < data.k; j++) {
-            listNames[j] = " " + data.getName(j);
+        String listNames[] = new String[dataSet.k];
+        for (int j = 0; j < dataSet.k; j++) {
+            listNames[j] = " " + dataSet.getName(j);
             //      System.out.println("Adding:"+listNames[j]);
         }
 
@@ -127,11 +126,11 @@ public class VariableSelector extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     int index = varNames.locationToIndex(e.getPoint());
-                    if (!data.alpha(index)) {
-                        if (data.categorical(index))
-                            data.catToNum(index);
+                    if (!dataSet.alpha(index)) {
+                        if (dataSet.categorical(index))
+                            dataSet.catToNum(index);
                         else
-                            data.numToCat(index);
+                            dataSet.numToCat(index);
                         rebuild();
                         monFrame.maintainPlotMenu();
                     }
@@ -147,14 +146,14 @@ public class VariableSelector extends JPanel {
                     }
                     for (int j = Math.abs(diff); j >= 0; j--) {
                         if (varNames.isSelectedIndex(index) && index != selectBuffer[0]) {
-                            for (int i = data.k - 1; i > 0; i--)
+                            for (int i = dataSet.k - 1; i > 0; i--)
                                 selectBuffer[i] = selectBuffer[i - 1];
                             selectBuffer[0] = index + (j * (diff < 0 ? -1 : 1));
                         }
                         if (!varNames.isSelectedIndex(index)) {              // Deselection, remove elements from Buffer
-                            for (int i = 0; i < data.k; i++)
+                            for (int i = 0; i < dataSet.k; i++)
                                 if (selectBuffer[i] == index) {
-                                    System.arraycopy(selectBuffer, i + 1, selectBuffer, i, data.k - 1 - i);
+                                    System.arraycopy(selectBuffer, i + 1, selectBuffer, i, dataSet.k - 1 - i);
                                 }
                         }
                         System.out.println(" History: " + selectBuffer[0] + " " + selectBuffer[1] + " " + selectBuffer[2] + " " + selectBuffer[3] + " " + selectBuffer[4]);
@@ -186,8 +185,8 @@ public class VariableSelector extends JPanel {
                     startT = new Date().getTime();
                     //         System.out.println("Search Text: "+searchText+" Position: "+(scrollPane.getVerticalScrollBar()).getValue());
                     if (!searchText.equals(""))
-                        for (int i = 0; i < data.k; i++) {
-                            String tmp = data.getName(i);
+                        for (int i = 0; i < dataSet.k; i++) {
+                            String tmp = dataSet.getName(i);
                             if ((tmp.toUpperCase()).startsWith((searchText.toUpperCase())))
                                 setIndices.addElement(i);
                         }
@@ -203,7 +202,7 @@ public class VariableSelector extends JPanel {
             }
         });
 
-        varNames.setCellRenderer(new AttributeCellRenderer(datSet));
+        varNames.setCellRenderer(new AttributeCellRenderer(this.dataSet));
 
         RepaintManager currentManager = RepaintManager.currentManager(varNames);
         currentManager.setDoubleBufferingEnabled(true);

@@ -20,6 +20,7 @@ public class MonController {
 
     MonFrame monFrame;
 
+    private Mondrian current;
 
     List<Mondrian> mondrians = new ArrayList<Mondrian>();
 
@@ -35,7 +36,7 @@ public class MonController {
 
 
     public Mondrian getCurrent() {
-        return null;
+        return current;
     }
 
 
@@ -57,7 +58,15 @@ public class MonController {
 
     public void addAndActiviate(Mondrian mondrian) {
         mondrians.add(mondrian);
+        setCurrent(mondrian);
+
         monFrame.maintainOptionMenu();
+
+    }
+
+
+    private void setCurrent(Mondrian mondrian) {
+        current = mondrian;
     }
 
 
@@ -74,9 +83,8 @@ public class MonController {
             }
 
             Mondrian mondrian = new Mondrian(dataSet, this);
-
             addAndActiviate(mondrian);
-
+            mondrian.getDialog().setVisible(true);
         }
     }
 
@@ -87,11 +95,15 @@ public class MonController {
 
 
     public void closeAll() {
-        String message = "Are you sure that you would like to close all current data-sets";
+        if (countInstances() > 0) {
+            String message = "Are you sure that you would like to close all current data-sets";
 
-        int answer = JOptionPane.showConfirmDialog(monFrame, message);
-        if (answer == JOptionPane.YES_OPTION) {
-            closeAll();
+            int answer = JOptionPane.showConfirmDialog(monFrame, message);
+            if (answer == JOptionPane.YES_OPTION) {
+                System.exit(0);
+            }
+        } else {
+            System.exit(0);
         }
     }
 
