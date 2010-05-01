@@ -1,6 +1,7 @@
 package de.mpicbg.sweng.mondrian.io.db;
 
 import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.util.Utils;
 
@@ -211,7 +212,8 @@ public class DBDatasetLoader {
                 public void actionPerformed(ActionEvent e) {
                     DataSet data = new DataSet(con, DBList.getSelectedItem(), tableList.getSelectedItem());
                     dbLoadDialog.dispose();
-                    monFrame.setDataSet(data);
+
+                    monFrame.getController().addAndActiviate(new Mondrian(data, monFrame.getController()));
                 }
             });
         }

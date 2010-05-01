@@ -1,6 +1,7 @@
 package de.mpicbg.sweng.mondrian.ui.transform;
 
 import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 
 import javax.swing.*;
@@ -40,7 +41,9 @@ public class TransformAction extends AbstractAction {
 
 
     public void transform(int mode) {
-        monFrame.checkHistoryBuffer();
+        Mondrian mondrian = monFrame.getController().getCurrent();
+
+        mondrian.getSelector().checkHistoryBuffer();
 
         System.out.println("Transform: " + mode);
         String name = "";
@@ -48,7 +51,7 @@ public class TransformAction extends AbstractAction {
 
         double[] tData = new double[data.n];
         boolean[] tMiss = new boolean[data.n];
-        int[] selectBuffer = monFrame.selectBuffer;
+        int[] selectBuffer = mondrian.getSelector().selectBuffer;
         String name1 = data.getName(selectBuffer[1]);
         String name2 = data.getName(selectBuffer[0]);
         switch (mode) {
@@ -126,13 +129,12 @@ public class TransformAction extends AbstractAction {
             if (tMiss[i])
                 tData[i] = Double.MAX_VALUE;
         boolean what;
-        if (mode < 5)
+        if (mode < 5) {
             what = data.categorical(selectBuffer[0]) && data.categorical(selectBuffer[1]);
-        else
+        } else {
             what = data.categorical(selectBuffer[0]);
+        }
         data.addVariable(name, false, what, tData, tMiss);
-        monFrame.varNames = null;
-        monFrame.setVarList();
     }
 
 

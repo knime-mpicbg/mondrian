@@ -40,16 +40,14 @@ public class PlotAction extends AbstractAction {
 
 
     public void actionPerformed(ActionEvent e) {
-        // this was done for each plot in the originial version; why is not clear yet
-        monFrame.checkHistoryBuffer();
-
         Mondrian mondrian = monFrame.getController().getCurrent();
+        mondrian.getSelector().checkHistoryBuffer();
 
         MDialog plotFrame = new MDialog(monFrame, mondrian);
         Font SF = new Font("SansSerif", Font.PLAIN, 11);
         plotFrame.setFont(SF);
 
-        PlotPanel plotPanel = plotFactory.createPlotPanel(monFrame, plotFrame, mondrian.getDataSet(), mondrian.getSelector().getVarNames());
+        PlotPanel plotPanel = plotFactory.createPlotPanel(mondrian, plotFrame, mondrian.getDataSet(), mondrian.getSelector().getVarNames());
 
 
         if (plotPanel != null) {

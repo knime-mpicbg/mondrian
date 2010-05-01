@@ -1,10 +1,11 @@
 package de.mpicbg.sweng.mondrian;
 
 import de.mpicbg.sweng.mondrian.core.DataSet;
+import de.mpicbg.sweng.mondrian.core.DragBox;
 import de.mpicbg.sweng.mondrian.io.AsciiFileLoader;
 import de.mpicbg.sweng.mondrian.ui.ProgIndicatorImpl;
-import de.mpicbg.sweng.mondrian.util.StatUtil;
 
+import javax.swing.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,22 +57,22 @@ public class MonController {
 
     public void addAndActiviate(Mondrian mondrian) {
         mondrians.add(mondrian);
-
-        monFrame.closeDataSetMenuItem.setEnabled(true);
-        monFrame.saveMenuItem.setEnabled(true);
         monFrame.maintainOptionMenu();
-
-        // todo make the new mondrian the current one
     }
 
 
-    public void loadDataSet(File file, String dataFrameName) {
+    public void loadDataSet(File file, String dsName) {
 
         ProgIndicatorImpl progIndicator = new ProgIndicatorImpl();
         DataSet dataSet = new AsciiFileLoader(progIndicator, getMonFrame()).loadAsciiFile(file);
+
         progIndicator.dispose();
 
         if (dataSet != null) {
+            if (dsName != null) {
+                dataSet.setName = dsName;
+            }
+
             Mondrian mondrian = new Mondrian(dataSet, this);
 
             addAndActiviate(mondrian);
@@ -80,29 +81,40 @@ public class MonController {
     }
 
 
+    public int countInstances() {
+        return mondrians.size();
+    }
+
+
+    public void closeAll() {
+        String message = "Are you sure that you would like to close all current data-sets";
+
+        int answer = JOptionPane.showConfirmDialog(monFrame, message);
+        if (answer == JOptionPane.YES_OPTION) {
+            closeAll();
+        }
+    }
+
+
     /**
-     * adds a dataset and makes is current.
-     *
-     * @param data     dataset to use
-     * @param monFrame
+     * Close an instance.  If this is the last open window, just quit.
      */
-    public void initWithData(DataSet data, MonFrame monFrame) {
-        Mondrian mondrian = new Mondrian(data, this);
-        addAndActiviate(mondrian);
+    void close(Mondrian mondrian) {
 
-        monFrame.dataSetCounter = dataSets.size() - 1;
-        monFrame.setVarList();
-        monFrame.setTitle("Mondrian(" + getCurrentDataSet().setName + ")");               //
-        monFrame.me.setText(monFrame.getTitle());
-        monFrame.closeDataSetMenuItem.setEnabled(true);
-        monFrame.saveMenuItem.setEnabled(true);
+        String message = "Close dataset \"" + getCurrentDataSet().setName + "\" and\n all corresponding plots?";
 
-        int nom = getCurrentDataSet().countSelection();
-        int denom = getCurrentDataSet().n;
-        String Display = nom + "/" + denom + " (" + StatUtil.roundToString(100 * nom / denom, 2) + "%)";
-        progText.setText(Display);
-        progBar.setValue(nom);
+        int answer = JOptionPane.showConfirmDialog(monFrame, message);
+        if (answer == JOptionPane.YES_OPTION) {
+            mondrian.close();
+        }
+    }
 
-        monFrame.maintainOptionMenu();
+
+    public void redrawAll() {
+        for (Mondrian mondrian : mondrians) {
+            for (DragBox dragBox : mondrian.getPlots()) {
+                dragBox.frame.repaint();
+            }
+        }
     }
 }

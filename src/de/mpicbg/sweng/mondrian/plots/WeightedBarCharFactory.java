@@ -1,11 +1,12 @@
 package de.mpicbg.sweng.mondrian.plots;
 
 import de.mpicbg.sweng.mondrian.MDialog;
-import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.core.Table;
 import de.mpicbg.sweng.mondrian.ui.PlotPanel;
+import de.mpicbg.sweng.mondrian.util.WeightCaclulator;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,15 +30,14 @@ public class WeightedBarCharFactory extends AbstractPlotFactory {
     }
 
 
-    public PlotPanel createPlotPanel(MonFrame monFrame, MDialog plotDialog, DataSet dataSet, JList varNames) {
+    public PlotPanel createPlotPanel(Mondrian mondrian, MDialog plotDialog, DataSet dataSet, JList varNames) {
         int[] indices = varNames.getSelectedIndices();
 
 
         PlotPanel barChartsContainer = new PlotPanel();
         plotDialog.setLayout(new GridLayout(1, indices.length));
 
-
-        int[] vars = monFrame.getWeightVariable(varNames.getSelectedIndices(), dataSet);
+        int[] vars = WeightCaclulator.getWeightVariable(varNames.getSelectedIndices(), dataSet, mondrian.calcNumCategoricalVars(), mondrian.determineWeightIndex(), null, varNames);
         int[] passed = new int[vars.length - 1];
         System.arraycopy(vars, 0, passed, 0, vars.length - 1);
 

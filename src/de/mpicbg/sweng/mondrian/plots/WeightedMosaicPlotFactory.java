@@ -1,11 +1,12 @@
 package de.mpicbg.sweng.mondrian.plots;
 
 import de.mpicbg.sweng.mondrian.MDialog;
-import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.core.Table;
 import de.mpicbg.sweng.mondrian.ui.PlotPanel;
+import de.mpicbg.sweng.mondrian.util.WeightCaclulator;
 
 import javax.swing.*;
 
@@ -27,14 +28,13 @@ public class WeightedMosaicPlotFactory extends AbstractPlotFactory {
     }
 
 
-    public PlotPanel createPlotPanel(MonFrame monFrame, MDialog plotDialog, DataSet dataSet, JList varNames) {
+    public PlotPanel createPlotPanel(Mondrian mondrian, MDialog plotDialog, DataSet dataSet, JList varNames) {
         int k = (varNames.getSelectedIndices()).length;
         int[] passBuffer = new int[k];
         for (int i = 0; i < k; i++)
-            passBuffer[i] = monFrame.selectBuffer[k - i - 1];
+            passBuffer[i] = mondrian.getSelector().selectBuffer[k - i - 1];
 
-        //    int[] vars = getWeightVariable(varNames.getSelectedIndices(), data);
-        int[] vars = monFrame.getWeightVariable(passBuffer, dataSet);
+        int[] vars = WeightCaclulator.getWeightVariable(passBuffer, dataSet, mondrian.calcNumCategoricalVars(), mondrian.determineWeightIndex(), null, varNames);
         int[] passed = new int[vars.length - 1];
         System.arraycopy(vars, 0, passed, 0, vars.length - 1);
         int weight = vars[vars.length - 1];

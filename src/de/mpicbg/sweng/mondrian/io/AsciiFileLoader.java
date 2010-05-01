@@ -84,7 +84,7 @@ public class AsciiFileLoader {
         progressIndicator.getProgBar().setMaximum(data.n);
 
         //todo do we need this
-//        mondrian.selectBuffer = new int[data.k + 15];
+//        mondrian.getSelector().selectBuffer = new int[data.k + 15];
 
         if (mapFile != null)
             if (!mapFile.equals(""))

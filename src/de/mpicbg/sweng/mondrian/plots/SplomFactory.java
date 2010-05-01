@@ -1,7 +1,7 @@
 package de.mpicbg.sweng.mondrian.plots;
 
 import de.mpicbg.sweng.mondrian.MDialog;
-import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.ui.ColorManager;
@@ -28,7 +28,7 @@ public class SplomFactory extends AbstractPlotFactory {
     }
 
 
-    public PlotPanel createPlotPanel(MonFrame monFrame, MDialog plotDialog, DataSet dataSet, JList varNames) {
+    public PlotPanel createPlotPanel(Mondrian mondrian, MDialog plotDialog, DataSet dataSet, JList varNames) {
         int numVars = (varNames.getSelectedIndices()).length;
 
         PlotPanel splomPanel = new PlotPanel();
@@ -46,8 +46,8 @@ public class SplomFactory extends AbstractPlotFactory {
                     int[] tmpVars = new int[2];
                     //          tmpVars[0] = varNames.getSelectedIndices()[j];
                     //          tmpVars[1] = varNames.getSelectedIndices()[i];
-                    tmpVars[0] = monFrame.selectBuffer[numVars - j - 1];
-                    tmpVars[1] = monFrame.selectBuffer[numVars - i - 1];
+                    tmpVars[0] = mondrian.getSelector().selectBuffer[numVars - j - 1];
+                    tmpVars[1] = mondrian.getSelector().selectBuffer[numVars - i - 1];
                     //
                     Scatter2DPlot scat = new Scatter2DPlot(plotDialog, 200, 200, dataSet, tmpVars, varNames, true);
                     splomPanel.add(scat);

@@ -36,12 +36,12 @@ public class SaveDataSetAction extends AbstractAction {
 
 
     public void actionPerformed(ActionEvent actionEvent) {
-        Save(saveSelection);
+        save(saveSelection);
     }
 
 
-    public void Save(boolean selection) {
-        monController.getMonFrame().checkHistoryBuffer();
+    public void save(boolean selection) {
+        monController.getCurrent().getSelector().checkHistoryBuffer();
 
         FileDialog f;
         if (selection)

@@ -80,13 +80,6 @@ public class MDialog extends JDialog implements WindowListener {
     }
 
 
-    public void maintainMenu(boolean preserve) {
-        if (!preserve)
-            selString = "";
-        m.setText(getTitle() + selString);
-    }
-
-
     public void show() {
 
         m = new JMenuItem(getTitle());

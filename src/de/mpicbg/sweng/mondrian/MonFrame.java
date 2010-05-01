@@ -19,7 +19,6 @@ import java.awt.event.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Vector;
 
 
 public class MonFrame extends JFrame implements MRJQuitHandler {
@@ -34,8 +33,6 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
     public boolean selseq = false;
     public boolean alphaHi = false;
 
-    private int numCategorical = 0;
-    private int weightIndex = 0;
 
     public JMenuBar menubar;
     public JMenu plotMenu, windowMenu, helpMenu, deriveVarMenu, transformMenu;
@@ -56,7 +53,7 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
     private ModelNavigator modelNavigator;
 
     private int dCol = 1, dSel = 1;
-    public boolean mondrianRunning = false;
+
     public SaveDataSetAction saveAction;
     public SaveDataSetAction saveDataSetAction;
 
@@ -292,28 +289,29 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
 
 
             public void actionPerformed(ActionEvent e) {
-                deleteSelection();
+                // todo reenable this
+//                deleteSelection();
             }
         });
         vm.addActionListener(new ActionListener() {     // Delete the current selection sequence
 
 
             public void actionPerformed(ActionEvent e) {
-                switchVariableMode();
+                controller.getCurrent().getSelector().switchVariableMode();
             }
         });
         closeAllMenuItem.addActionListener(new ActionListener() {     // Close all Windows
 
 
             public void actionPerformed(ActionEvent e) {
-                closeAll();
+                controller.closeAll();
             }
         });
         closeDataSetMenuItem.addActionListener(new ActionListener() {     // Close this window.
 
 
             public void actionPerformed(ActionEvent e) {
-                close();
+                controller.close(controller.getCurrent());
             }
         });
         me.addActionListener(new ActionListener() {   // Show main window
@@ -349,7 +347,7 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                close();
+                controller.closeAll();
             }
         });
 
@@ -367,39 +365,6 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
         Graphics g = this.getGraphics();
         g.setFont(new Font("SansSerif", 0, 11));
         g.drawString("v1.1", 260, 285);
-
-        mondrianRunning = true;
-
-        if (!RService.hasR()) {
-            //      JOptionPane.showMessageDialog(this, "Connection to R failed:\nSome functions might be missing!\n\nPlease check installation of R and  Rserve\nor try starting Rserve manually ...","Rserve Error",JOptionPane.WARNING_MESSAGE);
-            g.setColor(Color.white);
-            g.fillRect(9, 275, 220, 14);
-            g.setColor(Color.gray);
-            g.drawString("Connection to R failed: Please check Rserve", 9, 285);
-        }
-
-
-        new OpenDataSetAction(controller).actionPerformed();
-        if (load)
-            if (loadDB)
-                loadDataSet(true, null, "");
-            else {
-                //        System.out.println(".......... CALL loadDataSet() FROM MonFrame .........");
-                loadDataSet(false, loadFile, "");
-            }
-    }
-
-
-    /**
-     * this constructor is useful to create a Mondrian instance with a pre-loaded dataset. It will initialize Mondrians
-     * and dataSets if necessary, otherwise the dataset will be added to the existing static list.
-     *
-     * @param data dataset to open
-     */
-    public MonFrame(DataSet data) {
-        this((monFrames == null) ? new Vector<MonFrame>(5, 5) : monFrames, (MonController.dataSets == null) ? new Vector<DataSet>(5, 5) : MonController.dataSets, false, false, null);
-
-        controller.initWithData(data, this);
     }
 
 
@@ -408,49 +373,8 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
     }
 
 
-    /**
-     * Close a window.  If this is the last open window, just quit.
-     */
-    void close() {
-        // Modal dialog with OK button
-
-        if (monController.countInstances() == -1) {
-            this.dispose();
-            if (--num_windows == 0)
-                System.exit(0);
-            return;
-        }
-
-        Mondrian current = controller.getCurrent();
-        String message = "Close dataset \"" + controller.getCurrentDataSet().setName + "\" and\n all corresponding plots?";
-
-        int answer = JOptionPane.showConfirmDialog(this, message);
-        if (answer == JOptionPane.YES_OPTION) {
-            selList
-            num_windows--;
-            for (int i = plots.size() - 1; i >= 0; i--)
-                plots.elementAt(i).frame.close();
-            MonController.dataSets.setElementAt(new DataSet("nullinger"), monController.countInstances());
-            this.dispose();
-            if (num_windows == 0) {
-                new MonFrame(monFrames, MonController.dataSets, false, false, null);
-                //        System.out.println(" -----------------------> disposing MonFrame !!!!!!!!!!!!!!!!");
-                this.dispose();
-            }
-        }
-    }
-
-
-    public void closeAll() {
-        for (int i = plots.size() - 1; i >= 0; i--) {
-            plots.elementAt(i).frame.close();
-            plots.removeElementAt(i);
-        }
-    }
-
-
     public void switchSelection() {
-        if (monController.countInstances() > -1 && controller.getCurrentDataSet().isDB)
+        if (controller.countInstances() > -1 && controller.getCurrentDataSet().isDB)
             selseq = true;
         else {
             selseq = selSeqCheckItem.isSelected();
@@ -468,7 +392,7 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
 
 
     public void selectAll() {
-        if (monController.countInstances() > -1) {
+        if (controller.countInstances() > -1) {
             controller.getCurrentDataSet().selectAll();
             controller.getCurrent().updateSelection();
         }
@@ -476,7 +400,7 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
 
 
     public void toggleSelection() {
-        if (monController.countInstances() > -1) {
+        if (controller.countInstances() > -1) {
             controller.getCurrentDataSet().toggleSelection();
             controller.getCurrent().updateSelection();
         }
@@ -484,7 +408,7 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
 
 
     public void clearColors() {
-        if (monController.countInstances() > -1) {
+        if (controller.countInstances() > -1) {
             controller.getCurrentDataSet().colorsOff();
             controller.getCurrent().dataChanged(-1);
         }
@@ -517,106 +441,6 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
             dData = data.getSelection();
         }
         data.addVariable(name, false, true, dData, new boolean[data.n]);
-        varNames = null;
-        setVarList();
-    }
-
-
-    public void setVarList() {
-        if (varNames != null) {
-            paint(this.getGraphics());
-            return;
-        }
-        if (monController.countInstances() == -1)
-            monController.countInstances() = MonController.dataSets.size() - 1;
-
-
-        this.show();
-    }
-
-
-    public static int[] getWeightVariable(int[] vars, DataSet data) {
-
-        if (numCategorical == (vars).length - 1) {
-            int[] returner = new int[vars.length];
-            System.arraycopy(vars, 0, returner, 0, returner.length);
-
-            for (int i = 0; i < returner.length - 1; i++) {
-                if (vars[i] == weightIndex) {
-                    System.arraycopy(vars, i + 1, returner, i, returner.length - 1 - i);
-
-                    returner[returner.length - 1] = weightIndex;
-                    i = returner.length;
-
-                } else
-                    returner[i] = vars[i];
-            }
-            for (int i = 0; i < returner.length; i++) {
-                System.out.println("ind old = " + vars[i] + " ind new = " + returner[i]);
-            }
-
-            return returner;
-
-        } else {
-            final Dialog countDialog = new Dialog(this, " Choose Weight Variable", true);
-            Choice getCount = new Choice();
-
-            for (int j = 0; j < vars.length; j++) {
-                if (data.getName(vars[j]).length() > 1 && data.getName(vars[j]).substring(0, 1).equals("/"))
-                    getCount.addItem(data.getName(vars[j]).substring(2));
-                else
-                    getCount.addItem(data.getName(vars[j]));
-            }
-            for (int j = 0; j < getCount.getItemCount(); j++)
-                if (getCount.getItem(j).toLowerCase().equals("count") ||
-                        getCount.getItem(j).toLowerCase().equals("counts") ||
-                        getCount.getItem(j).toLowerCase().equals("n") ||
-                        getCount.getItem(j).toLowerCase().equals("weight") ||
-                        getCount.getItem(j).toLowerCase().equals("observed") ||
-                        getCount.getItem(j).toLowerCase().equals("number"))
-                    getCount.select(j);
-            Panel p1 = new Panel();
-            p1.add(getCount);
-            countDialog.add(p1, "Center");
-            Button OK = new Button("OK");
-            Panel p2 = new Panel();
-            p2.add(OK);
-            countDialog.add(p2, "South");
-            OK.addActionListener(new ActionListener() {     //
-
-
-                public void actionPerformed(ActionEvent e) {
-                    countDialog.dispose();
-                }
-            });
-            countDialog.pack();
-            if (countDialog.getWidth() < 240)
-                countDialog.setSize(240, countDialog.getHeight());
-            countDialog.setResizable(false);
-            countDialog.setModal(true);
-            countDialog.setBounds(this.getBounds().x + this.getBounds().width / 2 - countDialog.getBounds().width / 2,
-                    this.getBounds().y + this.getBounds().height / 2 - countDialog.getBounds().height / 2,
-                    countDialog.getBounds().width,
-                    countDialog.getBounds().height);
-            countDialog.show();
-
-            String[] selecteds = new String[(varNames.getSelectedValues()).length];
-            for (int i = 0; i < (varNames.getSelectedValues()).length; i++) {
-                selecteds[i] = (String) (varNames.getSelectedValues())[i];
-            }
-
-            int[] returner = new int[vars.length];
-            for (int i = 0; i < vars.length; i++) {
-                if ((selecteds[i].trim()).equals(getCount.getSelectedItem())) {
-                    returner[vars.length - 1] = vars[i];
-                    System.arraycopy(vars, i + 1, returner, i, vars.length - 1 - i);
-                    i = vars.length;
-
-                } else
-                    returner[i] = vars[i];
-            }
-            return returner;
-        }
     }
 
 
@@ -633,77 +457,9 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
     }
 
 
-    public void switchVariableMode() {
-        for (int i = 0; i < varNames.getSelectedIndices().length; i++) {
-            int index = (varNames.getSelectedIndices())[i];
-            DataSet data = controller.getCurrentDataSet();
-            if (!data.alpha(index)) {
-                if (data.categorical(index))
-                    data.catToNum(index);
-                else
-                    data.numToCat(index);
-            }
-        }
-        setVarList();
-        maintainPlotMenu();
-    }
-
-
-    public void getSelectedTypes() {
-        numCategorical = 0;
-        for (int i = 0; i < varNames.getSelectedIndices().length; i++) {
-            if (controller.getCurrentDataSet().categorical(varNames.getSelectedIndices()[i]))
-                numCategorical++;
-            else
-                weightIndex = varNames.getSelectedIndices()[i];
-        }
-    }
-
-
-    public void checkHistoryBuffer() {
-
-        int k = (varNames.getSelectedIndices()).length;
-        boolean error = false;
-        boolean[] check = new boolean[k];
-        for (int i = 0; i < k; i++)
-            check[i] = false;
-        /*    for( int i=0; i<k; i++ )
-        System.out.print(selectBuffer[i]+", ");
-        System.out.println("");
-        for( int i=0; i<k; i++ )
-        System.out.print(varNames.getSelectedIndices()[i]+", ");
-        System.out.println("");
-        */
-        for (int i = 0; i < k; i++) {
-            int match = selectBuffer[i];
-            for (int j = 0; j < k; j++)
-                if (varNames.getSelectedIndices()[j] == match)
-                    if (check[j])
-                        error = true;
-                    else
-                        check[j] = true;
-        }
-        for (int i = 0; i < k; i++)
-            if (!check[i])
-                error = true;
-
-        if (error) {
-            System.out.println(" Error in Selection History " + k);
-            for (int i = 0; i < k; i++)
-                selectBuffer[k - i - 1] = varNames.getSelectedIndices()[i];
-        }
-    }
-
-
     public void maintainPlotMenu() {
-        if (monController.countInstances() == -1) {
-            if (MonController.dataSets.size() > 0)
-                monController.countInstances() = MonController.dataSets.size() - 1;
-            else return; // invalid state, don't bother
-        }
 
-        // this updates the counter of the categorical variables
-        getSelectedTypes();
+        int numCategorical = controller.getCurrent().calcNumCategoricalVars();
 
         // update the enabled states of all registered plot-factories
         for (int i = 0; i < plotMenu.getMenuComponentCount(); i++) {
@@ -715,6 +471,7 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
             if (menuItem.getAction() instanceof PlotAction) {
                 PlotAction plotAction = (PlotAction) menuItem.getAction();
 
+                JList varNames = controller.getCurrent().getSelector().getVarNames();
                 if (varNames.getSelectedIndices().length == 0) {
                     plotAction.setEnabled(false);
                 } else {
@@ -731,7 +488,10 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
 
     private void updateTrafoMenuToVarSelection() {
         int alphs = 0;
+
+        JList varNames = controller.getCurrent().getSelector().getVarNames();
         DataSet data = controller.getCurrentDataSet();
+
         for (int i = 0; i < varNames.getSelectedIndices().length; i++) {
             if (data.alpha(varNames.getSelectedIndices()[i]))
                 alphs++;
@@ -759,6 +519,10 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
     public void maintainOptionMenu() {
         DataSet data = controller.getCurrentDataSet();
 
+        closeDataSetMenuItem.setEnabled(true);
+        saveMenuItem.setEnabled(true);
+
+
         // Selection
         if (data.countSelection() == 0)
             selectionMenuItem.setEnabled(false);
@@ -776,29 +540,7 @@ public class MonFrame extends JFrame implements MRJQuitHandler {
     }
 
 
-    public void maintainWindowMenu(boolean preserve) {
-        for (int i = 0; i < plots.size(); i++)
-            plots.elementAt(i).frame.maintainMenu(preserve);
-    }
-
-
-    public void topWindow() {
-        if (((System.getProperty("os.name")).toLowerCase()).indexOf("mac") > -1)
-            this.setJMenuBar(menubar);                 // Add it to the frame.
-    }
-
-
-    public void setDataSet(DataSet data) {
-        MonController.dataSets.addElement(data);
-        setVarList();
-        selseq = true;
-        selSeqCheckItem.setSelected(true);
-        selSeqCheckItem.setEnabled(false);
-    }
-
-
     public void registerPlotFactory(PlotFactory plotFactory) {
-        plotFacRegistry.add(plotFactory);
 
         // add the new factory to the main-menu
         plotMenu.add(new JMenuItem(new PlotAction(plotFactory, this)));

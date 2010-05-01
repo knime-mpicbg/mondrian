@@ -1,7 +1,7 @@
 package de.mpicbg.sweng.mondrian.plots;
 
 import de.mpicbg.sweng.mondrian.MDialog;
-import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.ui.PlotPanel;
@@ -26,7 +26,7 @@ public class MissPlotFactory extends AbstractPlotFactory {
     }
 
 
-    public PlotPanel createPlotPanel(MonFrame monFrame, MDialog plotDialog, DataSet dataSet, JList varNames) {
+    public PlotPanel createPlotPanel(Mondrian mondrian, MDialog plotDialog, DataSet dataSet, JList varNames) {
         int k = 0;
         for (int i = 0; i < (varNames.getSelectedIndices()).length; i++)
             if (dataSet.n > dataSet.getN((varNames.getSelectedIndices())[i]))
@@ -34,8 +34,8 @@ public class MissPlotFactory extends AbstractPlotFactory {
         int[] passVars = new int[k];
         int kk = 0;
         for (int i = 0; i < (varNames.getSelectedIndices()).length; i++) {
-            if (dataSet.n > dataSet.getN(monFrame.selectBuffer[i]))
-                passVars[k - 1 - kk++] = monFrame.selectBuffer[i]; //(varNames.getSelectedIndices())[i];
+            if (dataSet.n > dataSet.getN(mondrian.getSelector().selectBuffer[i]))
+                passVars[k - 1 - kk++] = mondrian.getSelector().selectBuffer[i]; //(varNames.getSelectedIndices())[i];
         }
 
         if (k > 0) {

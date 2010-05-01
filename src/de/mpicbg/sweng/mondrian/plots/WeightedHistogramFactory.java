@@ -1,9 +1,10 @@
 package de.mpicbg.sweng.mondrian.plots;
 
 import de.mpicbg.sweng.mondrian.MDialog;
-import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.ui.PlotPanel;
+import de.mpicbg.sweng.mondrian.util.WeightCaclulator;
 
 import javax.swing.*;
 
@@ -22,9 +23,9 @@ public class WeightedHistogramFactory extends HistogramFactory {
 
 
     @Override
-    public PlotPanel createPlotPanel(MonFrame monFrame, MDialog plotDialog, DataSet dataSet, JList varNames) {
+    public PlotPanel createPlotPanel(Mondrian mondrian, MDialog plotDialog, DataSet dataSet, JList varNames) {
 
-        int[] vars = monFrame.getWeightVariable(varNames.getSelectedIndices(), dataSet);
+        int[] vars = WeightCaclulator.getWeightVariable(varNames.getSelectedIndices(), dataSet, mondrian.calcNumCategoricalVars(), mondrian.determineWeightIndex(), null, varNames);
 
         if (vars.length > 1) {
             int[] passed = new int[vars.length - 1];

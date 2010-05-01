@@ -1,7 +1,7 @@
 package de.mpicbg.sweng.mondrian.core;
 
 import de.mpicbg.sweng.mondrian.MDialog;
-import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.ui.PlotPanel;
 
 import javax.swing.*;
@@ -18,7 +18,7 @@ public interface PlotFactory {
 
     String getShortDescription();
 
-    PlotPanel createPlotPanel(MonFrame monFrame, MDialog plotDialog, DataSet dataSet, JList varNames);
+    PlotPanel createPlotPanel(Mondrian mondrian, MDialog plotDialog, DataSet dataSet, JList varNames);
 
     /**
      * Is called whenever the variable-selection changes in order to determine the enabled-state of the different plots

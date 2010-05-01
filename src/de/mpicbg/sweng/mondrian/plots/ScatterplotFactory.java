@@ -1,7 +1,7 @@
 package de.mpicbg.sweng.mondrian.plots;
 
 import de.mpicbg.sweng.mondrian.MDialog;
-import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.ui.PlotPanel;
@@ -26,10 +26,10 @@ public class ScatterplotFactory extends AbstractPlotFactory {
     }
 
 
-    public PlotPanel createPlotPanel(MonFrame monFrame, MDialog plotDialog, DataSet dataSet, JList varNames) {
+    public PlotPanel createPlotPanel(Mondrian mondrian, MDialog plotDialog, DataSet dataSet, JList varNames) {
         int[] passBuffer = new int[2];
-        passBuffer[0] = monFrame.selectBuffer[1];
-        passBuffer[1] = monFrame.selectBuffer[0];
+        passBuffer[0] = mondrian.getSelector().selectBuffer[1];
+        passBuffer[1] = mondrian.getSelector().selectBuffer[0];
 
         return new Scatter2DPlot(plotDialog, 400, 400, dataSet, passBuffer, varNames, false);
     }

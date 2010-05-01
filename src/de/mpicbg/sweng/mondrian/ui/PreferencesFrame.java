@@ -215,7 +215,7 @@ public class PreferencesFrame extends Frame implements WindowListener, MouseList
             ColorManager.objectColor = pc.c[1];
             ColorManager.lineColor = pc.c[2];
             DragBox.hiliteColor = pc.c[3];
-            frame.updateSelection();
+            frame.getController().redrawAll();
         }
         if (cmd.equals("Save")) {
             Preferences prefs = Preferences.userNodeForPackage(this.getClass());

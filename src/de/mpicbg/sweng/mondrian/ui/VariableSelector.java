@@ -34,12 +34,14 @@ public class VariableSelector extends JPanel {
     private String searchText = "";
     private long startT = 0;
     private Vector<Integer> setIndices = new Vector<Integer>(10, 0);
+    private DataSet datSet;
 
 
     public VariableSelector(DataSet datSet) {
+        this.datSet = datSet;
         selectBuffer = new int[datSet.k + 15];
 
-        rebuild(datSet);
+        rebuild();
     }
 
 
@@ -48,7 +50,58 @@ public class VariableSelector extends JPanel {
     }
 
 
-    private void rebuild(final DataSet datSet) {
+    public void switchVariableMode() {
+        for (int i = 0; i < varNames.getSelectedIndices().length; i++) {
+            int index = (varNames.getSelectedIndices())[i];
+            DataSet data = datSet;
+            if (!data.alpha(index)) {
+                if (data.categorical(index))
+                    data.catToNum(index);
+                else
+                    data.numToCat(index);
+            }
+        }
+        rebuild();
+//        maintainPlotMenu();
+    }
+
+
+    public void checkHistoryBuffer() {
+
+        int k = (varNames.getSelectedIndices()).length;
+        boolean error = false;
+        boolean[] check = new boolean[k];
+        for (int i = 0; i < k; i++)
+            check[i] = false;
+        /*    for( int i=0; i<k; i++ )
+        System.out.print(selectBuffer[i]+", ");
+        System.out.println("");
+        for( int i=0; i<k; i++ )
+        System.out.print(varNames.getSelectedIndices()[i]+", ");
+        System.out.println("");
+        */
+        for (int i = 0; i < k; i++) {
+            int match = selectBuffer[i];
+            for (int j = 0; j < k; j++)
+                if (varNames.getSelectedIndices()[j] == match)
+                    if (check[j])
+                        error = true;
+                    else
+                        check[j] = true;
+        }
+        for (int i = 0; i < k; i++)
+            if (!check[i])
+                error = true;
+
+        if (error) {
+            System.out.println(" Error in Selection History " + k);
+            for (int i = 0; i < k; i++)
+                selectBuffer[k - i - 1] = varNames.getSelectedIndices()[i];
+        }
+    }
+
+
+    private void rebuild() {
         final DataSet data = monFrame.getController().getCurrentDataSet();
         String listNames[] = new String[data.k];
         for (int j = 0; j < data.k; j++) {
@@ -79,7 +132,7 @@ public class VariableSelector extends JPanel {
                             data.catToNum(index);
                         else
                             data.numToCat(index);
-                        rebuild(datSet);
+                        rebuild();
                         monFrame.maintainPlotMenu();
                     }
                 } else {

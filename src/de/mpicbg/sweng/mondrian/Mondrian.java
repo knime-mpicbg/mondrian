@@ -53,6 +53,33 @@ public class Mondrian implements SelectionListener, ProgressIndicator, DataListe
     }
 
 
+    public int calcNumCategoricalVars() {
+
+        int numCategorical = 0;
+        JList list = getSelector().getVarNames();
+        for (int i = 0; i < list.getSelectedIndices().length; i++) {
+            if (controller.getCurrentDataSet().categorical(list.getSelectedIndices()[i]))
+                numCategorical++;
+        }
+
+        return numCategorical;
+    }
+
+
+    public int determineWeightIndex() {
+        int weightIndex = 0;
+        DataSet dataSet = controller.getCurrentDataSet();
+
+        JList varNames = getSelector().getVarNames();
+        for (int i = 0; i < varNames.getSelectedIndices().length; i++) {
+            if (!dataSet.categorical(varNames.getSelectedIndices()[i]))
+                weightIndex = varNames.getSelectedIndices()[i];
+        }
+
+        return weightIndex;
+    }
+
+
     public void updateSelection() {
         // Remove Selections from list, which are no longer active
         //
@@ -144,8 +171,6 @@ public class Mondrian implements SelectionListener, ProgressIndicator, DataListe
                 oneClick.r.height += 1;
                 (oneClick.d).maintainSelection(oneClick);
             } else {
-                controller.getMonFrame().maintainWindowMenu(false);
-
                 for (int i = 0; i < selList.size(); i++) {
                     Selection S = selList.elementAt(i);
                     S.step = i + 1;
@@ -239,7 +264,6 @@ public class Mondrian implements SelectionListener, ProgressIndicator, DataListe
                 selList.elementAt(i).status = Selection.KILLED;
             }
 
-            controller.getMonFrame().maintainWindowMenu(false);
             updateSelection();
         }
     }

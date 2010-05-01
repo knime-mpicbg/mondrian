@@ -52,6 +52,8 @@ public class MondrianDialog extends MDialog {
         progPanel.add(progText, BorderLayout.WEST);
 
         content.add(progPanel, BorderLayout.CENTER);
+
+        updateSelectionInfo();
     }
 
 
