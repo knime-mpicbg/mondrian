@@ -1,11 +1,9 @@
-package de.mpicbg.sweng.mondrian;
+package de.mpicbg.sweng.mondrian.util;
 
 import de.mpicbg.sweng.mondrian.core.ModelListener;
 import de.mpicbg.sweng.mondrian.core.SelectionEvent;
 import de.mpicbg.sweng.mondrian.core.Table;
 import de.mpicbg.sweng.mondrian.plots.MosaicPlot;
-import de.mpicbg.sweng.mondrian.util.StatUtil;
-import de.mpicbg.sweng.mondrian.util.Utils;
 
 import javax.swing.*;
 import java.awt.*;

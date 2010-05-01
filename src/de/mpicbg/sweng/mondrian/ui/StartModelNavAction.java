@@ -1,7 +1,7 @@
 package de.mpicbg.sweng.mondrian.ui;
 
-import de.mpicbg.sweng.mondrian.ModelNavigator;
 import de.mpicbg.sweng.mondrian.MonController;
+import de.mpicbg.sweng.mondrian.util.ModelNavigator;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

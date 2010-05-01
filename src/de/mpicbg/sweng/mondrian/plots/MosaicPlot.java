@@ -356,7 +356,7 @@ public class MosaicPlot extends DragBox implements ActionListener {
                         brush.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, Event.ALT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
                         brush.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
-                                controller.clearColors();
+                                frame.parentFrame.getController().clearColors();
                             }
 
 

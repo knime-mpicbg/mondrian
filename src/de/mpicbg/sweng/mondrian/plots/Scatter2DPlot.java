@@ -836,7 +836,7 @@ public class Scatter2DPlot extends DragBox {
                 if (xVal[i] >= getLlx() && xVal[i] < getUrx() && yVal[i] >= getLly() && yVal[i] < getUry())
                     num++;
             if (!force)
-                if (num > GraphicsPerformance.getPerformance()) {
+                if (num > GraphicsPerformance.getPerformance(frame)) {
                     modeString = "bins";
                 } else
                     modeString = "points";

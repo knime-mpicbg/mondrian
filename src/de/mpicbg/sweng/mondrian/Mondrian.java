@@ -46,6 +46,11 @@ public class Mondrian implements SelectionListener, ProgressIndicator, DataListe
     }
 
 
+    public MonController getController() {
+        return controller;
+    }
+
+
     public MondrianDialog getDialog() {
         return dialog;
     }

@@ -1,7 +1,7 @@
 package de.mpicbg.sweng.mondrian.ui;
 
 import de.mpicbg.sweng.mondrian.MonController;
-import de.mpicbg.sweng.mondrian.MonFrame;
+import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 
 import javax.swing.*;
@@ -23,23 +23,30 @@ import java.util.Vector;
  */
 public class VariableSelector extends JPanel {
 
-    public JList varNames = null;
-    private JScrollPane scrollPane;
+    private JList varNames = new JList();
     public int[] selectBuffer;
 
-
-    MonFrame monFrame;
-    MonController monController;
 
     private String searchText = "";
     private long startT = 0;
     private Vector<Integer> setIndices = new Vector<Integer>(10, 0);
     private DataSet dataSet;
+    private Mondrian mondrian;
+    public MonController controller;
 
 
-    public VariableSelector(DataSet dataSet) {
-        this.dataSet = dataSet;
+    public VariableSelector(Mondrian mondrian) {
+        this.mondrian = mondrian;
+        this.dataSet = mondrian.getDataSet();
+
+        controller = mondrian.getController();
+
         selectBuffer = new int[dataSet.k + 15];
+
+        setLayout(new BorderLayout());
+
+        setupListSelector();
+
 
         rebuild();
     }
@@ -102,21 +109,32 @@ public class VariableSelector extends JPanel {
 
 
     private void rebuild() {
-        String listNames[] = new String[dataSet.k];
+        DefaultListModel listModel = new DefaultListModel();
+
         for (int j = 0; j < dataSet.k; j++) {
-            listNames[j] = " " + dataSet.getName(j);
-            //      System.out.println("Adding:"+listNames[j]);
+            listModel.add(j, dataSet.getName(j));
         }
 
-        varNames = new JList(listNames);
+        varNames.setModel(listModel);
 
-        scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        varNames.invalidate();
+        varNames.repaint();
+
+        RepaintManager currentManager = RepaintManager.currentManager(varNames);
+        currentManager.setDoubleBufferingEnabled(true);
+    }
+
+
+    private void setupListSelector() {
+        JScrollPane scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setViewportView(varNames);
 
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         scrollPane.setWheelScrollingEnabled(true);
+
+        add(scrollPane, BorderLayout.CENTER);
 
         varNames.setBackground(new Color(222, 222, 222));
 
@@ -132,7 +150,7 @@ public class VariableSelector extends JPanel {
                         else
                             dataSet.numToCat(index);
                         rebuild();
-                        monFrame.maintainPlotMenu();
+                        controller.fireVarSelectionChanged();
                     }
                 } else {
                     int index = varNames.locationToIndex(e.getPoint());
@@ -158,14 +176,14 @@ public class VariableSelector extends JPanel {
                         }
                         System.out.println(" History: " + selectBuffer[0] + " " + selectBuffer[1] + " " + selectBuffer[2] + " " + selectBuffer[3] + " " + selectBuffer[4]);
                     }
-                    monFrame.maintainPlotMenu();
+                    controller.fireVarSelectionChanged();
                 }
             }
         });
 
         varNames.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
-                monFrame.maintainPlotMenu();
+                controller.fireVarSelectionChanged();
             }
         });
 
@@ -203,8 +221,5 @@ public class VariableSelector extends JPanel {
         });
 
         varNames.setCellRenderer(new AttributeCellRenderer(this.dataSet));
-
-        RepaintManager currentManager = RepaintManager.currentManager(varNames);
-        currentManager.setDoubleBufferingEnabled(true);
     }
 }

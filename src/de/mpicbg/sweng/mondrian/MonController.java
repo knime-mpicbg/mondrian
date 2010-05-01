@@ -153,4 +153,9 @@ public class MonController {
             getCurrent().updateSelection();
         }
     }
+
+
+    public void fireVarSelectionChanged() {
+        monFrame.maintainPlotMenu();
+    }
 }

@@ -59,6 +59,6 @@ public class SplomFactory extends AbstractPlotFactory {
 
 
     public boolean isCompliant(DataSet dataSet, int numVariables, int numCategoricalVariables) {
-        return numVariables > 0;
+        return numVariables >= 2;
     }
 }

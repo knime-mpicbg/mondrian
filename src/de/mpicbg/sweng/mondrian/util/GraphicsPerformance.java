@@ -1,6 +1,5 @@
 package de.mpicbg.sweng.mondrian.util;
 
-import javax.swing.*;
 import java.awt.*;
 
 
@@ -15,10 +14,10 @@ public class GraphicsPerformance {
     private static Integer performance;
 
 
-    public static int testGraphicsPerformance() {
+    public static int testGraphicsPerformance(Component frame) {
 
         int graphicsPerf = 0;
-        Image testI = new JFrame().createImage(200, 200);        //
+        Image testI = frame.createImage(200, 200);        //
         Graphics2D gI = (Graphics2D) testI.getGraphics();
         gI.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, ((float) 0.05)));
         long start = new java.util.Date().getTime();
@@ -32,9 +31,9 @@ public class GraphicsPerformance {
     }
 
 
-    public static int getPerformance() {
+    public static int getPerformance(Component frame) {
         if (performance == null) {
-            performance = testGraphicsPerformance();
+            performance = testGraphicsPerformance(frame);
         }
 
         return performance;

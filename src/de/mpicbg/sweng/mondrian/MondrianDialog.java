@@ -29,9 +29,8 @@ public class MondrianDialog extends MDialog {
         this.mondrian = mondrian;
 
         JPanel content = new JPanel(new BorderLayout());
-        getContentPane().add(content);
 
-        varSelector = new VariableSelector(mondrian.getDataSet());
+        varSelector = new VariableSelector(mondrian);
         content.add(varSelector, BorderLayout.CENTER);
 
         // Add the status/progress bar
@@ -50,8 +49,9 @@ public class MondrianDialog extends MDialog {
         progText = new JLabel();
         progPanel.add(progText, BorderLayout.WEST);
 
-        content.add(progPanel, BorderLayout.CENTER);
+        content.add(progPanel, BorderLayout.SOUTH);
 
+        getContentPane().add(content);
         setTitle(mondrian.getDataSet().setName);
         setSize(300, 400);
 
