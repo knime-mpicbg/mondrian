@@ -6,6 +6,7 @@ package de.mpicbg.sweng.mondrian;
 import de.mpicbg.sweng.mondrian.core.DragBox;
 import de.mpicbg.sweng.mondrian.ui.ColorManager;
 import de.mpicbg.sweng.mondrian.ui.ResizePlotTask;
+import de.mpicbg.sweng.mondrian.util.Utils;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -16,7 +17,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class MDialog extends JDialog {
+public class MDialog extends JFrame {
 
     public MonFrame parentFrame;
     private JMenuItem m;
@@ -33,6 +34,8 @@ public class MDialog extends JDialog {
 
 
     public MDialog(MonFrame parentFrame, Mondrian mondrian) {
+        refreshMenuBar(parentFrame);
+
         this.mondrian = mondrian;
         this.parentFrame = parentFrame;
 
@@ -43,8 +46,20 @@ public class MDialog extends JDialog {
             public void windowClosing(WindowEvent windowEvent) {
                 close();
             }
+
+
+            @Override
+            public void windowActivated(WindowEvent windowEvent) {
+                refreshMenuBar(MDialog.this.parentFrame);
+            }
         });
 
+    }
+
+
+    private void refreshMenuBar(MonFrame parentFrame) {
+        if (Utils.isMacOS() && Utils.isDeployed())
+            this.setJMenuBar(parentFrame.menubar);
     }
 
 

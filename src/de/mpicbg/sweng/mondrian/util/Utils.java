@@ -306,6 +306,16 @@ public class Utils {
     public static Preferences getPrefs() {
         return Preferences.userNodeForPackage(Utils.class);
     }
+
+
+    public static boolean isMacOS() {
+        return ((System.getProperty("os.name")).toLowerCase()).contains("mac");
+    }
+
+
+    public static boolean isDeployed() {
+        return System.getProperty("apple.laf.useScreenMenuBar") != null;
+    }
 }
 
  

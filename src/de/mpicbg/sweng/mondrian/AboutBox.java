@@ -39,4 +39,9 @@ public class AboutBox extends JDialog implements ActionListener {
         setVisible(false);
     }
 
+
+    public static void main(String[] args) {
+        new AboutBox().setVisible(true);
+    }
+
 }
