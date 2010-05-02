@@ -9,6 +9,7 @@ import de.mpicbg.sweng.mondrian.util.Utils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 
 
 /**
@@ -23,8 +24,14 @@ public class ParallelPlotFactory extends AbstractPlotFactory {
     }
 
 
-    public String getShortDescription() {
+    public String getDescription() {
         return null;
+    }
+
+
+    @Override
+    public KeyStroke getAccelerator() {
+        return KeyStroke.getKeyStroke(KeyEvent.VK_F7, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
     }
 
 

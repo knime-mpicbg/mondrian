@@ -22,7 +22,7 @@ public class MapPlotFactory extends AbstractPlotFactory {
     }
 
 
-    public String getShortDescription() {
+    public String getDescription() {
         return null;
     }
 

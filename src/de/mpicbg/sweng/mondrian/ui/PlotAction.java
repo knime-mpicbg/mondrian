@@ -31,7 +31,7 @@ public class PlotAction extends AbstractAction {
         // configure the action
         putValue(NAME, plotFactory.getPlotName()); //$NON-NLS-1$
 //        putValue(SMALL_ICON, new ScaleableIcon("/resources/icons/category_add.png"));
-        putValue(SHORT_DESCRIPTION, plotFactory.getShortDescription());
+        putValue(SHORT_DESCRIPTION, plotFactory.getDescription());
 //        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
 //        putValue(MNEMONIC_KEY, 2);
     }

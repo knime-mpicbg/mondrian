@@ -21,8 +21,14 @@ public class WeightedBarCharFactory extends BarchartFactory {
     }
 
 
-    public String getShortDescription() {
+    public String getDescription() {
         return null; // todo
+    }
+
+
+    @Override
+    public KeyStroke getAccelerator() {
+        return null;
     }
 
 

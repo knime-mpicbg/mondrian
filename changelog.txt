@@ -4,8 +4,8 @@ v1.2 (not yet released)
 end-user changes
 - New: data-frame dialog just shows up if there were several data-frames in the RData-file
 - New: RData-files can be used as command-line arguments
-- New: Description-tooltips in the menus for all plots
-- New: Keyboard-shortcuts for all default plots
+- New: Description-tooltips in the menus for some plots
+- New: Keyboard-shortcuts for all plots
 - Temporarily disabled: Loading data-sets directly from database
 
 development changes:
@@ -14,7 +14,7 @@ development changes:
 - decoupled model, controller and view into separate classes
 - refactored most ui-actions into swing-Actions.
 - refactored all plots out from main-class into implementations of generic-PlotFactory
-- created ant-build.xml for deployment
+- created ant-build.xml for deployment to macos and windows 
 
 
 1.1 as of 1/25/2010.

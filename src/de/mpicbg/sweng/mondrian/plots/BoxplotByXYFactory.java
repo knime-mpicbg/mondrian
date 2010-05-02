@@ -2,6 +2,10 @@ package de.mpicbg.sweng.mondrian.plots;
 
 import de.mpicbg.sweng.mondrian.core.DataSet;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+
 
 /**
  * Document me!
@@ -15,8 +19,14 @@ public class BoxplotByXYFactory extends ParallelBoxplotFactory {
     }
 
 
-    public String getShortDescription() {
+    public String getDescription() {
         return null;
+    }
+
+
+    @Override
+    public KeyStroke getAccelerator() {
+        return KeyStroke.getKeyStroke(KeyEvent.VK_F5, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
     }
 
 

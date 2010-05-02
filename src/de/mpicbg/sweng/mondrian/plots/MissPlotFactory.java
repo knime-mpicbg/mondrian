@@ -21,7 +21,7 @@ public class MissPlotFactory extends AbstractPlotFactory {
     }
 
 
-    public String getShortDescription() {
+    public String getDescription() {
         return null;
     }
 

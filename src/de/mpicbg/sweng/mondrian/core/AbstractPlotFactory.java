@@ -4,6 +4,8 @@ import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.ui.PlotPanel;
 
+import javax.swing.*;
+
 
 /**
  * Document me!
@@ -21,5 +23,10 @@ public abstract class AbstractPlotFactory implements PlotFactory {
 
         plotFrame.setTitle(plotPanel.getName() != null ? plotPanel.getName() : getPlotName());
         plotFrame.setVisible(true);
+    }
+
+
+    public KeyStroke getAccelerator() {
+        return null;
     }
 }

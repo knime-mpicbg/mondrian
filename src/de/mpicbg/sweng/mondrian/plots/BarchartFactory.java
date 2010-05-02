@@ -9,6 +9,7 @@ import de.mpicbg.sweng.mondrian.ui.PlotPanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 
 
 /**
@@ -23,17 +24,20 @@ public class BarchartFactory extends AbstractPlotFactory {
     }
 
 
-    public String getShortDescription() {
+    public String getDescription() {
         return null; // todo
     }
 
 
+    @Override
+    public KeyStroke getAccelerator() {
+        return KeyStroke.getKeyStroke(KeyEvent.VK_F1, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+    }
+
+
     public PlotPanel createPlotPanel(Mondrian mondrian, MFrame plotFrame, DataSet dataSet, JList varNames) {
-
-
         int[] indices = varNames.getSelectedIndices();
         int weight = -1;
-
 
         return createBarChart(mondrian, plotFrame, dataSet, indices, weight);
     }

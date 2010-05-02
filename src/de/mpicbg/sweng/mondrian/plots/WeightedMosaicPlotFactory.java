@@ -24,7 +24,7 @@ public class WeightedMosaicPlotFactory extends AbstractPlotFactory {
     }
 
 
-    public String getShortDescription() {
+    public String getDescription() {
         return "A weighted mosaic plot";
     }
 

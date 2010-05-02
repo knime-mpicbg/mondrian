@@ -23,6 +23,12 @@ public class WeightedHistogramFactory extends HistogramFactory {
 
 
     @Override
+    public KeyStroke getAccelerator() {
+        return null;
+    }
+
+
+    @Override
     public PlotPanel createPlotPanel(Mondrian mondrian, MFrame plotFrame, DataSet dataSet, JList varNames) {
 
         int[] vars = WeightCaclulator.getWeightVariable(varNames.getSelectedIndices(), dataSet, mondrian.calcNumCategoricalVars(), mondrian.determineWeightIndex(), null, varNames);

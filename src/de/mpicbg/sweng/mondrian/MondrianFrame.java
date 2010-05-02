@@ -50,6 +50,7 @@ public class MondrianFrame extends MFrame {
         progPanel.add(progText, BorderLayout.WEST);
 
         content.add(progPanel, BorderLayout.SOUTH);
+        progPanel.setBackground(Color.LIGHT_GRAY);
 
         getContentPane().add(content);
         setTitle(mondrian.getDataSet().setName);

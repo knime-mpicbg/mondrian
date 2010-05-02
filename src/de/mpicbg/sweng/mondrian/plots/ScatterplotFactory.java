@@ -7,6 +7,8 @@ import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.ui.PlotPanel;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
 
 
 /**
@@ -21,8 +23,14 @@ public class ScatterplotFactory extends AbstractPlotFactory {
     }
 
 
-    public String getShortDescription() {
+    public String getDescription() {
         return "TODO"; //todo
+    }
+
+
+    @Override
+    public KeyStroke getAccelerator() {
+        return KeyStroke.getKeyStroke(KeyEvent.VK_F3, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
     }
 
 

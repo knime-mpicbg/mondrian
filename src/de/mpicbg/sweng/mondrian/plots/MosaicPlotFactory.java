@@ -9,6 +9,8 @@ import de.mpicbg.sweng.mondrian.ui.PlotPanel;
 import de.mpicbg.sweng.mondrian.util.Utils;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
 
 
 /**
@@ -23,8 +25,14 @@ public class MosaicPlotFactory extends AbstractPlotFactory {
     }
 
 
-    public String getShortDescription() {
+    public String getDescription() {
         return "A mosaic plot";
+    }
+
+
+    @Override
+    public KeyStroke getAccelerator() {
+        return KeyStroke.getKeyStroke(KeyEvent.VK_F8, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
     }
 
 

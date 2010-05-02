@@ -26,7 +26,7 @@ public class TwoDimMDSFactory extends AbstractPlotFactory {
     }
 
 
-    public String getShortDescription() {
+    public String getDescription() {
         return null; // todo
     }
 

@@ -23,7 +23,7 @@ public class PCAPlotFactory extends AbstractPlotFactory {
     }
 
 
-    public String getShortDescription() {
+    public String getDescription() {
         return "A pca plot";
     }
 

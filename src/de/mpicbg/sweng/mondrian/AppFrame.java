@@ -318,14 +318,13 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
         registerPlotFactory(new SplomFactory());
         plotMenu.add(new JSeparator());
 
-
-        registerPlotFactory(new MosaicPlotFactory());
-        registerPlotFactory(new WeightedMosaicPlotFactory());
-        plotMenu.add(new JSeparator());
-
         registerPlotFactory(new BoxplotByXYFactory());
         registerPlotFactory(new ParallelBoxplotFactory());
         registerPlotFactory(new ParallelPlotFactory());
+        plotMenu.add(new JSeparator());
+
+        registerPlotFactory(new MosaicPlotFactory());
+        registerPlotFactory(new WeightedMosaicPlotFactory());
         plotMenu.add(new JSeparator());
 
         registerPlotFactory(new TwoDimMDSFactory());
@@ -448,7 +447,19 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
      */
     public void registerPlotFactory(PlotFactory plotFactory) {
 
-        plotMenu.add(new JMenuItem(new PlotAction(plotFactory, this)));
+        PlotAction plotAction = new PlotAction(plotFactory, this);
+
+        KeyStroke accelerator = plotFactory.getAccelerator();
+        if (accelerator != null) {
+            plotAction.putValue(Action.ACCELERATOR_KEY, accelerator);
+        }
+
+        String description = plotFactory.getDescription();
+        if (description != null) {
+            plotAction.putValue(Action.SHORT_DESCRIPTION, description);
+        }
+
+        plotMenu.add(new JMenuItem(plotAction));
     }
 
 

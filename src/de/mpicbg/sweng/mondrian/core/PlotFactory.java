@@ -16,7 +16,7 @@ public interface PlotFactory {
 
     String getPlotName();
 
-    String getShortDescription();
+    String getDescription();
 
     PlotPanel createPlotPanel(Mondrian mondrian, MFrame plotFrame, DataSet dataSet, JList varNames);
 
@@ -31,4 +31,11 @@ public interface PlotFactory {
      * invoked by the factory class.
      */
     void makeVisible(Mondrian mondrian, MFrame plotFrame, PlotPanel plotPanel);
+
+
+    /**
+     * Returns either <code>null</code> or an accelerator for the plot. As there is no validation about the uniqueness
+     * of it, PlotFactory-implementation should select their accelerator carefully.
+     */
+    KeyStroke getAccelerator();
 }

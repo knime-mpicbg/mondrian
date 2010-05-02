@@ -8,6 +8,7 @@ import de.mpicbg.sweng.mondrian.ui.PlotPanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 
 
 /**
@@ -22,8 +23,14 @@ public class SplomFactory extends AbstractPlotFactory {
     }
 
 
-    public String getShortDescription() {
+    public String getDescription() {
         return "A scatter plot matrix";
+    }
+
+
+    @Override
+    public KeyStroke getAccelerator() {
+        return KeyStroke.getKeyStroke(KeyEvent.VK_F4, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
     }
 
 
