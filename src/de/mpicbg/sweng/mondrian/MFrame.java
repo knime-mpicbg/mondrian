@@ -6,6 +6,7 @@ package de.mpicbg.sweng.mondrian;
 import de.mpicbg.sweng.mondrian.core.DragBox;
 import de.mpicbg.sweng.mondrian.ui.ColorManager;
 import de.mpicbg.sweng.mondrian.ui.ResizePlotTask;
+import de.mpicbg.sweng.mondrian.util.PanelImageExporter;
 import de.mpicbg.sweng.mondrian.util.Utils;
 
 import javax.swing.*;
@@ -65,6 +66,7 @@ public class MFrame extends JFrame {
 
         });
 
+        new PanelImageExporter((JPanel) getContentPane(), true);
     }
 
 

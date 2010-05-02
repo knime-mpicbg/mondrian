@@ -6,9 +6,10 @@ end-user changes
 - New: RData-files can be used as command-line arguments
 - New: Description-tooltips in the menus for some plots
 - New: Keyboard-shortcuts for all plots
+- New: Meta+C copies plots into clipboard. Meta+Alt+S allows to save plot as a png
 - Temporarily disabled: Loading data-sets directly from database
 
-development changes:
+developer changes:
 - started git-repository
 - superimposed packaging structure over existing code
 - decoupled model, controller and view into separate classes
