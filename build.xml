@@ -1,6 +1,15 @@
 <project name="mondrian" default="deploy.mac" basedir=".">
 
+    <!--define the jarbundler-task-->
     <taskdef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler"/>
+
+    <!--define the launch4j-task-->
+    <property name="launch4j.dir" location="/Users/brandl/local/software/launch4j"/>
+
+    <taskdef name="launch4j"
+             classname="net.sf.launch4j.ant.Launch4jTask"
+             classpath="${launch4j.dir}/launch4j.jar:${launch4j.dir}/lib/xstream.jar"/>
+
 
     <path id="maven-ant-tasks.classpath" path="${basedir}/resources/maven-ant-tasks-2.1.0.jar"/>
 
@@ -104,6 +113,17 @@
             <javaproperty name="apple.awt.showGrowBox" value="false"/>
 
         </jarbundler>
+    </target>
+
+
+    <target name="deploy.win" depends="create-jar" description="creates a macos app for the mondrian">
+        <property name="target.dir" value="${dist.dir}"/>
+        <delete file="${target.dir}" failonerror="true"/>
+
+        <mkdir dir="${target.dir}"/>
+
+        <launch4j configFile="${basedir}/launch4j.cfg"/>
+
     </target>
 
 
