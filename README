@@ -1,4 +1,41 @@
 
-Compilation
+1) Introduction
+----------------
+
+Mondrian is a general purpose statistical data-visualization system. It features outstanding visualization techniques for data of almost any kind, and has its particular strength compared to other tools when working with Categorical Data, Geographical Data and LARGE Data.
+
+All plots in Mondrian are fully linked, and offer various interactions and queries. Any case selected in a plot in Mondrian is highlighted in all other plots.
+
+Currently implemented plots comprise Mosaic Plot, Scatterplots and SPLOM, Maps, Barcharts, Histograms, Missing Value Plot, Parallel Coordinates/Boxplots and  Boxplots y by x.
+
+Mondrian works with data in standard tab-delimited or comma-separated ASCII files and can load data from R workspaces. There is basic support for working directly on data in Databases (please contact me for further info).
+
+Mondrian is written in JAVA and is distributed as native application (wrapper) for MacOS X and Windows. Linux users need to start the jar-file.
+
+
+2) Compilation
+---------------
 
 add misc/jarbundler-2.1.0.jar ant's extension class-path. Just type ant
+
+
+3) Copyright
+-------------
+
+© 1997-1998 AT&T Labs Research
+© 2002-2006 Augsburg University
+© 2010 Max Planck Institute of Molecular Cell Biology and Genetics
+
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <http://www.gnu.org/licenses/>.

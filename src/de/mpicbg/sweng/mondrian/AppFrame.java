@@ -292,7 +292,7 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
 
         // Set the window size and pop it up.
         this.setResizable(false);
-        this.setSize(295, 320);
+        this.setSize(295, 290);
         setLocationRelativeTo(null);
 
         this.show();
@@ -309,6 +309,11 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
                     AppFrame.this.setJMenuBar(menubar);
                 }
 
+
+                @Override
+                public void windowClosing(WindowEvent windowEvent) {
+                    handleQuit();
+                }
             });
         }
 
