@@ -12,3 +12,116 @@ development changes:
 - refactored all plots out from main-class into implementaitons of generic-PlotFactory
 - created ant-build.xml for deployment
 
+
+1.1 as of 1/25/2010.
+- Load data directly from R workspace files
+- New color schemes
+- Compatible with Java 6 on all platforms
+- Very many bug fixes and minor features added
+
+1.0 as of 12/18/2008.
+Windows (exe-file)
+UNIX (JAR-file)
+Mac OS X (Disk-Image containing application and demo data)
+
+Changes:
+- Autostart of Rserve under Windows and Linux
+- Searchable variable list window
+- Missing value plot is compatible to color brushing now
+
+Changes in Version 1.0 beta12 as of 08/29/2008.
+- Support for Rserve 0.5+
+- Fixes and clean-ups
+
+Changes in Version 1.0 beta11 as of 03/19/2008.
+- Image can be used in extended queries for URL variables
+- New color scheme in maps
+- Search in barcharts by typing a prefix of the level
+- Fixes and clean-ups
+
+Changes in Version 1.0 beta10 as of 12/16/2007.
+- More consistent menu entries and menu labels for plot windows
+- A 'Open Recent ...' menu entry
+- Indication of missingness in the variable window icons
+- Window sizes can now be set in the scale dialog box
+- Censored zooming in barcharts (shift up/down-arrow) consistent with mosaic plots
+
+Changes in Version 1.0 beta7 as of 05/13/2007.
+- Rserve start-up compatible with Rserve for R2.5.x
+- SPLOMs are available now (for those who like'm ...)
+- histograms are more consistent now (weighted histograms support densities (needs Rserve), spinograms now work at any zoom level)
+- better scaling and queries in parallel boxplots (still incomplete)
+- several fixes and enhancements ...
+
+Changes in Version 1.0 beta3 as of 10/31/2006.
+- simple transformations (+, *, -, /, log, 1/x, ...)
+- selection order of variables in variable window is reflected in all multivariate plots!
+- many minor fixes and enhancements ...
+
+Changes in Version 1.0 beta1 as of 05/24/2006.
+- new much faster loader (note: maps are now expected to be in a separate file)
+- missing values (coded as "NA") are suported in all graphics
+- missing value plot can be used to investigate the structure of the missing values.
+- custom scaling (<meta>-j), scatterplot only, other plots to follow
+- color brushing (<meta>-b) in barcharts, mosaic plots and histograms (rainbow)
+- <meta>-1...9 sets persistent colors for the current selection
+- derived variables from selection- and color-state
+- painting, via "OR"-mode in the first selection step of a selection sequence
+- many minor fixes and enhancements ...
+
+Changes in Version RC 1.0m as of 11/29/2005.
+- Using 1.4.x JVM on all platforms.
+- '<-' and '->' can be used to change the saturation of boundaries in maps.
+- "Boxplot y by x" is now a separate menu item.
+- Levels can now be sorted in boxplots y by x according to median or IQ-range.
+- Plotting of 2-dim MDS (input is not carefully checked yet)
+
+Changes in Version RC 1.0f as of 04/06/2005.
+- Queries are now implemented via ToolTips.
+- Further improvements to Parallel Coordinate Plots. See section for details!
+- Maps now feature six different color schemes for shading choropleth maps.
+- Under MacOSX you can now drop files on Mondrian to start the application and load the data.
+- If you have R and Simon's Rserve installed on your machine, you find new features in
+   + Histograms
+   + Scatterplots
+
+Changes in Version RC 1.0 as pf 09/24/2004:
+- Vast improvements to Parallel Coordinate Plots. Se section for details!
+- Printing works via <meta>-P in all plots. In MacOS X use "Preview" to save as PDF.
+- Additional sorting options in Barcharts.
+- Histogram parameters can now be set manually as well.
+- Choropleth maps can now be inverted and colored by rank.
+- Yet another update to the L&F of selection sequences.
+
+Changes in Version 0.99a as of 03/11/2004:
+- an updated version of selection sequences. See the section for details.
+- "window" menu and more intelligent window placement
+- new controls to set width and origins in histograms
+- zooming for all platforms (use middle mouse button on all other machines than mac)
+
+Changes in Version 0.99 as of 11/18/2003
+- Three new variations of Mosaic plots (same bin size, fluctuation diagram and multiple barcharts)
+- Automatic sorting of axes in a parallel coordinate plot
+- Use meta-R to switch the splitting direction of the last variable in a Mosaic plots
+- Inverse color scheme for density highlighting in scatterplots
+- Preference box to set highlight color and background color
+- Zooming under Windows is still delayed because of a yet to be finalized major update on the interface
+
+Changes in Version 0.98 as of 03/22/2003:
+- Boxplots y by x. Just select a continuous variable and a categorical variable and choose 'parallel boxplots' in the plot menu.
+- Regression lines in scatterplots (can be queried)
+- Highlight color is now red!
+- Add lines in scatterplots by third variables to visualize paths and other relationships.
+
+Changes in Version 0.97a as of 11/21/2002:
+- oneClick selection is introduced, i.e. a selection rectangle of size 0 will only select the clicked object, but NOT create a corresponding selection rectangle (selection is only temporary as with the select all feature (META-a))
+- Bug fix in Scatterplots
+- Update on selection rectangle appearance
+
+Changes in Version 0.97 as of 7/12/2002:
+- META-a will select all points in any plot now
+- alpha-channel works in scatterplots (use arrow keys to change) and parallel coordinates (via pop-up).
+- scatterplot are automatically binned, if the dataset is really large (can be overridden)
+- interrogation in maps added
+
+First public release 0.96 as of 4/9/2002
