@@ -4,6 +4,7 @@ import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.core.DragBox;
 import de.mpicbg.sweng.mondrian.io.AsciiFileLoader;
 import de.mpicbg.sweng.mondrian.ui.ProgIndicatorImpl;
+import de.mpicbg.sweng.mondrian.util.Utils;
 
 import javax.swing.*;
 import java.io.File;
@@ -59,6 +60,10 @@ public class MonController {
     public void addAndActiviate(Mondrian mondrian) {
         mondrians.add(mondrian);
         setCurrent(mondrian);
+
+        if (Utils.isMacOS() && Utils.isDeployed()) {
+            appFrame.setVisible(false);
+        }
     }
 
 
@@ -98,10 +103,10 @@ public class MonController {
 
             int answer = JOptionPane.showConfirmDialog(appFrame, message);
             if (answer == JOptionPane.YES_OPTION) {
-                System.exit(0);
+                for (Mondrian mondrian : mondrians) {
+                    close(mondrian, false);
+                }
             }
-        } else {
-            System.exit(0);
         }
     }
 
@@ -109,17 +114,24 @@ public class MonController {
     /**
      * Close an instance.  If this is the last open window, just quit.
      */
-    public void close(Mondrian mondrian) {
+    public void close(Mondrian mondrian, boolean askForConfirm) {
 
         String message = "Close dataset \"" + getCurrentDataSet().setName + "\" and\n all corresponding plots?";
 
-        int answer = JOptionPane.showConfirmDialog(appFrame, message);
+        int answer = askForConfirm ? JOptionPane.showConfirmDialog(mondrian.getDialog(), message) : JOptionPane.YES_OPTION;
         if (answer == JOptionPane.YES_OPTION) {
             mondrian.close();
         }
 
+        mondrians.remove(mondrian);
+
         if (getNumInstances() == 0) {
-            System.exit(0);
+//            System.exit(0);
+            if (Utils.isMacOS() && Utils.isDeployed()) {
+                appFrame.setVisible(true);
+            }
+        } else {
+            setCurrent(mondrians.get(0));
         }
     }
 

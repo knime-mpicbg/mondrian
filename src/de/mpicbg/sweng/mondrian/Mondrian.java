@@ -288,12 +288,12 @@ public class Mondrian implements SelectionListener, ProgressIndicator, DataListe
 
 
     public void close() {
-        if (dialog.isDisplayable())
-            dialog.dispose();
-
-
         for (int i = plots.size() - 1; i >= 0; i--) {
             plots.elementAt(i).frame.close();
+        }
+
+        if (dialog.isDisplayable()) {
+            dialog.close();
         }
     }
 

@@ -59,27 +59,28 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
         menubar = new JMenuBar();         // Create a menubar.
 
         // Create menu items, with menu shortcuts, and add to the menu.
-        JMenu file = menubar.add(new JMenu("File"));
-        file.add(new JMenuItem(new OpenDataSetAction(controller)));
-        file.add(new JMenuItem(new LoadRDataFrameAction(controller)));
-        file.addSeparator();
+        JMenu fileMenu = menubar.add(new JMenu("File"));
+        fileMenu.add(new JMenuItem(new OpenDataSetAction(controller)));
+        fileMenu.add(new JMenuItem(new LoadRDataFrameAction(controller)));
+        fileMenu.addSeparator();
 //        file.add(new JMenuItem(new CreateDBDataSetAction(controller)));
 
         saveAction = new SaveDataSetAction("Save", false, controller);
-        file.add(new JMenuItem(saveAction));
+        fileMenu.add(new JMenuItem(saveAction));
 
         saveSelectionAction = new SaveDataSetAction("Save Selection", true, controller);
-        file.add(new JMenuItem(saveSelectionAction));
+        fileMenu.add(new JMenuItem(saveSelectionAction));
+        fileMenu.addSeparator();
 
         closeDataSetAction = new CloseDataSetAction(controller);
-        file.add(new JMenuItem(closeDataSetAction));
+        fileMenu.add(new JMenuItem(closeDataSetAction));
 
 
         //    file.add(p = new JMenuItem("Print Window",new JMenuShortcut(KeyEvent.VK_P)));
         JMenuItem q = new JMenuItem("Quit");
         if (((System.getProperty("os.name")).toLowerCase()).indexOf("mac") == -1) {
-            file.addSeparator();
-            file.add(q);
+            fileMenu.addSeparator();
+            fileMenu.add(q);
             q.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
             q.addActionListener(new ActionListener() {     // Quit the program.
@@ -95,7 +96,7 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
                 }
             });
         }
-        menubar.add(file);
+        menubar.add(fileMenu);
 
         plotMenu = new JMenu("Plot");
         menubar.add(plotMenu);
@@ -292,11 +293,24 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
         // Set the window size and pop it up.
         this.setResizable(false);
         this.setSize(295, 320);
+        setLocationRelativeTo(null);
+
         this.show();
 
         Graphics g = this.getGraphics();
         g.setFont(new Font("SansSerif", 0, 11));
         g.drawString("v1.1", 260, 285);
+
+        if (Utils.isMacOS() && Utils.isDeployed()) {
+            addWindowListener(new WindowAdapter() {
+
+                @Override
+                public void windowActivated(WindowEvent windowEvent) {
+                    AppFrame.this.setJMenuBar(menubar);
+                }
+
+            });
+        }
 
         registerCommonPlots();
     }

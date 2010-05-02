@@ -34,6 +34,6 @@ public class CloseDataSetAction extends AbstractAction {
 
 
     private void close(Mondrian mondrian) {
-        controller.close(controller.getCurrent());
+        controller.close(controller.getCurrent(), true);
     }
 }

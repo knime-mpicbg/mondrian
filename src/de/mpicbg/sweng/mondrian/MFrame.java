@@ -48,7 +48,11 @@ public class MFrame extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent windowEvent) {
-                close();
+                if (MFrame.this instanceof MondrianFrame) {
+                    mondrian.getController().close(mondrian, true);
+                } else {
+                    close();
+                }
             }
 
 
@@ -86,8 +90,6 @@ public class MFrame extends JFrame {
 
 
     public void close() {
-        System.out.println("Window Closed!!");
-
         parentFrame.windowMenu.remove(m);
         if (parentFrame.windowMenu.getItemCount() < 3)
             parentFrame.closeAllMenuItem.setEnabled(false);
@@ -96,6 +98,15 @@ public class MFrame extends JFrame {
 
         this.setVisible(false);
         this.dispose();
+    }
+
+
+    protected void removeFromWinMenu() {
+        parentFrame.windowMenu.remove(m);
+        if (parentFrame.windowMenu.getItemCount() < 3)
+            parentFrame.closeAllMenuItem.setEnabled(false);
+        if (!selString.equals(""))
+            mondrian.updateSelection();
     }
 
 

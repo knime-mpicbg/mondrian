@@ -53,8 +53,9 @@
             <manifest>
                 <attribute name="Built-By"
                            value="Holger Brandl (Max Planck Institute of Molecular Cell Biology and Genetics (MPI-CBG)). All rights reserverd, 2010"/>
-                <attribute name="Main-Class" value="de.mpicbg.sweng.mondriandrian.MondrianStarter"/>
+                <attribute name="Main-Class" value="de.mpicbg.sweng.mondrian.MondrianStarter"/>
                 <attribute name="Class-Path" value="lib/REngine-0.6.jar lib/Rserve-0.6.jar"/>
+                <!--<attribute name="SplashScreen-Image" value="Logo.gif"/>-->
             </manifest>
         </jar>
 
