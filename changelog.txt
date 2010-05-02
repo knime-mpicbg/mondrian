@@ -5,11 +5,15 @@ end-user changes
 - New: data-frame dialog just shows up if there were several data-frames in the RData-file
 - New: RData-files can be used as command-line arguments
 - New: Description-tooltips in the menus for all plots
+- New: Keyboard-shortcuts for all default plots
+- Temporarily disabled: Loading data-sets directly from database
 
 development changes:
 - started git-repository
 - superimposed packaging structure over existing code
-- refactored all plots out from main-class into implementaitons of generic-PlotFactory
+- decoupled model, controller and view into separate classes
+- refactored most ui-actions into swing-Actions.
+- refactored all plots out from main-class into implementations of generic-PlotFactory
 - created ant-build.xml for deployment
 
 
@@ -19,12 +23,7 @@ development changes:
 - Compatible with Java 6 on all platforms
 - Very many bug fixes and minor features added
 
-1.0 as of 12/18/2008.
-Windows (exe-file)
-UNIX (JAR-file)
-Mac OS X (Disk-Image containing application and demo data)
-
-Changes:
+1.0 as of 12/18/2008
 - Autostart of Rserve under Windows and Linux
 - Searchable variable list window
 - Missing value plot is compatible to color brushing now
