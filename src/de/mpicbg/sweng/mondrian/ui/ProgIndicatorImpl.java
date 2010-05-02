@@ -32,6 +32,7 @@ public class ProgIndicatorImpl extends JDialog implements ProgressIndicator {
 
 
     public void setProgress(double progress) {
+        progBar.setValue((int) (progress));
     }
 
 

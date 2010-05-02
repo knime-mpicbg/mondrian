@@ -11,8 +11,6 @@ import de.mpicbg.sweng.mondrian.ui.*;
 import de.mpicbg.sweng.mondrian.ui.transform.TransformAction;
 import de.mpicbg.sweng.mondrian.util.Utils;
 import de.mpicbg.sweng.mondrian.util.r.RService;
-import org.rosuda.REngine.Rserve.RConnection;
-import org.rosuda.REngine.Rserve.RserveException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -87,11 +85,6 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
 
 
                 public void actionPerformed(ActionEvent e) {
-                    try {                                                                                // Shut down RServe if running ...
-                        RConnection c = new RConnection();
-                        c.shutdown();
-                    } catch (RserveException ignored) {
-                    }
                     System.exit(0);
                 }
             });
@@ -276,17 +269,21 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
             }
         });
 
-        // Another event listener, this one to handle window close requests.
+        // define the closing behavior of the application
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        this.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                controller.closeAll();
-            }
-        });
+        addWindowListener(new WindowAdapter() {
 
-        this.addWindowListener(new WindowAdapter() {
-            public void windowActivated(WindowEvent e) {
-//                topWindow();
+            @Override
+            public void windowActivated(WindowEvent windowEvent) {
+                if (Utils.isMacOS() && Utils.isDeployed()) {
+                    AppFrame.this.setJMenuBar(menubar);
+                }
+            }
+
+
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                handleQuit();
             }
         });
 
@@ -300,22 +297,6 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
         Graphics g = this.getGraphics();
         g.setFont(new Font("SansSerif", 0, 11));
         g.drawString("v1.1", 260, 285);
-
-        if (Utils.isMacOS() && Utils.isDeployed()) {
-            addWindowListener(new WindowAdapter() {
-
-                @Override
-                public void windowActivated(WindowEvent windowEvent) {
-                    AppFrame.this.setJMenuBar(menubar);
-                }
-
-
-                @Override
-                public void windowClosing(WindowEvent windowEvent) {
-                    handleQuit();
-                }
-            });
-        }
 
         registerCommonPlots();
     }
@@ -355,7 +336,9 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
 
 
     public void handleQuit() {
-        System.exit(0);
+        if (controller.closeAll()) {
+            System.exit(0);
+        }
     }
 
 

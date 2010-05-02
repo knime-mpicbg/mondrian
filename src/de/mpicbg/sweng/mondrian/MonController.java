@@ -97,16 +97,25 @@ public class MonController {
     }
 
 
-    public void closeAll() {
-        if (countInstances() > 0) {
-            String message = "Are you sure that you would like to close all current data-sets";
+    /**
+     * Returns true if the user confirmed to close all open instances or there were no instances to be closed.
+     */
+    public boolean closeAll() {
+        if (countInstances() == 0) {
+            return true;
+        }
 
-            int answer = JOptionPane.showConfirmDialog(appFrame, message);
-            if (answer == JOptionPane.YES_OPTION) {
-                for (Mondrian mondrian : mondrians) {
-                    close(mondrian, false);
-                }
+        String message = "Are you sure that you would like to close all current data-sets";
+
+        int answer = JOptionPane.showConfirmDialog(appFrame, message);
+        if (answer == JOptionPane.YES_OPTION) {
+            while (!mondrians.isEmpty()) {
+                close(mondrians.get(0), false);
             }
+
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -126,7 +135,6 @@ public class MonController {
         mondrians.remove(mondrian);
 
         if (getNumInstances() == 0) {
-//            System.exit(0);
             if (Utils.isMacOS() && Utils.isDeployed()) {
                 appFrame.setVisible(true);
             }
