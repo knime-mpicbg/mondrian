@@ -4,7 +4,6 @@ import de.mpicbg.sweng.mondrian.MFrame;
 import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.AbstractPlotFactory;
 import de.mpicbg.sweng.mondrian.core.DataSet;
-import de.mpicbg.sweng.mondrian.ui.ColorManager;
 import de.mpicbg.sweng.mondrian.ui.PlotPanel;
 
 import javax.swing.*;
@@ -41,9 +40,9 @@ public class SplomFactory extends AbstractPlotFactory {
         for (int i = 0; i < (numVars - 1); i++)
             for (int j = 1; j < numVars; j++) {
                 if (i >= j) {
-                    JPanel Filler = new JPanel();
-                    Filler.setBackground(ColorManager.backgroundColor);
-                    splomPanel.add(Filler);
+                    JPanel filler = new JPanel();
+//                    Filler.setBackground(ColorManager.backgroundColor);
+                    splomPanel.add(filler);
                     //          (Filler.getGraphics()).drawString("text",10,10);
                 } else {
                     int[] tmpVars = new int[2];

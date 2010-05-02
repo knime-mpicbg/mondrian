@@ -805,6 +805,7 @@ public class Scatter2DPlot extends DragBox {
 
 
     public void paint(Graphics2D g) {
+//        frame.setBackground(ColorManager.backgroundColor);
 
         frame.setCursor(Cursor.getDefaultCursor());
 
@@ -820,7 +821,7 @@ public class Scatter2DPlot extends DragBox {
         Dimension size = this.getSize();
 
         if (oldWidth != size.width || oldHeight != size.height || scaleChanged || frame.getBackground() != ColorManager.backgroundColor) {
-            frame.setBackground(ColorManager.backgroundColor);
+//            frame.setBackground(ColorManager.backgroundColor);
             this.width = size.width;
             this.height = size.height;
 

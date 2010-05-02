@@ -84,6 +84,13 @@ public class MFrame extends JFrame {
     }
 
 
+    @Override
+    public void paint(Graphics graphics) {
+        setBackground(ColorManager.backgroundColor);
+        super.paint(graphics);
+    }
+
+
     public boolean getAlphaHi() {
         return parentFrame.alphaHi;
     }
