@@ -109,13 +109,17 @@ public class MonController {
     /**
      * Close an instance.  If this is the last open window, just quit.
      */
-    void close(Mondrian mondrian) {
+    public void close(Mondrian mondrian) {
 
         String message = "Close dataset \"" + getCurrentDataSet().setName + "\" and\n all corresponding plots?";
 
         int answer = JOptionPane.showConfirmDialog(appFrame, message);
         if (answer == JOptionPane.YES_OPTION) {
             mondrian.close();
+        }
+
+        if (getNumInstances() == 0) {
+            System.exit(0);
         }
     }
 

@@ -34,27 +34,6 @@ public class CloseDataSetAction extends AbstractAction {
 
 
     private void close(Mondrian mondrian) {
-
-
-        // close immediately if there are no plots open
-        if (mondrian.getPlots().isEmpty()) {
-            mondrian.close();
-            controller.removeInstance(mondrian);
-            if (controller.getNumInstances() == 0) {
-                System.exit(0);
-            }
-
-            return;
-        }
-
-        String message = "Close dataset \"" + controller.getCurrentDataSet().setName + "\" and\n all corresponding plots?";
-
-        int answer = JOptionPane.showConfirmDialog(controller.getMonFrame(), message);
-
-
-        if (answer == JOptionPane.YES_OPTION) {
-            mondrian.close();
-        }
-
+        controller.close(controller.getCurrent());
     }
 }

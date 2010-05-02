@@ -86,4 +86,9 @@ public class MondrianFrame extends MFrame {
     public VariableSelector getVarSelector() {
         return varSelector;
     }
+
+
+    public void refresh() {
+        varSelector.rebuild();
+    }
 }

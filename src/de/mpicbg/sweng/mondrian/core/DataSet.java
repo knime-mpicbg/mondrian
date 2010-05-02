@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
 public class DataSet {
 
     public Vector<Variable> data = new Vector<Variable>(256, 256);
-    //  protected Vector name = new Vector(256,256);
     protected boolean[] alpha = {true};
     protected int[] NAcount = {0};
     protected double[] selectionArray;
@@ -36,7 +35,6 @@ public class DataSet {
     protected double[] filterA;
     public int[] filterGrpSize;
     public int[] filterSelGrpSize;
-    protected boolean groupsSet = false;
     protected boolean filterON = false;
     public int filterVar = -1;
     public int target;

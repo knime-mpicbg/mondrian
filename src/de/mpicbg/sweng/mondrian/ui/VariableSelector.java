@@ -108,7 +108,7 @@ public class VariableSelector extends JPanel {
     }
 
 
-    private void rebuild() {
+    public void rebuild() {
         DefaultListModel listModel = new DefaultListModel();
 
         for (int j = 0; j < dataSet.k; j++) {

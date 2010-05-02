@@ -29,7 +29,6 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
     public JMenuBar menubar;
     public JMenu plotMenu, windowMenu, deriveVarMenu, transformMenu, helpMenu;
 
-    public JMenuItem closeDataSetMenuItem;
     public JMenuItem closeAllMenuItem, me;
     public JCheckBoxMenuItem selSeqCheckItem;
     public JCheckBoxMenuItem alphaOnHighlightCheckMenuItem;
@@ -40,6 +39,7 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
     public SaveDataSetAction saveSelectionAction;
     public DeriveVariableAction deriveVarBySelAction;
     public DeriveVariableAction deriveVarByColAction;
+    public CloseDataSetAction closeDataSetAction;
 
 
     public AppFrame() {
@@ -62,7 +62,8 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
         JMenu file = menubar.add(new JMenu("File"));
         file.add(new JMenuItem(new OpenDataSetAction(controller)));
         file.add(new JMenuItem(new LoadRDataFrameAction(controller)));
-        file.add(new JMenuItem(new CreateDBDataSetAction(controller)));
+        file.addSeparator();
+//        file.add(new JMenuItem(new CreateDBDataSetAction(controller)));
 
         saveAction = new SaveDataSetAction("Save", false, controller);
         file.add(new JMenuItem(saveAction));
@@ -70,7 +71,9 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
         saveSelectionAction = new SaveDataSetAction("Save Selection", true, controller);
         file.add(new JMenuItem(saveSelectionAction));
 
-        file.add(closeDataSetMenuItem = new JMenuItem(new CloseDataSetAction(controller)));
+        closeDataSetAction = new CloseDataSetAction(controller);
+        file.add(new JMenuItem(closeDataSetAction));
+
 
         //    file.add(p = new JMenuItem("Print Window",new JMenuShortcut(KeyEvent.VK_P)));
         JMenuItem q = new JMenuItem("Quit");
@@ -235,7 +238,6 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
                 switchAlpha();
             }
         });
-        ;
         cs.addActionListener(new ActionListener() {     // Delete the current selection sequence
 
 
@@ -256,13 +258,6 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
 
             public void actionPerformed(ActionEvent e) {
                 controller.closeAll();
-            }
-        });
-        closeDataSetMenuItem.addActionListener(new ActionListener() {     // Close this window.
-
-
-            public void actionPerformed(ActionEvent e) {
-                controller.close(controller.getCurrent());
             }
         });
         me.addActionListener(new ActionListener() {   // Show main window
@@ -373,7 +368,7 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
     public void updateMenusToSelection() {
         DataSet data = controller.getCurrentDataSet();
 
-        closeDataSetMenuItem.setEnabled(true);
+        closeDataSetAction.setEnabled(true);
         saveAction.setEnabled(true);
 
         deriveVarBySelAction.setEnabled(data.countSelection() > 0);
@@ -430,7 +425,7 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
         if (alphs == 0 && (varNames.getSelectedIndices().length == 2 || varNames.getSelectedIndices().length == 1)) {
             transformMenu.setEnabled(true);
 
-            for (int i = 0; i < transformMenu.getComponentCount(); i++) {
+            for (int i = 0; i < transformMenu.getItemCount(); i++) {
                 Component menuComponent = transformMenu.getMenuComponent(i);
                 if (!(menuComponent instanceof JMenuItem)) {
                     continue;

@@ -1,6 +1,7 @@
 package de.mpicbg.sweng.mondrian.ui.transform;
 
 import de.mpicbg.sweng.mondrian.AppFrame;
+import de.mpicbg.sweng.mondrian.MonController;
 import de.mpicbg.sweng.mondrian.Mondrian;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 
@@ -16,16 +17,17 @@ import java.awt.event.ActionEvent;
 public class TransformAction extends AbstractAction {
 
     private int trafoMode;
-    private AppFrame appFrame;
     private int numArguments;
 
+    private MonController controller;
 
-    public TransformAction(String title, int trafoMode, AppFrame appFrame, int numArguments) {
+
+    public TransformAction(String title, int trafoMode, int numArguments, MonController controller) {
         super(title);
 
-
         this.trafoMode = trafoMode;
-        this.appFrame = appFrame;
+        this.controller = controller;
+
         this.numArguments = numArguments;
     }
 
@@ -41,13 +43,12 @@ public class TransformAction extends AbstractAction {
 
 
     public void transform(int mode) {
-        Mondrian mondrian = appFrame.getController().getCurrent();
-
+        Mondrian mondrian = controller.getCurrent();
         mondrian.getSelector().checkHistoryBuffer();
 
         System.out.println("Transform: " + mode);
         String name = "";
-        DataSet data = appFrame.getController().getCurrentDataSet();
+        DataSet data = mondrian.getDataSet();
 
         double[] tData = new double[data.n];
         boolean[] tMiss = new boolean[data.n];
@@ -125,16 +126,23 @@ public class TransformAction extends AbstractAction {
                     break;
             }
         }
-        for (int i = 0; i < data.n; i++)
+
+        for (int i = 0; i < data.n; i++) {
             if (tMiss[i])
                 tData[i] = Double.MAX_VALUE;
+        }
+
         boolean what;
         if (mode < 5) {
             what = data.categorical(selectBuffer[0]) && data.categorical(selectBuffer[1]);
         } else {
             what = data.categorical(selectBuffer[0]);
         }
+
         data.addVariable(name, false, what, tData, tMiss);
+
+        // refresh the variable selector to include the feature
+        mondrian.getDialog().refresh();
     }
 
 
@@ -142,15 +150,17 @@ public class TransformAction extends AbstractAction {
         JMenu transformMenu = new JMenu("Transform");
 
         transformMenu.setEnabled(false);
-        transformMenu.add(new JMenuItem(new TransformAction("x + y", 1, appFrame, 2)));
-        transformMenu.add(new JMenuItem(new TransformAction("x - y", 2, appFrame, 2)));
-        transformMenu.add(new JMenuItem(new TransformAction("x * y", 3, appFrame, 2)));
-        transformMenu.add(new JMenuItem(new TransformAction("x / y", 4, appFrame, 2)));
+        transformMenu.add(new JMenuItem(new TransformAction("x + y", 1, 2, appFrame.getController())));
+        transformMenu.add(new JMenuItem(new TransformAction("x - y", 2, 2, appFrame.getController())));
+        transformMenu.add(new JMenuItem(new TransformAction("x * y", 3, 2, appFrame.getController())));
+        transformMenu.add(new JMenuItem(new TransformAction("x / y", 4, 2, appFrame.getController())));
+
         transformMenu.addSeparator();
-        transformMenu.add(new JMenuItem(new TransformAction("- x", 5, appFrame, 1)));
-        transformMenu.add(new JMenuItem(new TransformAction("1/x", 6, appFrame, 1)));
-        transformMenu.add(new JMenuItem(new TransformAction("log(x)", 7, appFrame, 1)));
-        transformMenu.add(new JMenuItem(new TransformAction("exp(x)", 8, appFrame, 1)));
+
+        transformMenu.add(new JMenuItem(new TransformAction("- x", 5, 1, appFrame.getController())));
+        transformMenu.add(new JMenuItem(new TransformAction("1/x", 6, 1, appFrame.getController())));
+        transformMenu.add(new JMenuItem(new TransformAction("log(x)", 7, 1, appFrame.getController())));
+        transformMenu.add(new JMenuItem(new TransformAction("exp(x)", 8, 1, appFrame.getController())));
 
         return transformMenu;
     }
