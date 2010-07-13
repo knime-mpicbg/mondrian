@@ -17,7 +17,7 @@
     <property name="resources.dir" location="${basedir}/resources"/>
     <property name="classes.dir" location="${basedir}/classes"/>
     <property name="lib.dir" location="${basedir}/lib"/>
-    <property name="lib.mrj" location="${basedir}/mrj"/>
+    <!--<property name="lib.mrj" location="${basedir}/mrj"/>-->
     <property name="dist.dir" location="${basedir}/../mondrian-deployed"/>
     <property name="bin.dir" location="${basedir}/bin"/>
 
@@ -30,9 +30,9 @@
             <include name="*.jar"/>
         </fileset>
 
-        <fileset dir="${lib.mrj}">
-            <include name="*.jar"/>
-        </fileset>
+        <!--<fileset dir="${lib.mrj}">-->
+        <!--<include name="*.jar"/>-->
+        <!--</fileset>-->
 
     </path>
 
@@ -53,7 +53,7 @@
 
         <jar basedir="${classes.dir}" destfile="${jarfile}"/>
         <jar update="true" basedir="${resources.dir}" destfile="${jarfile}"/>
-        <jar update="true" basedir="${lib.mrj}" destfile="${jarfile}"/>
+        <!--<jar update="true" basedir="${lib.mrj}" destfile="${jarfile}"/>-->
 
         <!--<jar basedir="${bin.dir}" includes="config/config.sxl" update="true" destfile="${project.name}.jar"/>-->
         <!--<jar basedir="${user.home}" includes=".winlayout" update="true" destfile="${project.name}.jar"/>-->

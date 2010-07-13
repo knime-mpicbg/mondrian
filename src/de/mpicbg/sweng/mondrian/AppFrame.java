@@ -1,8 +1,6 @@
 package de.mpicbg.sweng.mondrian;
 
 
-import com.apple.mrj.MRJApplicationUtils;
-import com.apple.mrj.MRJQuitHandler;
 import de.mpicbg.sweng.mondrian.core.DataSet;
 import de.mpicbg.sweng.mondrian.core.DragBox;
 import de.mpicbg.sweng.mondrian.core.PlotFactory;
@@ -17,7 +15,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 
-public class AppFrame extends JFrame implements MRJQuitHandler {
+public class AppFrame extends JFrame {
 
     public MonController controller;
 
@@ -45,7 +43,6 @@ public class AppFrame extends JFrame implements MRJQuitHandler {
         controller = new MonController(this);
 
         Toolkit.getDefaultToolkit().setDynamicLayout(false);
-        MRJApplicationUtils.registerQuitHandler(this);
 
         // Start Rserve
         RService.init();

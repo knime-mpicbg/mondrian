@@ -1,14 +1,12 @@
 package de.mpicbg.sweng.mondrian;
 
-import com.apple.mrj.MRJApplicationUtils;
-import com.apple.mrj.MRJOpenDocumentHandler;
 import de.mpicbg.sweng.mondrian.io.DataFrameConverter;
 
 import java.io.File;
 import java.util.Vector;
 
 
-public class MondrianStarter implements MRJOpenDocumentHandler {
+public class MondrianStarter {
 
 
     /**
@@ -23,8 +21,6 @@ public class MondrianStarter implements MRJOpenDocumentHandler {
 
         AppFrame appFrame = new AppFrame();
 
-
-        MRJApplicationUtils.registerOpenDocumentHandler(this);
 
         if (dataFileName != null) {
             File dataFile = new File(dataFileName);

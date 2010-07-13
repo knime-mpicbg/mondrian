@@ -1,0 +1,30 @@
+<launch4jConfig>
+    <dontWrapJar>false</dontWrapJar>
+    <headerType>gui</headerType>
+    <jar>/Users/brandl/projects/misc/git-mondrian/mondrian.jar</jar>
+    <outfile>/Users/brandl/local/incoming/Mondrian2.exe</outfile>
+    <errTitle></errTitle>
+    <cmdLine></cmdLine>
+    <chdir></chdir>
+    <priority>normal</priority>
+    <downloadUrl>http://java.com/download</downloadUrl>
+    <supportUrl></supportUrl>
+    <customProcName>false</customProcName>
+    <stayAlive>true</stayAlive>
+    <manifest></manifest>
+    <icon>/Users/brandl/projects/misc/git-mondrian/Mondrian.ico</icon>
+    <classPath>
+        <mainClass>de.mpicbg.sweng.mondrian.MondrianStarter</mainClass>
+        <cp>lib/REngine-0.6.jar</cp>
+        <cp>lib/Rserve-0.6.jar</cp>
+        <cp>lib/MRJAdapter.jar</cp>
+    </classPath>
+    <jre>
+        <path></path>
+        <minVersion>1.6.0</minVersion>
+        <maxVersion></maxVersion>
+        <jdkPreference>preferJre</jdkPreference>
+        <initialHeapSize>512</initialHeapSize>
+        <maxHeapSize>1024</maxHeapSize>
+    </jre>
+</launch4jConfig>
