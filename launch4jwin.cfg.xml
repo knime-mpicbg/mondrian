@@ -2,7 +2,7 @@
     <dontWrapJar>false</dontWrapJar>
     <headerType>gui</headerType>
     <jar>mondrian.jar</jar>
-    <outfile>/Users/brandl/local/incoming/Mondrian2.exe</outfile>
+    <outfile>/Users/brandl/local/incoming/Mondrian.exe</outfile>
     <errTitle></errTitle>
     <cmdLine></cmdLine>
     <chdir></chdir>
