@@ -8,7 +8,7 @@ import de.mpicbg.sweng.mondrian.plots.*;
 import de.mpicbg.sweng.mondrian.ui.*;
 import de.mpicbg.sweng.mondrian.ui.transform.TransformAction;
 import de.mpicbg.sweng.mondrian.util.Utils;
-import de.mpicbg.sweng.mondrian.util.r.RService;
+import de.mpicbg.sweng.mondrian.util.r.StartLocalRAction;
 
 import javax.swing.*;
 import java.awt.*;
@@ -43,9 +43,6 @@ public class AppFrame extends JFrame {
         controller = new MonController(this);
 
         Toolkit.getDefaultToolkit().setDynamicLayout(false);
-
-        // Start Rserve
-        RService.init();
 
         Font SF = new Font("SansSerif", Font.BOLD, 12);
         this.setFont(SF);
@@ -141,6 +138,10 @@ public class AppFrame extends JFrame {
         options.addSeparator();
 
         options.add(new JMenuItem(new StartModelNavAction("Model Navigator", controller)));
+        options.addSeparator();
+
+        options.add(new JMenuItem(new StartLocalRAction("Launch RServe...")));
+
         options.addSeparator();
 
         options.add(new JMenuItem(new PreferencesAction("Preferences ...", this)));

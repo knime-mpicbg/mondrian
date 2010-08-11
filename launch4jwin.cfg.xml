@@ -1,24 +1,18 @@
 <launch4jConfig>
-    <dontWrapJar>false</dontWrapJar>
+    <dontWrapJar>true</dontWrapJar>
     <headerType>gui</headerType>
     <jar>mondrian.jar</jar>
-    <outfile>/Users/brandl/local/incoming/Mondrian.exe</outfile>
+    <outfile>/Volumes/tds/transfer/brandl/Mondrian.exe</outfile>
     <errTitle></errTitle>
     <cmdLine></cmdLine>
     <chdir></chdir>
     <priority>normal</priority>
     <downloadUrl>http://java.com/download</downloadUrl>
     <supportUrl></supportUrl>
-    <customProcName>true</customProcName>
+    <customProcName>false</customProcName>
     <stayAlive>true</stayAlive>
     <manifest></manifest>
-    <icon>/Users/brandl/projects/misc/git-mondrian/Mondrian.ico</icon>
-    <classPath>
-        <mainClass>de.mpicbg.sweng.mondrian.MondrianStarter</mainClass>
-        <cp>lib/REngine-0.6.jar</cp>
-        <cp>lib/Rserve-0.6.jar</cp>
-        <cp>mondrian.jar</cp>
-    </classPath>
+    <icon>/Users/brandl/projects/misc/mondrian/Mondrian.ico</icon>
     <jre>
         <path></path>
         <minVersion>1.6.0</minVersion>
@@ -27,4 +21,15 @@
         <initialHeapSize>512</initialHeapSize>
         <maxHeapSize>1024</maxHeapSize>
     </jre>
+    <messages>
+        <startupErr>An error occurred while starting the application.</startupErr>
+        <bundledJreErr>This application was configured to use a bundled Java Runtime Environment but the runtime is
+            missing or corrupted.
+        </bundledJreErr>
+        <jreVersionErr>This application requires a Java Runtime Environment</jreVersionErr>
+        <launcherErr>The registry refers to a nonexistent Java Runtime Environment installation or the runtime is
+            corrupted.
+        </launcherErr>
+        <instanceAlreadyExistsMsg>An application instance is already running.</instanceAlreadyExistsMsg>
+    </messages>
 </launch4jConfig>

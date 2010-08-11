@@ -18,7 +18,7 @@ public class RService {
 
 
     public static boolean hasR() {
-        return hasR;
+        return isRserveRunning();
     }
 
 
