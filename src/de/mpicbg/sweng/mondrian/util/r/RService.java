@@ -18,7 +18,7 @@ public class RService {
 
 
     public static boolean hasR() {
-        return isRserveRunning();
+        return hasR;
     }
 
 
@@ -89,7 +89,10 @@ public class RService {
      * setups you may get more control over R with <<code>launchRserve</code> instead.
      */
     public static boolean checkLocalRserve() {
-        if (isRserveRunning()) return true;
+        if (hasR || isRserveRunning()) {
+            return true;
+        }
+
         String osname = System.getProperty("os.name");
         if (osname != null && osname.length() >= 7 && osname.substring(0, 7).equals("Windows")) {
             System.out.println("Windows: query registry to find where R is installed ...");
@@ -132,6 +135,9 @@ public class RService {
             RConnection c = new RConnection();
             System.out.println("Rserve is running.");
             c.close();
+
+            hasR = true;
+
             return true;
         } catch (Exception e) {
             System.out.println("First connect try failed with: " + e.getMessage());
